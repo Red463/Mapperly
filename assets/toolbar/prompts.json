@@ -1,0 +1,50 @@
+{
+  "tool": "Built-in image_gen",
+  "entries": [
+    {
+      "name": "Locate",
+      "prompt": "Use case: stylized-concept. A single isolated small fantasy game toolbar icon: a golden compass pointer arrow centered in a simple ivory compass ring, unmistakably MY CURRENT LOCATION / center map on player. WoW classic hand-painted map marker style, warm ivory, muted antique brass-gold, small cyan accent, dark brown outline. Bold chunky silhouette legible at 20 pixels. Minimal internal details, crisp edges, front view, centered fills 80 percent square. Genuine transparent background. No tile, no frame, no shadows behind, no lettering, no multiple icons. Production raster asset for Mapperly alongside painted hearthstone and mailbox icons.",
+      "source": "exec-f73d7402-6b84-4a59-a03b-a3a6c451d1ef.png"
+    },
+    {
+      "name": "AddNote",
+      "prompt": "Use case: stylized-concept. Single isolated fantasy-game toolbar icon for Mapperly. Subject: A parchment note with a single ivory quill pen and a large clean gold PLUS sign at lower right: unmistakable ADD MAP NOTE. Style: WoW classic hand-painted map-marker art matching warm painted mailbox, hearthstone and winged boot markers. Muted antique brass-gold, warm ivory highlights, dark brown outline, very sparse cyan accent only if appropriate. Bold chunky silhouette, extremely simple shapes legible at 20 pixels, crisp edges, centered fills 80 percent of square. Genuine transparent background with transparent holes. No tile, no frame or border, no lettering, no shadows behind, no scene, no duplicate icons. Production raster asset.",
+      "source": "exec-25b696ba-f983-46ff-b8eb-4836d4fffe77.png"
+    },
+    {
+      "name": "Filters",
+      "prompt": "Use case: stylized-concept. Single isolated fantasy-game toolbar icon for Mapperly. Subject: A single large brass funnel, unmistakable FILTER control; wide open top tapering to short narrow stem, ivory highlights. Style: WoW classic hand-painted map-marker art matching warm painted mailbox, hearthstone and winged boot markers. Muted antique brass-gold, warm ivory highlights, dark brown outline, very sparse cyan accent only if appropriate. Bold chunky silhouette, extremely simple shapes legible at 20 pixels, crisp edges, centered fills 80 percent of square. Genuine transparent background with transparent holes. No tile, no frame or border, no lettering, no shadows behind, no scene, no duplicate icons. Production raster asset.",
+      "source": "exec-557c99a0-e3d4-41b7-8f55-79045188129d.png"
+    },
+    {
+      "name": "Reveal",
+      "prompt": "Use case: stylized-concept. Single isolated fantasy-game toolbar icon for Mapperly. Subject: One large open ivory-and-gold EYE with cyan iris, unmistakable REVEAL UNEXPLORED MAP. Style: WoW classic hand-painted map-marker art matching warm painted mailbox, hearthstone and winged boot markers. Muted antique brass-gold, warm ivory highlights, dark brown outline, very sparse cyan accent only if appropriate. Bold chunky silhouette, extremely simple shapes legible at 20 pixels, crisp edges, centered fills 80 percent of square. Genuine transparent background with transparent holes. No tile, no frame or border, no lettering, no shadows behind, no scene, no duplicate icons. Production raster asset.",
+      "source": "exec-9bcd645d-5473-44fe-a1ff-e13cc19d8c22.png"
+    },
+    {
+      "name": "Lock",
+      "prompt": "Use case: stylized-concept. Single isolated fantasy-game toolbar icon for Mapperly. Subject: One simple brass PADLOCK with thick rounded shackle and dark keyhole, unmistakable LOCK MAP POSITION. Style: WoW classic hand-painted map-marker art matching warm painted mailbox, hearthstone and winged boot markers. Muted antique brass-gold, warm ivory highlights, dark brown outline, very sparse cyan accent only if appropriate. Bold chunky silhouette, extremely simple shapes legible at 20 pixels, crisp edges, centered fills 80 percent of square. Genuine transparent background with transparent holes. No tile, no frame or border, no lettering, no shadows behind, no scene, no duplicate icons. Production raster asset.",
+      "source": "exec-b19c26d2-72b0-4bdc-9d75-d82d47669a9c.png"
+    },
+    {
+      "name": "Settings",
+      "prompt": "Use case: stylized-concept. Single isolated fantasy-game toolbar icon for Mapperly. Subject: One chunky gold COGWHEEL with eight thick teeth and a dark central hole, unmistakable SETTINGS. Style: WoW classic hand-painted map-marker art matching warm painted mailbox, hearthstone and winged boot markers. Muted antique brass-gold, warm ivory highlights, dark brown outline, very sparse cyan accent only if appropriate. Bold chunky silhouette, extremely simple shapes legible at 20 pixels, crisp edges, centered fills 80 percent of square. Genuine transparent background with transparent holes. No tile, no frame or border, no lettering, no shadows behind, no scene, no duplicate icons. Production raster asset.",
+      "source": "exec-94d8059e-ff14-4b4d-85c2-33d8d0941b48.png"
+    },
+    {
+      "name": "Resize",
+      "prompt": "Use case: stylized-concept. Single isolated fantasy-game toolbar icon for Mapperly. Subject: Two broad antique-gold arrows pointing diagonally apart toward upper-right and lower-left, unmistakable ENLARGE / RESIZE MAP. Style: WoW classic hand-painted map-marker art matching warm painted mailbox, hearthstone and winged boot markers. Muted antique brass-gold, warm ivory highlights, dark brown outline, very sparse cyan accent only if appropriate. Bold chunky silhouette, extremely simple shapes legible at 20 pixels, crisp edges, centered fills 80 percent of square. Genuine transparent background with transparent holes. No tile, no frame or border, no lettering, no shadows behind, no scene, no duplicate icons. Production raster asset.",
+      "source": "exec-9bf7a050-e475-4840-b891-fc5c4df98784.png"
+    },
+    {
+      "name": "Close",
+      "prompt": "Use case: stylized-concept. Single isolated fantasy-game toolbar icon for Mapperly. Subject: A large simple ivory-and-gold diagonal X cross, unmistakable CLOSE WINDOW, not crossed swords. Style: WoW classic hand-painted map-marker art matching warm painted mailbox, hearthstone and winged boot markers. Muted antique brass-gold, warm ivory highlights, dark brown outline, very sparse cyan accent only if appropriate. Bold chunky silhouette, extremely simple shapes legible at 20 pixels, crisp edges, centered fills 80 percent of square. Genuine transparent background with transparent holes. No tile, no frame or border, no lettering, no shadows behind, no scene, no duplicate icons. Production raster asset.",
+      "source": "exec-283a0feb-b3a7-452c-baad-19e38ddb3fe9.png"
+    },
+    {
+      "name": "ParentMap",
+      "prompt": "Use case: stylized-concept. Single isolated fantasy-game toolbar icon for Mapperly. Subject: A small unfurled parchment MAP with a single prominent gold upward curved arrow rising above it, unmistakable GO UP TO CONTINENT / PARENT MAP. Style: WoW classic hand-painted map-marker art matching warm painted mailbox, hearthstone and winged boot markers. Muted antique brass-gold, warm ivory highlights, dark brown outline, very sparse cyan accent only if appropriate. Bold chunky silhouette, extremely simple shapes legible at 20 pixels, crisp edges, centered fills 80 percent of square. Genuine transparent background with transparent holes. No tile, no frame or border, no lettering, no shadows behind, no scene, no duplicate icons. Production raster asset.",
+      "source": "exec-2baf4428-50dd-45bd-9574-e22d5f70c2b0.png"
+    }
+  ]
+}

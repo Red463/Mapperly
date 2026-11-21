@@ -1,0 +1,13 @@
+# Coordinate navigation
+
+Add a standalone Mapperly destination guide similar to Gatherly's arrow. A new right-rail arrow button opens a small coordinate window for the currently viewed map, displaying its name and requiring X/Y percentages from 0 through 100. Decimal values are supported. Start validates input and map geometry before replacing an active destination; errors remain visible in the window. Stop navigation is available there and through right-clicking the HUD arrow.
+
+The guide uses Mapperly's bundled HereBeDragons library for world positions, allowing direction and yard distance across adjacent zones on the same world instance. It samples position at 10 Hz and smooths rotation against current player facing every frame. Unavailable or protected positions and different world instances show an explanatory waiting state, never an invented direction. It is a straight-line bearing, not terrain/boat/portal routing. Arrival within ten yards clears the target.
+
+The movable HUD is independent of the world map and remains visible after closing it. Use the existing user-owned Gatherly GuideArrow artwork, bundled into Mapperly; no runtime dependency or control over Gatherly's routes/arrow. Initial HUD placement is slightly right of center so both addons can be used together. Save only its position; destination is session-only and clears on reload. The active destination has a dedicated native map pin, independent of location filters and custom notes.
+
+Use the existing charcoal/gold style and hover hints. Coordinate entry targets the map captured when opening the window, even if the map changes behind it. Continent/zone maps with valid world geometry are supported; disconnected world overview maps are rejected if projection is unavailable. The input window has X, Y, Start, Stop and Close, with Enter to start and Escape to dismiss. Settings and permanent note data remain unchanged.
+
+Validation: malformed/out-of-range/empty coordinates, exact boundaries, preserved target on invalid replacement, map capture, cardinal bearings, angular wrap/smoothing, cross-zone versus cross-instance, missing/protected coordinates, arrival/cancel, HUD dragging, map pin filtering independence, map close, and ZIP integrity. Native visual behavior remains subject to in-game verification.
+
+Version 0.1.30: the destination map pin now uses the generated painted Destination marker (gold rim, ruby-red center) via the shared size-tier texture path. The HUD and rail navigation arrow retain GuideArrow. Both pin interactions and filter-independent visibility remain unchanged. Source artwork/prompt: assets/Destination.png and assets/Destination-prompt.json.

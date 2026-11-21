@@ -1,0 +1,6 @@
+{
+  "tool": "Built-in image_gen",
+  "reference": "assets/Hearthstone.png (style reference)",
+  "prompt": "Use case: stylized-concept. Create ONE standalone NAVIGATION DESTINATION MAP MARKER. The attached hearthstone image is STYLE REFERENCE ONLY: match its chunky hand-painted classic fantasy game map-icon treatment, warm ivory highlights, dark brown outlines, restrained painted shading. Subject is a highly recognizable compact teardrop-shaped destination pin, point facing straight down, thick antique-brass/gold rim, a bold ruby-red center inset with a small warm ivory circular highlight. Symmetrical front view, simple solid shapes, no tiny ornament. Must stand out clearly against a tan parchment game map and remain legible at 18-24 pixels. Fill about 85 percent of a square composition. Genuine transparent background, no black square, no tile, no frame behind, no scene, no glow cloud, no ground shadow, no lettering. This is a physical painted fantasy waypoint pin, not a flat modern vector symbol or an arrow.",
+  "source": "exec-b0222c00-4bbd-42c5-82a6-ddd05d49ae7c.png"
+}

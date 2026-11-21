@@ -1,0 +1,6 @@
+{
+  "tool": "Built-in image_gen edit",
+  "reference": "assets/Dungeon-light-blue.png",
+  "prompt": "Edit only the portal interior in the attached dungeon icon. Make the blue swirl a BIT SIMPLER while retaining its hand-painted fantasy appearance: a single loose spiral of THREE broad soft-edged painted blue ribbons with subtle smooth shading and one pale-blue highlight, fewer fine streaks, no tiny turbulent wisps. It must still look like painted magical light, NOT a flat vector logo, NOT crisply separated solid-color geometric spiral bands. Keep the original lighter azure-blue palette and a readable center. Preserve the doorway frame, stone details, gold trim, blue gemstone, proportions, placement, dark outlines and transparent outer background exactly. This is a restrained reduction of texture detail, not a new design.",
+  "source": "exec-b76a5e5c-9d56-4249-a23f-e655bacde31b.png"
+}

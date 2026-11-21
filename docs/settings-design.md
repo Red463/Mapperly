@@ -1,0 +1,9 @@
+# Settings window refresh
+
+Requested: improve the options window, show icons beside location names, and preview map marker size while changing it.
+
+Settings.lua keeps the existing two pages and saved settings. The 640 by 676 UI-unit window has a Mapperly crest/title header, charcoal panels, muted bronze edges, gold section titles and highlighted flat page tabs. Display, map/marker size and opacity have separate panels. The location page uses alternating rows, 24-unit marker icons beside all eight names, and aligned Show / On continents columns. Reset position and Done remain at the bottom; layer bulk actions remain on their page. The window is draggable, Escape-closeable and scales to the available screen space.
+
+The marker-size slider has a live sample panel for inn, mailbox, dungeon and flight-master icons. UpdateMarkerPreview runs on slider changes and settings sync. It applies db.iconSize directly and uses SetPinTexture, sharing the map's Small/Medium texture choice. Four 60-unit-spaced sample centers fit the largest 36-unit markers without overlap. Preview controls never enter the live map pin pool or alter notes and data.
+
+Tests cover all eight row icons, preview dimensions at 12/28/36, texture-tier switching, saved preview restoration, page selection/highlight, opacity and filters persistence, and fit on an 800 by 600 screen. Layout previews are saved at output/mapperly-settings-appearance-preview.png and output/mapperly-settings-layers-preview.png; these are drawn layout references using actual marker artwork, not client screenshots. Native font, checkbox and slider appearance still need an in-game check.

@@ -1,0 +1,9 @@
+{
+  "tool": "Built-in image_gen edit",
+  "references": [
+    "assets/Dungeon-simple.png",
+    "assets/Dungeon-light-blue.png"
+  ],
+  "prompt": "Create a restrained midpoint edit of the BLUE PORTAL INTERIOR between these two references. Image 1 is the edit target: its smooth soft swirl is too simple and blurry. Image 2 is detail reference: its many fine energetic streaks are too busy. Change only the interior of image 1 to a clearly defined azure magic spiral with four or five moderately broad hand-painted ribbon streaks, sharper luminous pale-blue edges, subtle brush texture and a little depth. More structure and crisp highlights than image 1, but about HALF the fine streak detail of image 2. Keep a readable dark-blue central curl and irregular painterly edges; no flat vector bands, no sparks or tiny filaments. Keep the lighter blue palette. Preserve the stone doorway, gold trim, gemstone, silhouette, scale, placement and transparency of image 1 exactly. Genuine transparent background.",
+  "source": "exec-b7e24b4e-dc34-46d1-a637-e20fc1b69c4e.png"
+}

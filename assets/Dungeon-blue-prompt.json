@@ -1,0 +1,6 @@
+{
+  "tool": "Built-in image_gen edit",
+  "reference": "assets/portal-reference.png (upper-right tile of marker-atlas.png)",
+  "prompt": "Precisely recolor this single portal map icon for use as the DUNGEON marker. Preserve the same stone doorway silhouette, every stone block, gold trim, top diamond-shaped gem, perspective, chunky painted style, dark outline, and proportions. Change ONLY the purple magical vortex, purple reflections/runes and purple gemstone to BLUE: saturated azure/cobalt blue vortex with pale ice-blue highlights, blue gemstone and subtle blue reflected light. Keep stone brown-gray and trim antique gold. No redesign, no new objects, no text. One centered isolated icon, genuine transparent background including the area outside the doorway. Avoid any opaque dark rectangular background. Artwork should be crisp and clearly readable when reduced to 18-24 pixels.",
+  "source": "exec-d2a0cec2-09d3-4425-bd11-c41384b30ff8.png"
+}

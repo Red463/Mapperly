@@ -1,0 +1,205 @@
+local _,A=...
+local button=A.CreateIconButton
+function A.UpdateCoordinates()
+    if not A.playerCoordinates then return end
+    local player,cursor=A.playerCoordinates,A.cursorCoordinates
+    if not A.db.coordinates then player:SetText('');cursor:SetText('');return end
+    local id=A.map:GetMapID()
+    local pos=id and C_Map.GetPlayerMapPosition(id,'player')
+    local text='Player: --, --'
+    if pos then local x,y=pos:GetXY();text=string.format('Player: %.1f, %.1f',x*100,y*100) end
+    player:SetText(text)
+    local x,y=A.map:GetNormalizedCursorPosition()
+    cursor:SetText(x and y and x>=0 and x<=1 and y>=0 and y<=1 and string.format('Cursor: %.1f, %.1f',x*100,y*100) or 'Cursor: --, --')
+end
+function A.ApplyLayout()
+    if A.applying then return end
+    if InCombatLockdown() then A.layoutPending=true;return end
+    A.layoutPending=nil
+    local f=A.map
+    A.applying=true
+    -- Always use the windowed canvas. Native fullscreen is never a Mapperly mode.
+    if f.Minimize then f:Minimize() end
+    A.LayoutShell()
+    f:SetMovable(A.db.compact and not A.db.locked);f:SetClampedToScreen(true)
+    f:ClearAllPoints()
+    if A.db.compact and A.db.position then
+        local p=A.db.position
+        f:SetPoint('TOPLEFT',UIParent,'TOPLEFT',p.x,p.y)
+    else
+        f:SetPoint('CENTER',UIParent,'CENTER',0,0)
+    end
+    A.UpdateButtonStates()
+    A.applying=nil
+    A.UpdateOpacity()
+    A.QueueViewportFit()
+end
+function A.Refresh()
+    if not A.map or not A.db or not A.map:IsShown() then return end
+    if A.LoadServices then A.LoadServices() end
+    A.RefreshPins();A.RefreshReveal()
+    A.AttachZoneLevels()
+    A.UpdateNavigation()
+    A.UpdateButtonStates()
+end
+local function current()
+    local id=C_Map and C_Map.GetBestMapForUnit and C_Map.GetBestMapForUnit('player')
+    if not id then return end
+    A.map:SetMapID(id)
+    if A.map.ResetZoom then A.map:ResetZoom(true) end
+    if A.map.EnumeratePinsByTemplate then
+        for pin in A.map:EnumeratePinsByTemplate('GroupMembersPinTemplate') do
+            if pin.StopPlayerPing then pin:StopPlayerPing() end
+            if pin.UpdatePlayerPins then pin:UpdatePlayerPins() end
+            if pin.StartPlayerPing then pin:StartPlayerPing(2,.25) end
+        end
+    end
+end
+function A.ShowNote(map,x,y)
+    local dialog=StaticPopup_Show('MAPPERLY_NOTE',nil,nil,{map=map,x=x,y=y})
+    local edit=dialog and A.NoteEditBox(dialog)
+    if edit then edit:SetText('');edit:SetFocus()
+    else A.Print('The note dialog is unavailable. Close another popup and try again.') end
+end
+local labels={mail='Mailboxes',inn='Inns',dungeon='Dungeon entrances',flight='Flight masters',transport='Boats and zeppelins',portal='Portals',border='Zone exits',notes='Custom notes'}
+local function menuEntry(text,fn,checked,tip)
+    local info=UIDropDownMenu_CreateInfo();info.text=text;info.func=fn;info.checked=checked
+    info.isNotRadio=true;info.keepShownOnClick=true;info.notCheckable=checked==nil
+    if tip then info.tooltipTitle=text;info.tooltipText=tip;info.tooltipOnButton=true end
+    UIDropDownMenu_AddButton(info,1)
+end
+function A.BuildMenu(_,level)
+    if level~=1 then return end
+    local map=A.map:GetMapID();local counts={}
+    for _,p in ipairs(A.PinsForMap(map)) do counts[p.category]=(counts[p.category] or 0)+1 end
+    for _,category in ipairs(A.categories) do
+        local k=category
+        local tip=(k=='inn' or k=='mail') and 'Bundled Forever locations plus services you discover. No other addon is needed; coverage may have gaps.' or nil
+        local suffix=k=='border' and '' or ' ('..(counts[k] or 0)..')'
+        menuEntry(labels[k]..suffix,function() A.db.filters[k]=not A.db.filters[k];A.Refresh() end,A.db.filters[k],tip)
+    end
+    menuEntry('Show all',function() for _,k in ipairs(A.categories) do A.db.filters[k]=true end;A.Refresh() end)
+    menuEntry('Hide all',function() for _,k in ipairs(A.categories) do A.db.filters[k]=false end;A.Refresh() end)
+end
+function A.AttachMap()
+    if A.map or not WorldMapFrame or not WorldMapFrame.GetCanvas then return end
+    A.map=WorldMapFrame
+    local f=A.map
+    local bar=CreateFrame('Frame',nil,f,'BackdropTemplate');A.bar=bar
+    bar:SetSize(540,A.headerHeight);bar:SetPoint('TOPLEFT',f,'TOPLEFT',0,0);bar:SetFrameLevel(f:GetFrameLevel()+100)
+    bar:SetBackdrop({bgFile='Interface\\Tooltips\\UI-Tooltip-Background'});bar:SetBackdropColor(.025,.022,.018,1)
+    local footer=CreateFrame('Frame',nil,f,'BackdropTemplate');A.footer=footer
+    footer:SetSize(540,A.footerHeight);footer:SetPoint('BOTTOMLEFT',f,'BOTTOMLEFT',0,0)
+    footer:SetFrameLevel(f:GetFrameLevel()+100)
+    -- Keep a single opaque coordinate strip above legacy map-coordinate widgets.
+    footer:SetFrameStrata('HIGH');footer:SetFrameLevel(f:GetFrameLevel()+2500)
+    footer:SetBackdrop({bgFile='Interface\\Tooltips\\UI-Tooltip-Background'});footer:SetBackdropColor(.025,.022,.018,1)
+    bar:EnableMouse(true);bar:RegisterForDrag('LeftButton')
+    bar:SetScript('OnDragStart',function() if A.db.compact and not A.db.locked and not InCombatLockdown() then f:StartMoving();A.dragging=true end end)
+    bar:SetScript('OnDragStop',function()
+        if not A.dragging then return end;f:StopMovingOrSizing();A.dragging=nil
+        local ratio=f:GetEffectiveScale()/UIParent:GetEffectiveScale()
+        A.db.position={x=f:GetLeft(),y=f:GetTop()-UIParent:GetHeight()/ratio}
+    end)
+    local function toggleSize()
+        if InCombatLockdown() then A.Print('Map size can be changed after combat.');return end
+        A.db.compact=not A.db.compact;A.ApplyLayout()
+    end
+    -- Replace the native size controls, retaining the shared canvas/pin providers.
+    local border=f.BorderFrame
+    local nativeSize=border and border.MaximizeMinimizeFrame
+    if nativeSize then
+        nativeSize:Hide()
+        nativeSize:HookScript('OnShow',function(s) s:Hide() end)
+    end
+    local rail=CreateFrame('Frame',nil,f,'BackdropTemplate');A.actionRail=rail
+    rail:SetWidth(A.railWidth);rail:SetPoint('TOPRIGHT',f,'TOPRIGHT',0,0)
+    rail:SetPoint('BOTTOMRIGHT',f,'BOTTOMRIGHT',0,0)
+    rail:SetFrameStrata('HIGH');rail:SetFrameLevel(f:GetFrameLevel()+150)
+    rail:SetBackdrop({bgFile='Interface\\Tooltips\\UI-Tooltip-Background'})
+    rail:SetBackdropColor(.025,.027,.03,1)
+    A.zoneHeading=bar:CreateFontString(nil,'OVERLAY','GameFontNormal')
+    A.zoneHeading:SetPoint('LEFT',bar,'LEFT',12,0);A.zoneHeading:SetJustifyH('LEFT');A.zoneHeading:SetWordWrap(false)
+    A.menu=CreateFrame('Frame','MapperlyDropdown',UIParent,'UIDropDownMenuTemplate')
+    UIDropDownMenu_Initialize(A.menu,A.BuildMenu,'MENU')
+    local previous
+    local function control(key,asset,tip,fn,gap)
+        local b=button(rail,asset,fn);b:ClearAllPoints()
+        if previous then b:SetPoint('TOP',previous,'BOTTOM',0,-(gap or 4))
+        else b:SetPoint('TOP',rail,'TOP',0,-4) end
+        previous=b
+        b:HookScript('OnEnter',function(self)
+            GameTooltip:SetOwner(self,'ANCHOR_LEFT')
+            GameTooltip:SetText(type(tip)=='function' and tip() or tip);GameTooltip:Show()
+        end)
+        b:HookScript('OnLeave',function() GameTooltip:Hide() end)
+        A.controls=A.controls or {};A.controls[key]=b;return b
+    end
+    A.closeButton=control('close','Close','Close map',function() if HideUIPanel then HideUIPanel(f) else f:Hide() end end)
+    A.sizeButton=control('size','Resize',function() return A.db.compact and 'Enlarge map' or 'Use compact map' end,toggleSize)
+    A.navigation=control('parent','ParentMap',function()
+        local info=C_Map.GetMapInfo and C_Map.GetMapInfo(f:GetMapID())
+        local parent=info and info.parentMapID and C_Map.GetMapInfo(info.parentMapID)
+        return parent and 'Zoom out to '..parent.name or 'Parent map'
+    end,function()
+        local info=C_Map.GetMapInfo and C_Map.GetMapInfo(f:GetMapID())
+        if info and info.parentMapID and info.parentMapID>0 then f:SetMapID(info.parentMapID) end
+    end,10)
+    control('locate','Locate','My location: return to your zone and ping your arrow',current)
+    control('navigate','Navigate','Navigate to coordinates',function() A.ShowNavigationInput() end)
+    control('notes','AddNote','Add note at player; Alt-click to place anywhere',function()
+        local id=f:GetMapID();local pos=id and C_Map.GetPlayerMapPosition(id,'player')
+        if not pos then
+            id=C_Map.GetBestMapForUnit and C_Map.GetBestMapForUnit('player')
+            pos=id and C_Map.GetPlayerMapPosition(id,'player')
+            if pos then f:SetMapID(id) end
+        end
+        if pos then local x,y=pos:GetXY();A.ShowNote(id,x,y) else A.Print('Alt-click the map to place a note.') end
+    end)
+    control('filters','Filters','Location filters',function(self) ToggleDropDownMenu(1,nil,A.menu,self,0,0) end,10)
+    local quest=control('quests','Quest',function() return A.db.questPane and 'Hide quest log' or 'Show quest log' end,function()
+        A.db.questPane=not A.db.questPane;A.ApplyLayout()
+        if A.SyncSettings then A.SyncSettings() end
+    end)
+    quest.icon:SetSize(24,24)
+    quest.arrow=quest:CreateFontString(nil,'OVERLAY','GameFontNormalSmall')
+    quest.arrow:SetPoint('BOTTOMRIGHT',quest,'BOTTOMRIGHT',-2,2)
+    control('reveal','Reveal',function() return A.db.reveal and 'Hide unexplored terrain' or 'Reveal unexplored terrain' end,function() A.db.reveal=not A.db.reveal;A.Refresh() end)
+    control('lock','Lock',function() return A.db.locked and 'Unlock map position' or 'Lock map position' end,function() A.db.locked=not A.db.locked;A.ApplyLayout() end,10)
+    control('settings','Settings','Open Mapperly settings',A.ShowSettings)
+    A.playerCoordinates=footer:CreateFontString(nil,'OVERLAY','GameFontNormalSmall')
+    A.playerCoordinates:SetPoint('LEFT',footer,'LEFT',10,0);A.playerCoordinates:SetJustifyH('LEFT');A.playerCoordinates:SetWordWrap(false)
+    A.cursorCoordinates=footer:CreateFontString(nil,'OVERLAY','GameFontNormalSmall')
+    A.cursorCoordinates:SetPoint('RIGHT',footer,'RIGHT',-10,0);A.cursorCoordinates:SetJustifyH('RIGHT');A.cursorCoordinates:SetWordWrap(false)
+    A.AttachZoneLevels()
+    f:HookScript('OnShow',function() A.UpdateOpacity(true);A.ApplyLayout();A.Refresh() end)
+    if f.SetMapID then hooksecurefunc(f,'SetMapID',A.Refresh) end
+    if f.Maximize then hooksecurefunc(f,'Maximize',function() if not A.applying then A.db.compact=false;A.ApplyLayout() end end) end
+    if f.Minimize then hooksecurefunc(f,'Minimize',function() if not A.applying then A.db.compact=true;A.ApplyLayout() end end) end
+    if f.SetQuestLogPanelShown then hooksecurefunc(f,'SetQuestLogPanelShown',function(_,shown) if not A.applying then A.db.questPane=not not shown;A.ApplyLayout() end end) end
+    f:HookScript('OnSizeChanged',function() if not A.applying then A.ApplyLayout() end end)
+    f:GetCanvas():HookScript('OnSizeChanged',A.Refresh)
+    if f.ScrollContainer then
+        f.ScrollContainer:HookScript('OnSizeChanged',function() if not A.applying then A.QueueViewportFit() end end)
+    end
+    local clickSurface=f.ScrollContainer or f:GetCanvas()
+    clickSurface:HookScript('OnMouseUp',function(_,mouse)
+        if mouse~='LeftButton' or not IsAltKeyDown() then return end
+        local canvas=f:GetCanvas();local x,y=GetCursorPosition();local scale=canvas:GetEffectiveScale()
+        x=(x/scale-canvas:GetLeft())/canvas:GetWidth();y=(canvas:GetTop()-y/scale)/canvas:GetHeight()
+        if x>=0 and x<=1 and y>=0 and y<=1 then A.ShowNote(f:GetMapID(),x,y) end
+    end)
+    local elapsed=0
+    local serviceRetry=0
+    bar:SetScript('OnUpdate',function(_,dt)
+        elapsed=elapsed+dt;if elapsed<.15 then return end;elapsed=0
+        serviceRetry=serviceRetry+.15
+        if serviceRetry>=5 then serviceRetry=0;if A.LoadServices then A.LoadServices() end end
+        A.UpdateButtonStates()
+        local scale=f:GetCanvas():GetEffectiveScale()
+        if A.lastCanvasScale~=scale then A.lastCanvasScale=scale;A.RefreshPins() end
+        A.UpdateOpacity()
+        A.UpdateCoordinates()
+    end)
+    A.UpdateOpacity(true);A.ApplyLayout();A.Refresh()
+end

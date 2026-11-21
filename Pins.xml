@@ -1,0 +1,9 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
+    <Button name="MapperlyMapPinTemplate" mixin="MapCanvasPinMixin, MapperlyMapPinMixin" enableMouse="true" virtual="true">
+        <Layers>
+            <Layer level="ARTWORK">
+                <Texture parentKey="icon" setAllPoints="true"/>
+            </Layer>
+        </Layers>
+    </Button>
+</Ui>

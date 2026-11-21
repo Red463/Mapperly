@@ -1,0 +1,6 @@
+{
+  "tool": "Built-in image_gen edit",
+  "reference": "assets/Dungeon-blue.png",
+  "prompt": "Make a very small color-only edit to this dungeon map icon. Lighten the blue magical vortex and blue gemstone slightly, from deep cobalt toward a brighter medium sky/azure blue, about 15 percent lighter overall. Keep it clearly blue, not teal, not white and not pastel. Preserve the exact original doorway silhouette, composition, stone colors and texture, gold trim, dark outline, swirl design, highlights and transparency. Do not redraw or redesign any objects. Keep the genuine transparent background.",
+  "source": "exec-061ab7c3-db8d-4907-9842-841b43b00579.png"
+}

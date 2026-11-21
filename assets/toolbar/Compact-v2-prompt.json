@@ -1,0 +1,6 @@
+{
+  "tool": "Built-in image_gen edit",
+  "reference": "assets/toolbar/Resize.png",
+  "prompt": "Edit the supplied expand toolbar icon into its matching COMPACT / CONTRACT counterpart. This is a precise edit, not a redesign. Preserve exactly the same two short chunky gold arrows, same broad arrowheads, short thick shafts, proportions, size, painted texture, gold tones, ivory highlights, brown outline and transparent canvas. Reverse EACH individual arrow in place: the arrow occupying the top-right quadrant should point down-left TOWARD THE CENTER; the arrow occupying the bottom-left quadrant should point up-right TOWARD THE CENTER. Keep their centers and overall footprint similar, adjusting separation just enough to leave a clean gap between inward tips. Do NOT create long thin shafts. Do NOT rotate the entire composition, since that would still point outward. No new ornaments. Genuine transparent background. These must look like a matched pair of expand/compact buttons differing only in arrow direction.",
+  "source": "exec-586cab6b-4c0f-4b33-8601-8167240201dc.png"
+}

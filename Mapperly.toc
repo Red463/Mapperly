@@ -1,0 +1,31 @@
+## Interface: 16001
+## Title: Mapperly
+## Notes: Native world map improvements. /mapperly
+## Author: Tom
+## Version: 1.0.0
+## IconTexture: Interface\AddOns\Mapperly\Media\Icon
+## SavedVariables: MapperlyDB
+## OptionalDeps: Blizzard_WorldMap, Gatherly, RareScanner
+Libs/LibStub.lua
+Libs/CallbackHandler-1.0.lua
+Libs/HereBeDragons-2.0.lua
+Store.lua
+Data/MapReveal.lua
+Data/Places.lua
+Data/FlightData.lua
+Data/ZoneLevels.lua
+ZoneLevels.lua
+Places.lua
+Data/Services.lua
+Services.lua
+Navigation.lua
+Pins.lua
+Pins.xml
+Reveal.lua
+Shell.lua
+Opacity.lua
+Settings.lua
+Buttons.lua
+NavigationUI.lua
+Map.lua
+Core.lua
