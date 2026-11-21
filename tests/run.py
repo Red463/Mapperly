@@ -15,6 +15,8 @@ assert(A.InitStore({iconSize=24}).iconSize==24,'saved marker sizes must remain i
 A.InitStore(db)
 assert(db.scale==1 and db.layoutVersion==2 and db.movingAlpha==.2 and db.filters.mail==false)
 assert(A.InitStore({layoutVersion=2,scale=99}).scale==1.1)
+assert(A.InitStore({layoutVersion=2,scale=.5}).scale==.5,'50 percent compact size must persist on reload')
+assert(A.InitStore({layoutVersion=2,scale=.1}).scale==.5,'invalid compact sizes must clamp to the new minimum')
 A.InitStore(db)
 assert(db.filters.inn and type(db.notes)=='table')
 assert(db.continentFilters and db.continentFilters.dungeon==true and db.continentFilters.inn==false,'overview defaults must show only dungeons')
@@ -36,6 +38,9 @@ assert(not A.ValidPin({map=1,x=-1,y=0,name='bad'}))
 lua.execute((root/'tests/wow.lua').read_text())
 lua.execute('''
 fakeUI()
+C_AddOns={GetAddOnMetadata=function(_,field) return field=='Version' and 'test-version' or nil end}
+GameTooltip.SetOwner=function(self,owner) self.owner=owner end
+GameTooltip.IsOwned=function(self,owner) return self.owner==owner end
 local createFrame=CreateFrame
 CreateFrame=function(kind,...)
  local object=createFrame(kind,...)
@@ -57,6 +62,11 @@ WorldMapFrame.GetScale=function(self) return self.scale or 1 end
 WorldMapFrame.BorderFrame=CreateFrame('Frame')
 WorldMapFrame.BorderFrame.MaximizeMinimizeFrame=CreateFrame('Frame')
 WorldMapFrame.NavBar=CreateFrame('Frame')
+WorldMapFrame.WorldMapTrackingPinButton=CreateFrame('Button',nil,WorldMapFrame)
+WorldMapFrame.AdjustOverlayFrames=function(self)
+ self.WorldMapTrackingPinButton:ClearAllPoints()
+ self.WorldMapTrackingPinButton:SetPoint('TOPLEFT',self.ScrollContainer,'TOPLEFT',3,0)
+end
 WorldMapFrame.BlackoutFrame=CreateFrame('Frame')
 WorldMapFrame.QuestLog=CreateFrame('Frame')
 WorldMapFrame.questLogWidth=333
@@ -78,8 +88,8 @@ questScroll.ResizeBackground=function(self)
  self.Background:SetTexCoord(0,1,0,math.min(1,self:GetHeight()/height))
 end
 WorldMapFrame.SetQuestLogPanelShown=function(self,shown) if shown then self.QuestLog:Show() else self.QuestLog:Hide() end end
-WorldMapFrame.ScrollContainer.GetWidth=function() return WorldMapFrame:GetWidth()-(A.questPaneExtent or 0)-(A.railWidth or 0) end
-WorldMapFrame.ScrollContainer.GetHeight=function() return WorldMapFrame:GetHeight()-(A.headerHeight+A.footerHeight) end
+WorldMapFrame.ScrollContainer.GetWidth=function() return WorldMapFrame:GetWidth()-(A.questPaneExtent or 0)-(A.railWidth or 0)-2*(A.mapInset or 0) end
+WorldMapFrame.ScrollContainer.GetHeight=function() return WorldMapFrame:GetHeight()-(A.headerHeight+A.footerHeight)-(A.mapInset or 0) end
 WorldMapFrame.OnFrameSizeChanged=function(self)
  self.fittedWidth=self.ScrollContainer:GetWidth();self.fittedHeight=self.ScrollContainer:GetHeight()
 end
@@ -118,11 +128,25 @@ WorldMapFrame.AcquirePin=function(self,template,data)
  pin:OnLoad();pin:OnAcquired(data);pin:Show();table.insert(self.nativePins,pin);return pin
 end
 ''')
-for name in ['Data/Places.lua','Data/FlightData.lua','Data/ZoneLevels.lua','ZoneLevels.lua','Places.lua','Data/Services.lua','Services.lua','Navigation.lua','Pins.lua','Reveal.lua','Shell.lua','Opacity.lua','Settings.lua','Buttons.lua','NavigationUI.lua','Map.lua','Core.lua']:
+for name in ['Data/Places.lua','Data/FlightData.lua','Data/ZoneLevels.lua','ZoneLevels.lua','Places.lua','Data/Services.lua','Services.lua','Theme.lua','Destinations.lua','Navigation.lua','Pins.lua','Reveal.lua','Shell.lua','Opacity.lua','Settings.lua','Buttons.lua','Dialogs.lua','NavigationUI.lua','NotesUI.lua','MapInteractions.lua','Map.lua','Core.lua']:
     lua.execute('assert(loadstring(...))("Mapperly", A)', (root/name).read_text(encoding='utf-8-sig'))
 lua.execute('''
 A.AttachMap()
 assert(A.map==WorldMapFrame and A.bar)
+assert(A.bar.mapperlyThemeStyle=='gatherly' and A.actionRail.mapperlyThemeStyle=='gatherly','new theme must style all map chrome')
+assert(A.bar.backdrop==nil and A.headerHeight==26,'Default must remove the zone strip below the native title bar')
+assert(A.mapThemeTrim.themeChrome and A.mapThemeTrim.themeChrome:IsShown(),'Default map must display its native title/portrait chrome')
+assert(A.mapInset==6 and A.footer.point[5]==6 and A.actionRail.point[4]==-6,'map surfaces must leave the native bottom/right frame visible')
+assert(A.mapThemeTrim.themeChrome.title=='Mapperly test-version','map title must include the installed version')
+assert(A.mapThemeTrim.themeChrome.themePortrait:GetWidth()==58 and A.mapThemeTrim.themeChrome.themePortrait.texture:find('Media\\\\Icon',1,true),'map badge must retain the original Mapperly crest')
+assert(A.mapThemeTrim.themeChrome.themePortrait.coords[1]==0 and A.mapThemeTrim.themeChrome.themePortrait.coords[2]==1,'crest must reset inherited portrait cropping')
+A.Theme.Set('original')
+assert(A.bar.mapperlyThemeStyle=='original' and not A.mapThemeTrim:IsShown(),'Original must restore the unframed map')
+assert(A.zoneHeading.point[4]==12 and A.zoneHeading.point[5]==0,'Original must restore the zone heading position')
+assert(A.headerHeight==42 and A.bar:GetHeight()==42,'Original must retain its old header layout')
+A.Theme.Set('gatherly');assert(A.mapThemeTrim:IsShown())
+assert(A.zoneHeading.point[1]=='TOP' and A.zoneHeading.point[2]==A.map.ScrollContainer and A.zoneHeading.point[4]==0,'zone heading must centre over the map viewport')
+assert(A.zoneHeading.fontSize==18 and A.zoneHeading.fontFlags=='OUTLINE' and A.zoneHeading.textColor[1]==1 and A.zoneHeading.textColor[3]==1,'overlaid zone heading must be larger white outlined text')
 assert(A.navigation.rightBorder and not A.navigation.rightBorder:IsShown(),'icon buttons must not retain visible border edges')
 local questScroll=A.map.QuestLog.QuestsFrame.ScrollFrame
 local function fittedQuestBackground()
@@ -169,25 +193,16 @@ A.BuildMenu(nil,1)
 assert(#records==10,'filters should contain only eight pin categories and show/hide all')
 for _,info in ipairs(records) do assert(not info.text:find('opacity') and not info.text:find('Quest pane')) end
 assert(A.controls.quests and A.controls.notes and A.controls.reveal and A.controls.settings)
--- Forever popups expose GetEditBox(), not the legacy lowercase editBox field.
-local popup,edit
-StaticPopup_Show=function(which,_,__,data)
- assert(which=='MAPPERLY_NOTE')
- edit={text='stale',SetText=function(self,v) self.text=v end,GetText=function(self) return self.text end,
-       SetFocus=function(self) self.focused=true end}
- popup={data=data,GetEditBox=function() return edit end,Hide=function(self) self.hidden=true end}
- edit.GetParent=function() return popup end
- return popup
-end
 local savedPosition=C_Map.GetPlayerMapPosition
 C_Map.GetPlayerMapPosition=function(id) if id==1416 then return {GetXY=function() return .3,.6 end} end end
 C_Map.GetBestMapForUnit=function() return 1416 end
 local notesBefore=#A.db.notes
 A.controls.notes:GetScript('OnClick')()
-assert(popup and edit.focused and edit.text=='','Add note must focus the Forever popup edit box')
+local editor=A.noteWindow;local edit=editor.nameInput
+assert(editor:IsShown() and edit:GetText()=='','Add note must open a clean styled editor')
 edit:SetText('Meeting spot')
 A.db.filters.notes=false
-StaticPopupDialogs.MAPPERLY_NOTE.OnAccept(popup,popup.data)
+editor.save:GetScript('OnClick')()
 assert(#A.db.notes==notesBefore+1 and A.db.notes[#A.db.notes].name=='Meeting spot')
 assert(A.db.filters.notes,'new notes must not be hidden by their category filter')
 local visibleNote=false
@@ -197,28 +212,30 @@ local savedGetMapID,savedSetMapID=A.map.GetMapID,A.map.SetMapID
 local noteMap=1431
 A.map.GetMapID=function() return noteMap end
 A.map.SetMapID=function(_,id) noteMap=id end
-popup=nil
 A.controls.notes:GetScript('OnClick')()
-assert(popup and popup.data.map==1416 and noteMap==1416,'Add note from another map must navigate to the player zone')
+assert(editor:IsShown() and editor.targetMap==1416 and noteMap==1416,'Add note from another map must navigate to the player zone')
 edit:SetText('')
-assert(StaticPopupDialogs.MAPPERLY_NOTE.OnAccept(popup,popup.data)==true,'blank note must keep the naming dialog open')
+editor.save:GetScript('OnClick')()
+assert(editor:IsShown() and editor.error:GetText()~='','blank note must keep the editor open')
 edit:SetText('Second spot')
-StaticPopupDialogs.MAPPERLY_NOTE.EditBoxOnEnterPressed(edit,popup.data)
-assert(popup.hidden and #A.db.notes==notesBefore+2,'Enter must save the note and close the dialog')
+edit:GetScript('OnEnterPressed')()
+assert(not editor:IsShown() and #A.db.notes==notesBefore+2,'Enter must save the note and close the dialog')
 A.ShowNote(1416,.2,.4)
 edit:SetText('Cancelled')
-StaticPopupDialogs.MAPPERLY_NOTE.EditBoxOnEscapePressed(edit)
-assert(popup.hidden and #A.db.notes==notesBefore+2,'Escape must close without saving')
+edit:GetScript('OnEscapePressed')()
+assert(not editor:IsShown() and #A.db.notes==notesBefore+2,'Escape must close without saving')
 A.map.GetMapID=savedGetMapID;A.map.SetMapID=savedSetMapID
 C_Map.GetPlayerMapPosition=savedPosition
 A.controls.settings:GetScript('OnClick')()
 assert(A.settingsWindow and A.settingsWindow:IsShown(),'settings action must open a dedicated window')
 assert(A.controls.quests:GetParent()==A.actionRail,'quest toggle must join the right-side icon rail')
-assert(A.bar:GetHeight()==42 and A.controls.filters:GetHeight()==28,'approved raised buttons need breathing room')
+assert(A.bar:GetHeight()==26 and A.controls.filters:GetHeight()==28,'Default must keep only the native title strip')
 assert(A.controls.quests:GetWidth()==28 and A.controls.quests:GetHeight()==28)
+assert(A.closeButton.template=='UIPanelCloseButton' and A.closeButton:GetParent()==A.map,'map close must be a native header button')
+assert(A.sizeButton.point[2]==A.actionRail,'resize must now be the first toolbar control')
 local skinButton=A.controls.filters
 assert(not skinButton.face.gradient and not skinButton.topBevel,'buttons must have a solid flat face without bevels')
-for _,key in ipairs({'locate','navigate','notes','filters','reveal','lock','settings','quests','parent','size','close'}) do
+for _,key in ipairs({'locate','navigate','notes','filters','reveal','lock','settings','quests','parent','size'}) do
  local b=A.controls[key]
  assert(b:GetParent()==A.actionRail and b.iconOnly and b:GetWidth()==28 and b:GetHeight()==28,'every action must be a compact icon on the right rail: '..key)
  assert(b.icon and b.icon:GetWidth()==24 and b:GetText()=='','toolbar artwork must be larger with less padding')
@@ -228,25 +245,60 @@ for _,key in ipairs({'locate','navigate','notes','filters','reveal','lock','sett
  b:GetScript('OnLeave')(b)
 end
 assert(skinButton.face.color[1]<.16,'flat charcoal button fill must be darker')
+for _,case in ipairs({{'quests','questPane','Show quest log','Hide quest log'},{'lock','locked','Lock map position','Unlock map position'},{'reveal','reveal','Reveal unexplored terrain','Hide unexplored terrain'},{'size','compact','Use compact map','Enlarge map'}}) do
+ local b=A.controls[case[1]]
+ local originalState=A.db[case[2]]
+ b:GetScript('OnEnter')(b)
+ assert(GameTooltip:GetText()==(originalState and case[4] or case[3]))
+ b:GetScript('OnClick')(b)
+ assert(GameTooltip:GetText()==(A.db[case[2]] and case[4] or case[3]),'tooltip must update immediately after click: '..case[1])
+ b:GetScript('OnClick')(b)
+ assert(A.db[case[2]]==originalState and GameTooltip:GetText()==(originalState and case[4] or case[3]))
+ b:GetScript('OnLeave')(b)
+end
 local savedCursor=A.map.GetNormalizedCursorPosition
+local tooltipButton=A.controls.lock
+tooltipButton:GetScript('OnEnter')(tooltipButton)
+local otherTooltipOwner=CreateFrame('Frame')
+GameTooltip:SetOwner(otherTooltipOwner,'ANCHOR_RIGHT');GameTooltip:SetText('Another tooltip')
+A.UpdateButtonStates()
+assert(GameTooltip:GetText()=='Another tooltip','state refresh must not overwrite another tooltip owner')
+tooltipButton:GetScript('OnLeave')(tooltipButton)
+assert(GameTooltip:IsShown(),'leaving a button must not hide another owner tooltip')
+GameTooltip:Hide()
+tooltipButton:GetScript('OnEnter')(tooltipButton)
+tooltipButton:Hide()
+assert(not GameTooltip:IsShown() and not tooltipButton.hover,'hiding the control must dismiss its tooltip')
+tooltipButton:Show()
+local oldTooltipSetText=GameTooltip.SetText
+local tooltipWrites=0
+GameTooltip.SetText=function(self,text) tooltipWrites=tooltipWrites+1;oldTooltipSetText(self,text) end
+tooltipButton:GetScript('OnEnter')(tooltipButton)
+for i=1,3 do A.UpdateButtonStates() end
+assert(tooltipWrites==1,'unchanged hovered tooltip must not be redrawn every poll')
+tooltipButton:GetScript('OnClick')(tooltipButton)
+assert(tooltipWrites==2,'changed tooltip must redraw immediately once')
+tooltipButton:GetScript('OnClick')(tooltipButton)
+tooltipButton:GetScript('OnLeave')(tooltipButton)
+GameTooltip.SetText=oldTooltipSetText
 local savedPlayerPosition=C_Map.GetPlayerMapPosition
 A.map.GetNormalizedCursorPosition=function() return .384,.563 end
 C_Map.GetPlayerMapPosition=function() return {GetXY=function() return .799,.568 end} end
 A.UpdateCoordinates()
-assert(A.playerCoordinates:GetText()=='Player: 79.9, 56.8')
-assert(A.cursorCoordinates:GetText()=='Cursor: 38.4, 56.3')
-assert(A.playerCoordinates.point[1]=='LEFT' and A.cursorCoordinates.point[1]=='RIGHT','coordinate fields must occupy separate anchored columns')
+assert(A.coordinateText:GetText()=='Player: 79.9, 56.8  ||  Cursor: 38.4, 56.3')
+assert(A.coordinateText.point[1]=='LEFT','combined coordinates must be left-aligned')
+assert(A.brandText:GetText()=='Mapperly test-version' and A.brandText:GetParent()==A.bar and not A.brandText:IsShown(),'branding must leave the footer and use the native title in Default')
 assert(A.footer:GetFrameStrata()=='HIGH' and A.footer:GetFrameLevel()>2000,'opaque footer must cover older coordinate labels beneath it')
 A.map.GetNormalizedCursorPosition=function() return 2,-1 end
-A.UpdateCoordinates();assert(A.cursorCoordinates:GetText()=='Cursor: --, --','outside-map cursor must have a clean placeholder')
+A.UpdateCoordinates();assert(A.coordinateText:GetText()=='Player: 79.9, 56.8  ||  Cursor: --, --','outside-map cursor must have a clean placeholder')
 A.db.coordinates=false;A.UpdateCoordinates()
-assert(A.playerCoordinates:GetText()=='' and A.cursorCoordinates:GetText()=='')
+assert(A.coordinateText:GetText()=='')
 A.db.coordinates=true
 A.map.GetNormalizedCursorPosition=savedCursor;C_Map.GetPlayerMapPosition=savedPlayerPosition
 local railHeight=4
-for _,key in ipairs({'close','size','parent','locate','navigate','notes','filters','quests','reveal','lock','settings'}) do
+for _,key in ipairs({'size','parent','locate','navigate','notes','filters','quests','reveal','lock','settings'}) do
  local b=A.controls[key]
- railHeight=railHeight+b:GetHeight()+(key=='close' and 0 or (key=='parent' or key=='filters' or key=='lock') and 10 or 4)
+ railHeight=railHeight+b:GetHeight()+(key=='size' and 0 or (key=='parent' or key=='filters' or key=='lock') and 10 or 4)
 end
 assert(railHeight<400,'compact icon rail must remain short enough for the supported compact map')
 local dropdownAnchor
@@ -342,6 +394,7 @@ end
 assert(A.markerPreviews and #A.markerPreviews==4,'size setting must have a representative live marker preview')
 A.settingsControls.alpha:SetValue(65);assert(A.db.alpha==.65,'opacity slider must set explicit percentage')
 A.settingsControls.iconSize:SetValue(28);assert(A.db.iconSize==28)
+assert(A.settingsControls.scale:GetMinMaxValues()==50,'compact size slider must allow 50 percent')
 for _,preview in ipairs(A.markerPreviews) do
  assert(preview.icon:GetWidth()==28 and preview.icon:GetHeight()==28,'preview must follow selected marker dimensions')
  assert(preview.icon.texture:find('Medium',1,true),'preview must use the same size tier as map pins')
@@ -432,6 +485,14 @@ for category,name in pairs({mail='Mail',portal='Portal',notes='Note',border='Zon
  assert(selected=='Interface\\\\AddOns\\\\Mapperly\\\\Media\\\\Markers\\\\'..name)
 end
 QuestieLoader=nil
+local nativePin=A.map.WorldMapTrackingPinButton
+local function checkNativePin()
+ assert(nativePin.point[1]=='TOPRIGHT' and nativePin.point[2]==A.map.ScrollContainer and nativePin.point[4]==-6 and nativePin.point[5]==-6,'Map Pin must remain clear of the crest and left-side addon controls')
+end
+checkNativePin()
+A.map:AdjustOverlayFrames();checkNativePin()
+A.Theme.Set('original');A.ApplyLayout();checkNativePin()
+A.Theme.Set('gatherly');A.ApplyLayout();checkNativePin()
 local compact=A.map:GetHeight()
 assert(compact>=UIParent:GetHeight()*.70,'compact mode should use a substantial screen area')
 assert(not A.map.BorderFrame:IsShown() and not A.map.BlackoutFrame:IsShown())
@@ -465,8 +526,8 @@ for _,dims in ipairs({{1280,720},{2560,1080},{1024,768}}) do
    assert(A.map:GetHeight()*A.map:GetScale()<=dims[2]*.90+.01)
    assert(A.map.ScrollContainer:GetWidth()>0)
    fittedQuestBackground()
-   assert(A.railWidth==32 and A.map.ScrollContainer:GetWidth()+A.questPaneExtent+A.railWidth==A.map:GetWidth(),'narrow rail and quest panel must sit outside the map artwork')
-   assert(A.playerCoordinates:GetWidth()+A.cursorCoordinates:GetWidth()+32==A.footer:GetWidth(),'footer columns must preserve an explicit gap at every map size')
+   assert(A.railWidth==32 and A.map.ScrollContainer:GetWidth()+A.questPaneExtent+A.railWidth+2*(A.mapInset or 0)==A.map:GetWidth(),'narrow rail and quest panel must sit outside the map artwork')
+   assert(A.coordinateText:GetWidth()+20==A.footer:GetWidth(),'footer coordinates must use the space freed by title-bar branding')
    if shown then
     assert(A.map.QuestLog:GetWidth()>=333,'compact mode must preserve native quest-control width')
     assert(A.controls.quests.arrow:GetText()=='<')
@@ -475,6 +536,25 @@ for _,dims in ipairs({{1280,720},{2560,1080},{1024,768}}) do
  end
 end
 UIParent:SetSize(1920,1080)
+local savedCompactScale=A.db.scale
+for _,dims in ipairs({{1920,1080},{1280,720},{1024,768},{800,600}}) do
+ UIParent:SetSize(dims[1],dims[2])
+ for _,scale in ipairs({.5,.75,1.1}) do
+  for _,shown in ipairs({true,false}) do
+   A.db.compact=true;A.db.scale=scale;A.db.questPane=shown;A.ApplyLayout()
+   assert(A.map:GetWidth()<=dims[1]*.92+.01 and A.map:GetHeight()<=dims[2]*.9+.01,'smaller compact map must fit the screen')
+   assert(A.map.ScrollContainer:GetWidth()>=320,'minimum viewport must remain useful even with the quest pane')
+   assert(A.minimumRailHeight and A.minimumRailHeight*(A.actionRail.scale or 1)+(A.railTopOffset or 0)<=A.map:GetHeight()-(A.mapInset or 0)+.01,'all toolbar controls must fit below the header at the minimum compact size')
+   if shown then assert(A.map.QuestLog:GetWidth()>=333,'quest text must retain its native width at 50 percent') end
+   fitted()
+  end
+ end
+end
+UIParent:SetSize(1920,1080);A.db.questPane=false;A.db.scale=1;A.ApplyLayout()
+local fullCompactWidth=A.map:GetWidth()
+A.settingsControls.scale:SetValue(50)
+assert(A.db.scale==.5 and A.map:GetWidth()<fullCompactWidth*.65,'50 percent must produce a substantially smaller map when space allows')
+A.db.scale=savedCompactScale
 A.db.compact=true;A.ApplyLayout()
 A.Refresh()
 assert(#A.PlacesForMap(1416)>0)
@@ -548,16 +628,22 @@ A.map.GetMapID=function() return 1415 end
 A.map.GetNormalizedCursorPosition=function() return .5,.5 end
 C_Map.GetMapInfoAtPosition=function() return {mapID=1431,name='Duskwood'} end
 local label=CreateFrame('Frame');label.Name=label:CreateFontString()
+label:SetPoint('TOP',A.map.ScrollContainer,'TOP',0,-10)
+label.GetPoint=function(self) return unpack(self.point) end
+label.GetNumPoints=function() return 1 end
 label.labelInfoByType={[3]={name='Duskwood'}}
 label.GetHighestPriorityLabelInfo=function(self) return self.labelInfoByType[3] end
 label:SetScript('OnUpdate',function(self) self.Name:SetText('Duskwood') end)
 local oldProviders=A.map.dataProviders
 A.map.dataProviders={[{Label=label}]=true}
 A.AttachZoneLevels();A.AttachZoneLevels()
+assert(label.point[2]==A.map.ScrollContainer and label.point[5]==-40,'native hover text must occupy its own row below the zone heading')
 for i=1,3 do label:GetScript('OnUpdate')(label);assert(label.Name:GetText()=='Duskwood (18–30)') end
 label.GetHighestPriorityLabelInfo=function() return {name='Higher-priority POI'} end
 label.Name:SetText('Higher-priority POI');A.UpdateHoverZoneLabel(label)
 assert(label.Name:GetText()=='Higher-priority POI','zone hover must not overwrite POI banners')
+A.Theme.Set('original');assert(label.point[5]==-10,'Original must restore the native hover label position')
+A.Theme.Set('gatherly');assert(label.point[5]==-40,'Default must separate hover labels again after theme switching')
 A.map.dataProviders=oldProviders;A.map.GetMapID=oldMapID;A.map.GetNormalizedCursorPosition=oldCursor
 C_Map.GetMapInfo=oldInfo;C_Map.GetMapLevels=oldLevels;C_Map.GetMapInfoAtPosition=oldAtPosition
 local pin=CreateFrame('Button');pin.data={category='dungeon',name='Gnomeregan (29–38)',description='Should not show'}
@@ -571,7 +657,9 @@ A.ApplyLayout();assert(A.layoutPending)
 ''')
 print('PASS: standalone services without Questie, Forever projection, faction filtering, discovery persistence/deduplication; Lua syntax, settings, native pins, sizing, opacity and locate ping')
 from PIL import Image
-for name in ['Boat','Zeppelin','Airship','Portal','Dungeon','Mail','Note','ZoneExit','Hearthstone','FlightMaster','Quest','Destination']:
+marker_names=['Boat','Zeppelin','Airship','Portal','Dungeon','Mail','Note','ZoneExit','Hearthstone','FlightMaster','Quest','Destination']
+marker_names += ['Note'+name for name in ['Enemy','Chest','POI','Scenic','Building','Danger','Camp','Meeting','Resource','Fishing','Cave','Travel']]
+for name in marker_names:
     path=root/'Media/Markers'/f'{name}.tga'
     with Image.open(path) as icon:
         assert icon.mode=='RGBA' and icon.size==(128,128)
@@ -586,8 +674,8 @@ for folder,size in [('Small',32),('Medium',64)]:
             assert icon.mode=='RGBA' and icon.size==(size,size)
             for point in [(0,0),(size-1,0),(0,size-1),(size-1,size-1)]: assert icon.getpixel(point)[3]==0
         assert path.read_bytes()[2]==2
-    assert len(list((root/'Media/Markers'/folder).glob('*.tga')))==12
-print('PASS: 36 WoW marker textures, size variants, transparent corners and valid TGA encoding')
+    assert len(list((root/'Media/Markers'/folder).glob('*.tga')))==len(marker_names)
+print('PASS: 72 WoW marker textures, size variants, transparent corners and valid TGA encoding')
 toolbar_names=['Locate','AddNote','Filters','Reveal','Lock','Settings','Resize','Compact','Close','ParentMap','Quest']
 for folder,size in [('',128),('Medium',64),('Small',32)]:
     for name in toolbar_names:

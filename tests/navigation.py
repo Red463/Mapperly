@@ -33,10 +33,11 @@ LibStub=function() return hbd end
 refreshes=0;A.RefreshPins=function() refreshes=refreshes+1 end
 messages={};A.Print=function(s) messages[#messages+1]=s end
 ''')
-for name in ['Store.lua','Buttons.lua','Navigation.lua','NavigationUI.lua']:
+for name in ['Store.lua','Theme.lua','Destinations.lua','Buttons.lua','Pins.lua','Navigation.lua','Dialogs.lua','NavigationUI.lua']:
     path=root/name
     if path.exists(): lua.execute('assert(loadstring(...))("Mapperly",A)',path.read_text(encoding='utf-8-sig'))
 lua.execute('''
+A.RefreshPins=function() refreshes=refreshes+1 end
 A.InitStore({})
 local N=A.Navigation
 assert(N and N.Parse,'navigation must expose coordinate validation')
@@ -49,6 +50,10 @@ local first=N.target
 assert(first.map==1431 and first.x==.5 and first.worldX==500)
 assert(not N.Start(1431,'bad','50') and N.target==first,'invalid replacement must preserve destination')
 assert(not N.Start(999,'50','50') and N.target==first,'unmapped destination must preserve destination')
+assert(#A.db.destinationHistory==1,'only successful starts belong in history')
+assert(N.ToPin({map=1431,x=.5,y=.5,name='Inn'}))
+assert(N.target.name=='Inn' and #A.db.destinationHistory==1,'marker navigation retains its name and deduplicates history')
+first=N.target
 local function near(a,b) assert(math.abs(a-b)<.00001,tostring(a)..' vs '..tostring(b)) end
 near(N.Bearing(0,100),0);near(N.Bearing(-100,0),-math.pi/2)
 near(N.Bearing(100,0),math.pi/2);near(math.abs(N.Bearing(0,-100)),math.pi)

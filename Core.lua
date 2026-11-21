@@ -1,21 +1,6 @@
 local _,A=...
+A.version=(C_AddOns and C_AddOns.GetAddOnMetadata and C_AddOns.GetAddOnMetadata('Mapperly','Version')) or (GetAddOnMetadata and GetAddOnMetadata('Mapperly','Version')) or 'Unknown'
 function A.Print(s) DEFAULT_CHAT_FRAME:AddMessage('|cffffd100Mapperly:|r '..s) end
-function A.NoteEditBox(dialog)
-    return dialog.GetEditBox and dialog:GetEditBox() or dialog.editBox
-end
-local function acceptNote(dialog,data)
-    local edit=A.NoteEditBox(dialog)
-    if not data or not edit or not A.AddNote(data.map,data.x,data.y,edit:GetText()) then return true end
-    A.db.filters.notes=true
-    A.Refresh()
-end
-StaticPopupDialogs.MAPPERLY_NOTE={text='Name this map note',button1=ACCEPT,button2=CANCEL,hasEditBox=true,maxLetters=120,timeout=0,whileDead=true,hideOnEscape=true,preferredIndex=3,
-    OnAccept=acceptNote,
-    EditBoxOnEnterPressed=function(edit,data)
-        local dialog=edit:GetParent()
-        if not acceptNote(dialog,data or dialog.data) then dialog:Hide() end
-    end,
-    EditBoxOnEscapePressed=function(edit) edit:GetParent():Hide() end}
 local events=CreateFrame('Frame')
 for _,event in ipairs({'ADDON_LOADED','PLAYER_LOGIN','PLAYER_REGEN_ENABLED','DISPLAY_SIZE_CHANGED','UI_SCALE_CHANGED','MAIL_SHOW','TAXIMAP_OPENED','GOSSIP_SHOW','CONFIRM_BINDER','MAP_EXPLORATION_UPDATED'}) do events:RegisterEvent(event) end
 events:SetScript('OnEvent',function(_,event,name)
@@ -38,7 +23,7 @@ SLASH_MAPPERLY1='/mapperly'
 SlashCmdList.MAPPERLY=function(msg)
     if not A.db then return end
     if msg=='debug' then
-        A.Print('Build 1.0.0; map '..tostring(A.map and A.map:GetMapID())..'; registered pins '..#A.pinPool)
+        A.Print('Build '..A.version..'; map '..tostring(A.map and A.map:GetMapID())..'; registered pins '..#A.pinPool)
         for i,pin in ipairs(A.pinPool) do
             if i>10 then break end
             local p=pin.data

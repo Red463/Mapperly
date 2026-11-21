@@ -1,5 +1,39 @@
 # Changelog
 
+## 1.1.0 - 2026-11-21
+
+All changes since 1.0.0 are consolidated into this release. Interim local development build numbers are superseded by 1.1.0.
+
+### Navigation and destinations
+
+- Navigate directly to map markers or place a quick waypoint with **Alt-right-click**, preserving normal marker actions and the game's Ctrl-click ping system.
+- Save named destinations and revisit the latest 20 unique destinations through Coordinates, Saved and Recent tabs. Favourites and history survive reloads.
+- Preserve exact marker positions for Mapperly and supported native/addon pins, and avoid placing waypoints while dragging.
+
+### Custom notes
+
+- Add and edit note names, descriptions, groups and icons in a dedicated window matching Settings.
+- Browse and search notes across all zones, navigate to them, share coordinates with Shift-click, or remove them with right-click.
+- Choose from twelve new painted symbols with transparent, size-matched textures. Icons have no purpose labels, so players can use each symbol however they wish. Existing notes and older icon choices are preserved.
+
+### Appearance and map layout
+
+- Add the new **Default** theme with warm Classic panels, Blizzard-style frames, native tabs and primary actions. Retain **Original** as a remembered Settings option, with immediate switching that preserves open drafts.
+- Refine settings, notes and destination windows, including native button captions and tab spacing.
+- Add a fitted original Mapperly crest and standard Blizzard close button. Show Mapperly and the installed version in the title bar.
+- Match the right toolbar and footer to the brown header styling, with consistent borders and controls positioned below the header.
+- Centre the zone name and level range in larger white outlined text; keep native hover/POI labels on a separate row.
+- Move Blizzard's Map Pin control to the upper-right of the map, clear of the crest and left-side addon controls.
+
+### Usability and compatibility
+
+- Extend compact map sizing down to **50%**, keeping text, marker sizes and the native quest-pane width intact. Fit all toolbar actions on smaller screens.
+- Keep player and cursor coordinates together at the left of the footer, separated by a pipe.
+- Refresh hovered toolbar tooltips immediately after clicks and state changes.
+- Expand automated coverage for saved destinations, note editing, themes, native pin interactions, map layout and small-screen fitting.
+
+Updating from 1.0.0 preserves saved settings, custom notes and other existing preferences. No Gatherly or Questie dependency is added.
+
 ## 1.0.0
 
 First public release for WoW Forever (Interface 16001).

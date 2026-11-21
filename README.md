@@ -4,13 +4,13 @@
 
 A cleaner world map for **WoW Forever**. Compact and enlarged views, painted location markers, custom notes and coordinate navigation, styled to fit the original game.
 
-**Current release: 1.0.0** ? **Interface: 16001**
+**Version: 1.1.0** | **Interface: 16001**
 
-[Download the latest release](https://github.com/Red463/Mapperly/releases/latest) ? [Report an issue](https://github.com/Red463/Mapperly/issues)
+[Download the latest release](https://github.com/Red463/Mapperly/releases/latest) | [Report an issue](https://github.com/Red463/Mapperly/issues)
 
 ## Installation
 
-1. Download **Mapperly-1.0.0.zip** from the release page.
+1. Download **Mapperly-1.1.0.zip** from the release page.
 2. Extract the `Mapperly` folder into your WoW Forever `Interface/AddOns` directory.
 3. Restart the game or run `/reload` when updating an existing installation.
 4. Open the world map with **M**.
@@ -22,36 +22,41 @@ Use the release ZIP for installation. GitHub's automatic source archives include
 - **Two remembered map sizes:** a substantial compact view and an enlarged view with game space around the edges. Drag the compact map's title bar to move it; use Lock to keep it in place.
 - **Location markers:** inns, mailboxes, dungeon entrances with level ranges, flight masters, boats/zeppelins, zone exits where supported, and custom notes.
 - **Simple layer controls:** toggle individual categories in Filters. In Settings, choose which also appear on continent/world maps. Dungeons are enabled there by default; the other layers default to zone maps.
+- **Switchable themes:** the Default theme uses warm Classic panels, native window trim and red primary actions. Choose **Original** in **Settings > Appearance theme** for the previous charcoal look. The choice is remembered and applies immediately to open windows without losing drafts; Gatherly is not required.
 - **Dedicated settings window:** grouped display, sizing and opacity controls; matching icons beside location names; a live marker-size preview.
 - **Optional quest pane:** the quest icon opens or closes the native quest list and remembers your choice.
 - **Useful map details:** player/cursor coordinates, recommended zone levels when reliable data is available, optional unexplored-area reveal and a repeatable player-location ping.
-- **Coordinate navigation:** enter a destination and follow a movable arrow and distance readout after closing the map.
+- **Navigation and destinations:** enter coordinates or Alt-right-click a map location/marker for an immediate waypoint. Follow a movable direction/distance arrow; save named favourites and revisit the latest 20 unique destinations.
+- **Custom notes:** choose from twelve purpose-made symbols (enemy, chest/loot, POI, scenic spot, building, danger, camp, meeting point, resources, fishing, cave and travel); edit names, descriptions, groups and painted icons in a window matching Settings. Browse and search notes across all zones.
 
 ## Map controls
 
-Hover any icon in the right-hand toolbar for its description. From top to bottom:
+Use the standard Blizzard close button at the top right of the header to close the map. Hover any icon in the right-hand toolbar for its description. From top to bottom:
 
 | Control | Action |
 | --- | --- |
-| Close | Close the map. |
 | Resize arrows | Switch compact/enlarged view. Arrows indicate the next action. |
 | Parent map | Zoom out to the parent zone, continent or world map. |
 | My location | Return to your current zone and ping the player arrow. |
-| Navigate | Enter X/Y coordinates for the map being viewed. |
-| Add note | Name a note at your character's position. Alt-click the map to place one elsewhere. |
+| Navigate | Open Coordinates, Saved and Recent destinations. Alt-right-click the map or a marker for a quick waypoint. |
+| Add note | Open the note editor at your character. Alt-click the map to place one elsewhere. The My notes tab browses existing notes. |
 | Filters | Toggle Mapperly location categories. |
 | Quest symbol | Show or hide the quest log. |
 | Reveal | Show unexplored map artwork. This does not grant exploration credit. |
 | Lock | Lock or unlock the map position. |
 | Settings | Open Mapperly's options window. |
 
-Right-click a custom note to remove it. Shift-click inserts its name and coordinates into an active chat edit box; nothing is sent automatically.
+Click a custom note to edit its name, description, group or icon. Notes stay in the Custom notes layer regardless of their chosen icon. The My notes tab searches names, groups, descriptions and zones. Right-click a custom note to remove it. Shift-click inserts its name and coordinates into an active chat edit box; nothing is sent automatically.
 
 ### Navigation
 
+**Alt-right-click** any map position or marker to start navigation immediately. Mapperly and standard native pins use the exact marker position; raw addon buttons inside native/HBD wrappers are also supported. Markers that entirely bypass these map systems may need an Alt-right-click beside the icon. Ordinary marker clicks and Alt-click note placement keep their existing actions. Dragging does not place a waypoint.
+
+Use **Save** in Coordinates to keep a named favourite without starting navigation. **Saved** offers Edit, Go and Remove; **Recent** keeps the last 20 unique successful destinations and offers Edit, Go, Save and Clear history. Saved and recent records survive reloads. Visiting the same point moves it to the top of history.
+
 Open the destination map, click Navigate, enter X and Y from **0 to 100** (decimals supported), then press **Start**. Close the map to follow the arrow. Drag the arrow to move it, left-click it to edit, or right-click it to stop. Right-clicking the destination pin or using Stop in the entry window also cancels navigation. Arrival within ten yards clears the destination.
 
-The guide provides a **straight-line bearing**, not a terrain or transport route. It works across adjacent zones in the same world instance and waits when position/facing is unavailable or the destination requires another continent/instance. The arrow position is remembered; destinations are session-only and clear on reload. Gatherly is not required and its navigation is not changed.
+The guide provides a **straight-line bearing**, not a terrain or transport route. It works across adjacent zones in the same world instance and waits when position/facing is unavailable or the destination requires another continent/instance. The arrow position is remembered; the active arrow target clears on reload, while Saved and Recent destinations remain available. Gatherly is not required and its navigation is not changed.
 
 ### Commands
 
@@ -79,6 +84,10 @@ Python development dependencies are separate from the addon and are not needed i
 python -m pip install -r requirements-dev.txt
 python tests/run.py
 python tests/navigation.py
+python tests/themes.py
+python tests/destinations.py
+python tests/destination_ui.py
+python tests/map_interactions.py
 python tests/services_builder.py
 python tools/package.py
 ```

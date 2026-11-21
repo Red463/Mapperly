@@ -45,6 +45,7 @@ function fakeUI()
  function methods:Show() local changed=self.shown==false;self.shown=true;if changed and self.scripts.OnShow then self.scripts.OnShow(self) end end
  function methods:Hide() local changed=self.shown~=false;self.shown=false;if changed and self.scripts.OnHide then self.scripts.OnHide(self) end end
  function methods:IsShown() return self.shown~=false end
+ function methods:SetShown(shown) if shown then self:Show() else self:Hide() end end
  function methods:IsVisible() return self:IsShown() and (not self.parent or self.parent:IsVisible()) end
  function methods:Enable() self:SetEnabled(true) end
  function methods:Disable() self:SetEnabled(false) end

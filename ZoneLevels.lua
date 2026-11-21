@@ -17,7 +17,30 @@ function A.ZoneTitle(map,name)
     if not lo then return name end
     return name..' ('..lo..(lo~=hi and '–'..hi or '')..')'
 end
+function A.PositionHoverZoneLabel(label,force)
+    if not A.map or not A.map.ScrollContainer then return end
+    if A.db.theme=='gatherly' then
+        if not label.mapperlyOriginalLabelPoints then
+            local points={};label.mapperlyOriginalLabelPoints=points
+            for i=1,(label:GetNumPoints() or 1) do
+                local point,relative,relativePoint,x,y=label:GetPoint(i)
+                if point then points[#points+1]={point,relative,relativePoint,x,y} end
+            end
+        end
+        if force or not label.mapperlyLabelOffsetApplied then
+            label:ClearAllPoints();label:SetPoint('TOP',A.map.ScrollContainer,'TOP',0,-40)
+            label.mapperlyLabelOffsetApplied=true
+        end
+    elseif label.mapperlyLabelOffsetApplied then
+        label:ClearAllPoints()
+        local points=label.mapperlyOriginalLabelPoints or {}
+        for _,p in ipairs(points) do label:SetPoint(p[1],p[2],p[3],p[4],p[5]) end
+        if #points==0 then label:SetPoint('TOP',A.map.ScrollContainer,'TOP',0,-10) end
+        label.mapperlyLabelOffsetApplied=false
+    end
+end
 function A.UpdateHoverZoneLabel(label)
+    A.PositionHoverZoneLabel(label)
     local map=A.map
     local info=C_Map.GetMapInfo and C_Map.GetMapInfo(map:GetMapID())
     local continentType=Enum and Enum.UIMapType and Enum.UIMapType.Continent or 2
@@ -35,9 +58,12 @@ end
 function A.AttachZoneLevels()
     for provider in pairs(A.map.dataProviders or {}) do
         local label=provider.Label
-        if (type(label)=='table' or type(label)=='userdata') and label.Name and label.GetHighestPriorityLabelInfo and not label.mapperlyLevelsHooked then
-            label.mapperlyLevelsHooked=true
-            label:HookScript('OnUpdate',function(self) A.UpdateHoverZoneLabel(self) end)
+        if (type(label)=='table' or type(label)=='userdata') and label.Name and label.GetHighestPriorityLabelInfo then
+            if not label.mapperlyLevelsHooked then
+                label.mapperlyLevelsHooked=true
+                label:HookScript('OnUpdate',function(self) A.UpdateHoverZoneLabel(self) end)
+            end
+            A.PositionHoverZoneLabel(label,true)
         end
     end
 end

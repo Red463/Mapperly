@@ -1,16 +1,7 @@
 local _,A=...
-local windowWidth,windowHeight=640,676
-local function label(parent,text,x,y,font)
-    local t=parent:CreateFontString(nil,'OVERLAY',font or 'GameFontHighlight')
-    t:SetPoint('TOPLEFT',parent,'TOPLEFT',x,-y);t:SetText(text);return t
-end
-local function panel(parent,x,y,width,height)
-    local f=CreateFrame('Frame',nil,parent,'BackdropTemplate')
-    f:SetPoint('TOPLEFT',parent,'TOPLEFT',x,-y);f:SetSize(width,height)
-    f:SetBackdrop({bgFile='Interface\\Buttons\\WHITE8X8',edgeFile='Interface\\Buttons\\WHITE8X8',edgeSize=1})
-    f:SetBackdropColor(.075,.08,.09,1);f:SetBackdropBorderColor(.23,.21,.16,1)
-    return f
-end
+local windowWidth,windowHeight=640,746
+local function label(parent,text,x,y,font) return A.Dialogs.Label(parent,text,x,y,font) end
+local function panel(parent,x,y,width,height) return A.Dialogs.Card(parent,x,y,width,height) end
 local function changed(layout)
     if layout and A.map then A.ApplyLayout() end
     A.UpdateOpacity();A.Refresh()
@@ -37,25 +28,12 @@ function A.SyncSettings()
         elseif c.kind=='continent' then c:SetChecked(A.db.continentFilters[c.category])
         else c:SetValue(A.db[key]*c.factor);c.valueText:SetText(c.format(A.db[key]*c.factor)) end
     end
+    for name,b in pairs(A.themeChoices or {}) do b.active=A.db.theme==name;b:UpdateVisual() end
     A.settingsSyncing=nil;A.UpdateMarkerPreview()
 end
 function A.CreateSettings()
-    local f=CreateFrame('Frame','MapperlySettingsWindow',UIParent,'BackdropTemplate')
+    local f=A.Dialogs.Window('MapperlySettingsWindow','Mapperly - Settings','Map settings  |  Changes save automatically',windowWidth,windowHeight)
     A.settingsWindow=f;A.settingsControls={};A.settingsLayerIcons={};A.markerPreviews={}
-    f:SetSize(windowWidth,windowHeight);f:SetPoint('CENTER');f:SetFrameStrata('DIALOG');f:SetClampedToScreen(true)
-    f:SetMovable(true);f:EnableMouse(true);f:RegisterForDrag('LeftButton')
-    f:SetScript('OnDragStart',function(s) s:StartMoving() end)
-    f:SetScript('OnDragStop',function(s) s:StopMovingOrSizing() end)
-    f:SetBackdrop({bgFile='Interface\\Buttons\\WHITE8X8',edgeFile='Interface\\DialogFrame\\UI-DialogBox-Border',tile=true,tileSize=32,edgeSize=24,insets={left=6,right=6,top=6,bottom=6}})
-    f:SetBackdropColor(.035,.04,.05,1)
-    local heading=panel(f,12,12,616,64)
-    local logo=heading:CreateTexture(nil,'ARTWORK');logo:SetSize(46,46);logo:SetPoint('LEFT',heading,'LEFT',10,0)
-    logo:SetTexture('Interface\\AddOns\\Mapperly\\Media\\Icon')
-    label(heading,'Mapperly',68,10,'GameFontNormalLarge')
-    label(heading,'Map settings  |  Changes save automatically',68,34,'GameFontDisableSmall')
-    local close=CreateFrame('Button',nil,heading,'UIPanelCloseButton');close:SetPoint('TOPRIGHT',heading,'TOPRIGHT',0,0)
-    close:SetScript('OnClick',function() f:Hide() end)
-    UISpecialFrames=UISpecialFrames or {};table.insert(UISpecialFrames,'MapperlySettingsWindow')
     local display=CreateFrame('Frame',nil,f);display:SetAllPoints(f)
     local layers=CreateFrame('Frame',nil,f);layers:SetAllPoints(f);layers:Hide()
     f.displayPage=display;f.layersPage=layers
@@ -66,12 +44,19 @@ function A.CreateSettings()
     A.settingsTabs={}
     local function selectPage(page)
         if page=='display' then display:Show();layers:Hide() else display:Hide();layers:Show() end
-        for key,tab in pairs(A.settingsTabs) do tab.active=key==page;tab:UpdateVisual() end
+        for key,tab in pairs(A.settingsTabs) do tab.active=key==page;A.Theme.ButtonRole(tab,'tab') end
         A.SyncSettings()
     end
     A.settingsTabs.display=action(f,'Map appearance',24,88,170,function() selectPage('display') end)
     A.settingsTabs.layers=action(f,'Location layers',202,88,170,function() selectPage('layers') end)
-    A.settingsTabs.display.active=true;A.settingsTabs.display:UpdateVisual()
+    A.settingsTabs.display.active=true;A.Theme.ButtonRole(A.settingsTabs.display,'tab');A.Theme.ButtonRole(A.settingsTabs.layers,'tab')
+    local themes=panel(f,24,132,592,58)
+    label(themes,'Appearance theme',16,21,'GameFontNormal')
+    A.themeChoices={}
+    A.themeChoices.gatherly=action(themes,'Default',220,15,166,function() A.Theme.Set('gatherly') end)
+    A.themeChoices.original=action(themes,'Original',394,15,166,function() A.Theme.Set('original') end)
+    A.AttachButtonTooltip(A.themeChoices.gatherly,'Default Mapperly theme. Applies immediately.')
+    A.AttachButtonTooltip(A.themeChoices.original,'Use the original Mapperly charcoal theme. Applies immediately.')
     local function check(parent,key,text,x,y,layout,filter)
         local c=CreateFrame('CheckButton',nil,parent,'UICheckButtonTemplate');c:SetSize(26,26);c:SetPoint('TOPLEFT',parent,'TOPLEFT',x,-y)
         if text then label(parent,text,x+30,y+6) end
@@ -83,13 +68,13 @@ function A.CreateSettings()
             changed(layout)
         end)
     end
-    local displayCard=panel(display,24,132,592,110)
+    local displayCard=panel(display,24,202,592,110)
     label(displayCard,'Map display',16,12,'GameFontNormal')
     check(displayCard,'coordinates','Show coordinates',14,38)
     check(displayCard,'reveal','Reveal unexplored areas',306,38)
     check(displayCard,'locked','Lock map position',14,72,true)
     check(displayCard,'questPane','Show quest log',306,72,true)
-    local sizeCard=panel(display,24,254,592,206)
+    local sizeCard=panel(display,24,324,592,206)
     label(sizeCard,'Map and markers',16,12,'GameFontNormal')
     local function slider(parent,key,text,x,y,width,lo,hi,step,factor,layout,format)
         label(parent,text,x,y)
@@ -113,7 +98,8 @@ function A.CreateSettings()
         end)
     end
     local percent=function(v) return string.format('%d%%',v) end
-    slider(sizeCard,'scale','Compact map size',20,42,548,90,110,1,100,true,percent)
+    slider(sizeCard,'scale','Compact map size',20,42,548,50,110,1,100,true,percent)
+    label(sizeCard,'Minimum size keeps the controls readable.',20,104,'GameFontDisableSmall')
     slider(sizeCard,'iconSize','Map marker size',20,120,280,12,36,1,1,false,function(v) return string.format('%d px',v) end)
     local previewCard=panel(sizeCard,326,108,246,82)
     label(previewCard,'Live marker preview',12,10,'GameFontNormalSmall')
@@ -121,12 +107,12 @@ function A.CreateSettings()
         local icon=previewCard:CreateTexture(nil,'ARTWORK');icon:SetPoint('CENTER',previewCard,'TOPLEFT',32+(i-1)*60,-52)
         A.markerPreviews[#A.markerPreviews+1]={icon=icon,category=category}
     end
-    local opacityCard=panel(display,24,474,592,142)
+    local opacityCard=panel(display,24,544,592,142)
     label(opacityCard,'Compact map opacity',16,12,'GameFontNormal')
     slider(opacityCard,'alpha','While stationary',20,42,250,20,100,5,100,false,percent)
     slider(opacityCard,'movingAlpha','While moving',320,42,250,20,100,5,100,false,percent)
     label(opacityCard,'The enlarged map stays fully opaque.',20,116,'GameFontDisableSmall')
-    local layerCard=panel(layers,24,132,592,454)
+    local layerCard=panel(layers,24,202,592,454)
     label(layerCard,'Location',16,14,'GameFontNormal')
     label(layerCard,'Show',392,14,'GameFontNormal')
     local continentTitle=label(layerCard,'On continents',482,14,'GameFontNormal')
@@ -143,11 +129,11 @@ function A.CreateSettings()
         check(row,key,nil,516,8,false,'continent')
     end
     label(layerCard,'Show enables the layer. On continents also shows it on overview maps.',16,416,'GameFontDisableSmall')
-    local coverage=label(layers,'Bundled locations plus your discoveries.',28,598,'GameFontDisableSmall')
+    local coverage=label(layers,'Bundled locations plus your discoveries.',28,668,'GameFontDisableSmall')
     coverage:SetWidth(330);coverage:SetWordWrap(false)
-    action(layers,'Show all',376,592,112,function() for _,k in ipairs(A.categories) do A.db.filters[k]=true end;A.SyncSettings();changed() end)
-    action(layers,'Hide all',496,592,112,function() for _,k in ipairs(A.categories) do A.db.filters[k]=false end;A.SyncSettings();changed() end)
-    action(f,'Reset map position',24,634,162,function() A.db.position=nil;changed(true) end)
-    action(f,'Done',496,634,120,function() f:Hide() end)
+    action(layers,'Show all',376,662,112,function() for _,k in ipairs(A.categories) do A.db.filters[k]=true end;A.SyncSettings();changed() end)
+    action(layers,'Hide all',496,662,112,function() for _,k in ipairs(A.categories) do A.db.filters[k]=false end;A.SyncSettings();changed() end)
+    action(f,'Reset map position',24,704,162,function() A.db.position=nil;changed(true) end)
+    A.Theme.ButtonRole(action(f,'Done',496,704,120,function() f:Hide() end),'primary')
     f:Hide()
 end

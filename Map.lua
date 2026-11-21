@@ -1,16 +1,16 @@
 local _,A=...
 local button=A.CreateIconButton
 function A.UpdateCoordinates()
-    if not A.playerCoordinates then return end
-    local player,cursor=A.playerCoordinates,A.cursorCoordinates
-    if not A.db.coordinates then player:SetText('');cursor:SetText('');return end
+    if not A.coordinateText then return end
+    if not A.db.coordinates then A.coordinateText:SetText('');return end
     local id=A.map:GetMapID()
     local pos=id and C_Map.GetPlayerMapPosition(id,'player')
     local text='Player: --, --'
     if pos then local x,y=pos:GetXY();text=string.format('Player: %.1f, %.1f',x*100,y*100) end
-    player:SetText(text)
     local x,y=A.map:GetNormalizedCursorPosition()
-    cursor:SetText(x and y and x>=0 and x<=1 and y>=0 and y<=1 and string.format('Cursor: %.1f, %.1f',x*100,y*100) or 'Cursor: --, --')
+    local cursor=x and y and x>=0 and x<=1 and y>=0 and y<=1 and string.format('Cursor: %.1f, %.1f',x*100,y*100) or 'Cursor: --, --'
+    -- FontStrings escape a literal pipe as ||.
+    A.coordinateText:SetText(text..'  ||  '..cursor)
 end
 function A.ApplyLayout()
     if A.applying then return end
@@ -54,12 +54,6 @@ local function current()
             if pin.StartPlayerPing then pin:StartPlayerPing(2,.25) end
         end
     end
-end
-function A.ShowNote(map,x,y)
-    local dialog=StaticPopup_Show('MAPPERLY_NOTE',nil,nil,{map=map,x=x,y=y})
-    local edit=dialog and A.NoteEditBox(dialog)
-    if edit then edit:SetText('');edit:SetFocus()
-    else A.Print('The note dialog is unavailable. Close another popup and try again.') end
 end
 local labels={mail='Mailboxes',inn='Inns',dungeon='Dungeon entrances',flight='Flight masters',transport='Boats and zeppelins',portal='Portals',border='Zone exits',notes='Custom notes'}
 local function menuEntry(text,fn,checked,tip)
@@ -118,24 +112,32 @@ function A.AttachMap()
     rail:SetFrameStrata('HIGH');rail:SetFrameLevel(f:GetFrameLevel()+150)
     rail:SetBackdrop({bgFile='Interface\\Tooltips\\UI-Tooltip-Background'})
     rail:SetBackdropColor(.025,.027,.03,1)
-    A.zoneHeading=bar:CreateFontString(nil,'OVERLAY','GameFontNormal')
+    if A.Theme then
+        A.Theme.Register(bar,'mapbar');A.Theme.Register(footer,'footer');A.Theme.Register(rail,'rail')
+        A.mapThemeTrim=A.Theme.MapChrome(f)
+    end
+    local headingHost=CreateFrame('Frame',nil,f);A.zoneHeadingHost=headingHost
+    headingHost:SetAllPoints(f);headingHost:EnableMouse(false);headingHost:SetFrameStrata('HIGH');headingHost:SetFrameLevel(f:GetFrameLevel()+200)
+    A.zoneHeading=headingHost:CreateFontString(nil,'OVERLAY','GameFontNormal')
     A.zoneHeading:SetPoint('LEFT',bar,'LEFT',12,0);A.zoneHeading:SetJustifyH('LEFT');A.zoneHeading:SetWordWrap(false)
     A.menu=CreateFrame('Frame','MapperlyDropdown',UIParent,'UIDropDownMenuTemplate')
     UIDropDownMenu_Initialize(A.menu,A.BuildMenu,'MENU')
-    local previous
+    local previous,railHeight=nil,4
     local function control(key,asset,tip,fn,gap)
         local b=button(rail,asset,fn);b:ClearAllPoints()
-        if previous then b:SetPoint('TOP',previous,'BOTTOM',0,-(gap or 4))
+        if previous then
+            b:SetPoint('TOP',previous,'BOTTOM',0,-(gap or 4));railHeight=railHeight+(gap or 4)
         else b:SetPoint('TOP',rail,'TOP',0,-4) end
+        railHeight=railHeight+b:GetHeight();A.minimumRailHeight=railHeight+4
         previous=b
-        b:HookScript('OnEnter',function(self)
-            GameTooltip:SetOwner(self,'ANCHOR_LEFT')
-            GameTooltip:SetText(type(tip)=='function' and tip() or tip);GameTooltip:Show()
-        end)
-        b:HookScript('OnLeave',function() GameTooltip:Hide() end)
+        A.AttachButtonTooltip(b,tip)
         A.controls=A.controls or {};A.controls[key]=b;return b
     end
-    A.closeButton=control('close','Close','Close map',function() if HideUIPanel then HideUIPanel(f) else f:Hide() end end)
+    local close=CreateFrame('Button',nil,f,'UIPanelCloseButton');A.closeButton=close
+    close:SetSize(22,22);close:SetPoint('TOPRIGHT',f,'TOPRIGHT',-5,-3)
+    close:SetFrameStrata('HIGH');close:SetFrameLevel(f:GetFrameLevel()+3000)
+    close:SetScript('OnClick',function() if HideUIPanel then HideUIPanel(f) else f:Hide() end end)
+    A.AttachButtonTooltip(close,'Close map');A.controls=A.controls or {};A.controls.close=close
     A.sizeButton=control('size','Resize',function() return A.db.compact and 'Enlarge map' or 'Use compact map' end,toggleSize)
     A.navigation=control('parent','ParentMap',function()
         local info=C_Map.GetMapInfo and C_Map.GetMapInfo(f:GetMapID())
@@ -146,7 +148,7 @@ function A.AttachMap()
         if info and info.parentMapID and info.parentMapID>0 then f:SetMapID(info.parentMapID) end
     end,10)
     control('locate','Locate','My location: return to your zone and ping your arrow',current)
-    control('navigate','Navigate','Navigate to coordinates',function() A.ShowNavigationInput() end)
+    control('navigate','Navigate','Destinations: coordinates, saved places and recent history. Alt-right-click map or marker for a quick waypoint.',function() A.ShowNavigationInput() end)
     control('notes','AddNote','Add note at player; Alt-click to place anywhere',function()
         local id=f:GetMapID();local pos=id and C_Map.GetPlayerMapPosition(id,'player')
         if not pos then
@@ -167,11 +169,18 @@ function A.AttachMap()
     control('reveal','Reveal',function() return A.db.reveal and 'Hide unexplored terrain' or 'Reveal unexplored terrain' end,function() A.db.reveal=not A.db.reveal;A.Refresh() end)
     control('lock','Lock',function() return A.db.locked and 'Unlock map position' or 'Lock map position' end,function() A.db.locked=not A.db.locked;A.ApplyLayout() end,10)
     control('settings','Settings','Open Mapperly settings',A.ShowSettings)
-    A.playerCoordinates=footer:CreateFontString(nil,'OVERLAY','GameFontNormalSmall')
-    A.playerCoordinates:SetPoint('LEFT',footer,'LEFT',10,0);A.playerCoordinates:SetJustifyH('LEFT');A.playerCoordinates:SetWordWrap(false)
-    A.cursorCoordinates=footer:CreateFontString(nil,'OVERLAY','GameFontNormalSmall')
-    A.cursorCoordinates:SetPoint('RIGHT',footer,'RIGHT',-10,0);A.cursorCoordinates:SetJustifyH('RIGHT');A.cursorCoordinates:SetWordWrap(false)
+    A.coordinateText=footer:CreateFontString(nil,'OVERLAY','GameFontNormalSmall')
+    A.coordinateText:SetPoint('LEFT',footer,'LEFT',10,0);A.coordinateText:SetJustifyH('LEFT');A.coordinateText:SetWordWrap(false)
+    A.brandText=bar:CreateFontString(nil,'OVERLAY','GameFontNormalSmall')
+    A.brandText:SetPoint('RIGHT',bar,'RIGHT',-10,0);A.brandText:SetJustifyH('RIGHT');A.brandText:SetWordWrap(false)
+    A.brandText:SetText('Mapperly '..A.version)
+    if A.Theme then
+        A.Theme.Register(A.zoneHeading,'zone')
+        A.Theme.Register(A.coordinateText,'text',{kind='coordinate'});A.Theme.Register(A.brandText,'text',{kind='coordinate'})
+        A.Theme.Apply()
+    end
     A.AttachZoneLevels()
+    if type(f.AdjustOverlayFrames)=='function' then hooksecurefunc(f,'AdjustOverlayFrames',A.PositionMapPinButton) end
     f:HookScript('OnShow',function() A.UpdateOpacity(true);A.ApplyLayout();A.Refresh() end)
     if f.SetMapID then hooksecurefunc(f,'SetMapID',A.Refresh) end
     if f.Maximize then hooksecurefunc(f,'Maximize',function() if not A.applying then A.db.compact=false;A.ApplyLayout() end end) end
@@ -182,13 +191,7 @@ function A.AttachMap()
     if f.ScrollContainer then
         f.ScrollContainer:HookScript('OnSizeChanged',function() if not A.applying then A.QueueViewportFit() end end)
     end
-    local clickSurface=f.ScrollContainer or f:GetCanvas()
-    clickSurface:HookScript('OnMouseUp',function(_,mouse)
-        if mouse~='LeftButton' or not IsAltKeyDown() then return end
-        local canvas=f:GetCanvas();local x,y=GetCursorPosition();local scale=canvas:GetEffectiveScale()
-        x=(x/scale-canvas:GetLeft())/canvas:GetWidth();y=(canvas:GetTop()-y/scale)/canvas:GetHeight()
-        if x>=0 and x<=1 and y>=0 and y<=1 then A.ShowNote(f:GetMapID(),x,y) end
-    end)
+    A.AttachMapInteractions(f)
     local elapsed=0
     local serviceRetry=0
     bar:SetScript('OnUpdate',function(_,dt)

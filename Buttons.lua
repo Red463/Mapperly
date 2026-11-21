@@ -30,7 +30,7 @@ function A.CreateMapButton(parent,text,width,x,callback)
     end
     b.activeLine=edge('BOTTOMLEFT','BOTTOMLEFT',9,5,'BOTTOMRIGHT','BOTTOMRIGHT',-9,5)
     b.activeLine:SetHeight(1);b.activeLine:SetColorTexture(.89,.74,.41,1)
-    local caption=b:CreateFontString(nil,'OVERLAY','GameFontNormal')
+    local caption=b:CreateFontString(nil,'OVERLAY','GameFontNormal');b.caption=caption
     caption:SetJustifyH('CENTER');caption:SetWordWrap(false)
     b:SetFontString(caption);b:SetText(text)
     -- Measure the actual Blizzard font instead of assuming fixed character widths.
@@ -56,6 +56,7 @@ function A.CreateMapButton(parent,text,width,x,callback)
             caption:SetPoint('RIGHT',self,'RIGHT',-12,0)
             self.icon:ClearAllPoints();self.icon:SetPoint('LEFT',self,'LEFT',14,0)
         else caption:SetWidth(math.max(1,self:GetWidth()-18));caption:SetPoint('CENTER',self,'CENTER',0,0) end
+        if A.Theme then A.Theme.PaintButton(self) end
     end
     b:UpdateVisual()
     b:SetScript('OnEnter',function(self) self.hover=true;self:UpdateVisual() end)
@@ -63,6 +64,7 @@ function A.CreateMapButton(parent,text,width,x,callback)
     b:SetScript('OnMouseDown',function(self) self.pressed=true;self:UpdateVisual() end)
     b:SetScript('OnMouseUp',function(self) self.pressed=false;self:UpdateVisual() end)
     b:SetScript('OnClick',callback)
+    if A.Theme then A.Theme.Register(b,'button') end
     return b
 end
 function A.CreateIconButton(parent,asset,callback)
@@ -76,6 +78,28 @@ function A.CreateIconButton(parent,asset,callback)
     b.icon:SetSnapToPixelGrid(true);b.icon:SetTexelSnappingBias(0)
     b:UpdateVisual()
     return b
+end
+function A.AttachButtonTooltip(button,text)
+    button.tooltipText=text
+    function button:RefreshTooltip()
+        if not self.hover or not self:IsVisible() or not GameTooltip:IsOwned(self) then return end
+        local value=type(self.tooltipText)=='function' and self.tooltipText() or self.tooltipText
+        if value~=self.tooltipShownText then
+            GameTooltip:SetText(value);self.tooltipShownText=value;GameTooltip:Show()
+        end
+    end
+    button:HookScript('OnEnter',function(self)
+        GameTooltip:SetOwner(self,'ANCHOR_LEFT');self.tooltipShownText=nil;self:RefreshTooltip()
+    end)
+    button:HookScript('OnLeave',function(self)
+        if GameTooltip:IsOwned(self) then GameTooltip:Hide() end
+        self.tooltipShownText=nil
+    end)
+    button:HookScript('OnClick',function() button:RefreshTooltip() end)
+    button:HookScript('OnHide',function(self)
+        if GameTooltip:IsOwned(self) then GameTooltip:Hide() end
+        self.hover=false;self.tooltipShownText=nil
+    end)
 end
 function A.UpdateButtonStates()
     if not A.db then return end
@@ -95,5 +119,8 @@ function A.UpdateButtonStates()
             if key=='quests' and b.arrow then b.arrow:SetText(b.active and '<' or '>') end
             b:UpdateVisual()
         end
+    end
+    for _,button in pairs(A.controls or {}) do
+        if button.RefreshTooltip then button:RefreshTooltip() end
     end
 end

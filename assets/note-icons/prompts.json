@@ -1,0 +1,66 @@
+{
+  "tool": "Built-in image_gen",
+  "reference": "assets/Hearthstone.png (style only)",
+  "icons": [
+    {
+      "name": "Enemy",
+      "prompt": "Generate ONE standalone game MAP NOTE ICON, square composition, for Mapperly, a classic fantasy MMORPG world-map addon. STYLE REFERENCE ONLY: match the attached hearthstone's chunky hand-painted fantasy item art, warm ivory highlights, dark brown silhouette edging, antique brass details and simple painted shading. The subject must read cleanly at 18-24 pixels: broad shapes, very little interior detail, no thin lines. Center the isolated object and fill 85% of the square. Genuine transparent background, no black or colored square, no frame, no tile, no scene, no lettering, no glow cloud, no floor shadow. Subject: an ivory monster skull with two short dark-red horns, hostile red eyes and one bold red accent; readable enemy silhouette",
+      "source": "Enemy.png"
+    },
+    {
+      "name": "Chest",
+      "prompt": "Generate ONE standalone game MAP NOTE ICON, square composition, for Mapperly, a classic fantasy MMORPG world-map addon. STYLE REFERENCE ONLY: match the attached hearthstone's chunky hand-painted fantasy item art, warm ivory highlights, dark brown silhouette edging, antique brass details and simple painted shading. The subject must read cleanly at 18-24 pixels: broad shapes, very little interior detail, no thin lines. Center the isolated object and fill 85% of the square. Genuine transparent background, no black or colored square, no frame, no tile, no scene, no lettering, no glow cloud, no floor shadow. Subject: a small half-open dark wooden treasure chest with thick antique-brass bands and a few large gold coins visible; unmistakable loot chest",
+      "source": "Chest.png"
+    },
+    {
+      "name": "POI",
+      "prompt": "Generate ONE standalone game MAP NOTE ICON, square composition, for Mapperly, a classic fantasy MMORPG world-map addon. STYLE REFERENCE ONLY: match the attached hearthstone's chunky hand-painted fantasy item art, warm ivory highlights, dark brown silhouette edging, antique brass details and simple painted shading. The subject must read cleanly at 18-24 pixels: broad shapes, very little interior detail, no thin lines. Center the isolated object and fill 85% of the square. Genuine transparent background, no black or colored square, no frame, no tile, no scene, no lettering, no glow cloud, no floor shadow. Subject: a single upright triangular royal-blue pennant on a stout warm-gold flagpole with a small gold base; unmistakable point-of-interest flag",
+      "source": "POI.png"
+    },
+    {
+      "name": "Scenic",
+      "prompt": "Generate ONE standalone game MAP NOTE ICON, square composition, for Mapperly, a classic fantasy MMORPG world-map addon. STYLE REFERENCE ONLY: match the attached hearthstone's chunky hand-painted fantasy item art, warm ivory highlights, dark brown silhouette edging, antique brass details and simple painted shading. The subject must read cleanly at 18-24 pixels: broad shapes, very little interior detail, no thin lines. Center the isolated object and fill 85% of the square. Genuine transparent background, no black or colored square, no frame, no tile, no scene, no lettering, no glow cloud, no floor shadow. Subject: two chunky emerald-green mountain peaks with small ivory snow caps and a large warm golden sun peeking behind them, contained in one compact scenic-location emblem; no horizon or backdrop",
+      "source": "Scenic.png"
+    },
+    {
+      "name": "Building",
+      "prompt": "Generate ONE standalone game MAP NOTE ICON, square composition, for Mapperly, a classic fantasy MMORPG world-map addon. STYLE REFERENCE ONLY: match the attached hearthstone's chunky hand-painted fantasy item art, warm ivory highlights, dark brown silhouette edging, antique brass details and simple painted shading. The subject must read cleanly at 18-24 pixels: broad shapes, very little interior detail, no thin lines. Center the isolated object and fill 85% of the square. Genuine transparent background, no black or colored square, no frame, no tile, no scene, no lettering, no glow cloud, no floor shadow. Subject: a single compact timber-and-ivory cottage with a deep red gabled roof and one broad dark doorway, three-quarter isometric view; no ground or scenery",
+      "source": "Building.png"
+    },
+    {
+      "name": "Danger",
+      "prompt": "Generate ONE standalone game MAP NOTE ICON, square composition, for Mapperly, a classic fantasy MMORPG world-map addon. STYLE REFERENCE ONLY: match the attached hearthstone's chunky hand-painted fantasy item art, warm ivory highlights, dark brown silhouette edging, antique brass details and simple painted shading. The subject must read cleanly at 18-24 pixels: broad shapes, very little interior detail, no thin lines. Center the isolated object and fill 85% of the square. Genuine transparent background, no black or colored square, no frame, no tile, no scene, no lettering, no glow cloud, no floor shadow. Subject: a weathered ruby-red triangular warning plaque with a thick antique gold rim and one bold ivory exclamation mark in the center; isolated physical fantasy warning token",
+      "source": "Danger.png"
+    },
+    {
+      "name": "Camp",
+      "prompt": "Generate ONE standalone game MAP NOTE ICON, square composition, for Mapperly, a classic fantasy MMORPG world-map addon. STYLE REFERENCE ONLY: match the attached hearthstone's chunky hand-painted fantasy item art, warm ivory highlights, dark brown silhouette edging, antique brass details and simple painted shading. The subject must read cleanly at 18-24 pixels: broad shapes, very little interior detail, no thin lines. Center the isolated object and fill 85% of the square. Genuine transparent background, no black or colored square, no frame, no tile, no scene, no lettering, no glow cloud, no floor shadow. Subject: a compact campfire with three chunky dark wooden logs and a single bold orange-and-gold flame; friendly resting/camping place, no surrounding stones or ground",
+      "source": "Camp.png"
+    },
+    {
+      "name": "Meeting",
+      "prompt": "Generate ONE standalone game MAP NOTE ICON, square composition, for Mapperly, a classic fantasy MMORPG world-map addon. STYLE REFERENCE ONLY: match the attached hearthstone's chunky hand-painted fantasy item art, warm ivory highlights, dark brown silhouette edging, antique brass details and simple painted shading. The subject must read cleanly at 18-24 pixels: broad shapes, very little interior detail, no thin lines. Center the isolated object and fill 85% of the square. Genuine transparent background, no black or colored square, no frame, no tile, no scene, no lettering, no glow cloud, no floor shadow. Subject: two short upright cloth pennants, one royal blue and one emerald green, standing side by side on thick antique-brass poles and leaning slightly toward each other, compact silhouette; meeting or rendezvous place, no crossed swords",
+      "source": "Meeting.png"
+    },
+    {
+      "name": "Resource",
+      "prompt": "Generate ONE standalone game MAP NOTE ICON, square composition, for Mapperly, a classic fantasy MMORPG world-map addon. STYLE REFERENCE ONLY: match the attached hearthstone's chunky hand-painted fantasy item art, warm ivory highlights, dark brown silhouette edging, antique brass details and simple painted shading. The subject must read cleanly at 18-24 pixels: broad shapes, very little interior detail, no thin lines. Center the isolated object and fill 85% of the square. Genuine transparent background, no black or colored square, no frame, no tile, no scene, no lettering, no glow cloud, no floor shadow. Subject: one stout steel mining pickaxe angled diagonally beside a small cluster of three large teal-green crystals, antique-brass ferrule and dark wooden handle; a gathering/resource location, compact simple shape",
+      "source": "Resource.png"
+    },
+    {
+      "name": "Fishing",
+      "prompt": "Generate ONE standalone game MAP NOTE ICON, square composition, for Mapperly, a classic fantasy MMORPG world-map addon. STYLE REFERENCE ONLY: match the attached hearthstone's chunky hand-painted fantasy item art, warm ivory highlights, dark brown silhouette edging, antique brass details and simple painted shading. The subject must read cleanly at 18-24 pixels: broad shapes, very little interior detail, no thin lines. Center the isolated object and fill 85% of the square. Genuine transparent background, no black or colored square, no frame, no tile, no scene, no lettering, no glow cloud, no floor shadow. Subject: one plump silver-blue fish with a turquoise back and warm ivory belly, arched sideways with a clear large tail and one eye, a single small antique-gold fishing hook beside its mouth; no water or splash",
+      "source": "Fishing.png"
+    },
+    {
+      "name": "Cave",
+      "prompt": "Generate ONE standalone game MAP NOTE ICON, square composition, for Mapperly, a classic fantasy MMORPG world-map addon. STYLE REFERENCE ONLY: match the attached hearthstone's chunky hand-painted fantasy item art, warm ivory highlights, dark brown silhouette edging, antique brass details and simple painted shading. The subject must read cleanly at 18-24 pixels: broad shapes, very little interior detail, no thin lines. Center the isolated object and fill 85% of the square. Genuine transparent background, no black or colored square, no frame, no tile, no scene, no lettering, no glow cloud, no floor shadow. Subject: one compact rugged slate-grey rock arch with an unmistakable deep dark-blue cave opening, broad chunky rocks with warm ivory highlights, isolated cave entrance symbol; no surrounding terrain",
+      "source": "Cave.png"
+    },
+    {
+      "name": "Travel",
+      "prompt": "Generate ONE standalone game MAP NOTE ICON, square composition, for Mapperly, a classic fantasy MMORPG world-map addon. STYLE REFERENCE ONLY: match the attached hearthstone's chunky hand-painted fantasy item art, warm ivory highlights, dark brown silhouette edging, antique brass details and simple painted shading. The subject must read cleanly at 18-24 pixels: broad shapes, very little interior detail, no thin lines. Center the isolated object and fill 85% of the square. Genuine transparent background, no black or colored square, no frame, no tile, no scene, no lettering, no glow cloud, no floor shadow. Subject: a stout dark wooden signpost with two broad arrow-shaped planks pointing opposite directions, thick antique-brass bindings and a small teal painted accent; travel or route junction symbol; no lettering, no ground",
+      "source": "Travel.png"
+    }
+  ]
+}

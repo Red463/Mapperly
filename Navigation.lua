@@ -79,7 +79,7 @@ function N.Build()
     end)
     f:Hide()
 end
-function N.Start(map,x,y)
+function N.Start(map,x,y,name)
     local nx,ny=N.Parse(x,y)
     if nx==nil then return nil,ny end
     map=tonumber(map)
@@ -89,11 +89,21 @@ function N.Start(map,x,y)
     local ok,wx,wy,instance=pcall(hbd.GetWorldCoordinatesFromZone,hbd,nx,ny,map)
     if not ok or not number(wx) or not number(wy) or not number(instance) then return nil,'This map cannot be used for navigation. Open a zone or continent map.' end
     local info=C_Map.GetMapInfo and C_Map.GetMapInfo(map)
-    N.target={map=map,x=nx,y=ny,worldX=wx,worldY=wy,instance=instance,category='navigation',name='Navigation destination',zone=info and info.name or 'Map '..map}
+    local zone=info and info.name or 'Map '..map
+    name=type(name)=='string' and name:sub(1,120) or zone
+    if name:match('^%s*$') then name=zone end
+    N.target={map=map,x=nx,y=ny,worldX=wx,worldY=wy,instance=instance,category='navigation',name=name,zone=zone}
+    if A.Destinations then A.Destinations.Remember(N.target) end
     N.Build()
     N.frame.bearing=nil;N.frame.renderAngle=nil
-    N.frame.destination:SetText(string.format('%s (%.1f, %.1f)',N.target.zone,nx*100,ny*100))
+    N.frame.destination:SetText(string.format('%s (%.1f, %.1f)',name,nx*100,ny*100))
     N.Tick();refresh();return true
+end
+function N.ToPin(pin)
+    if not A.ValidPin(pin) then return nil,'This marker has no usable map coordinates.' end
+    local ok,reason=N.Start(pin.map,pin.x*100,pin.y*100,pin.name)
+    if not ok and A.Print then A.Print(reason) end
+    return ok,reason
 end
 function N.Stop(arrived)
     N.target=nil
