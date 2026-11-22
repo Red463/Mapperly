@@ -61,29 +61,32 @@ function J.Update(position)
     if J.paused then return nil,'Paused' end
     local p=point(position)
     if not p or p.mapID~=plan.mapID then return nil,'Return to the route zone' end
-    if not A.Terrain.Segment(p,p) then return nil,'Outside mapped walking terrain' end
+    -- Masks constrain the planned geometry, not where the player may walk.
+    -- Keep the established target while outside the mask; do not rebuild or
+    -- discard the route because of a false-positive restriction underfoot.
+    local outsideMask=not A.Terrain.Segment(p,p)
     local target=J.Current()
     while target and distance(p,target)<=8 do
         local nextPoint=plan.points[J.index+1]
         if not nextPoint then
-            if A.Terrain.Segment(p,target) then return nil,'arrived' end
+            if outsideMask or A.Terrain.Segment(p,target) then return nil,'arrived' end
             break
         end
-        if not A.Terrain.Segment(p,nextPoint) then break end
+        if not outsideMask and not A.Terrain.Segment(p,nextPoint) then break end
         J.index=J.index+1;target=J.Current()
     end
-    if not target or not A.Terrain.Segment(p,target) then return nil,'Route obstructed: replan or return to the route' end
+    if not target or not outsideMask and not A.Terrain.Segment(p,target) then return nil,'Route obstructed: replan or return to the route' end
     return target
 end
 function J.Pause() if J.active then J.paused=true;return true end end
 function J.Resume(position)
     local p=point(position);local target=J.Current()
-    if not p or not target or not A.Terrain.Segment(p,target) then return nil,'Replan from your current position before resuming.' end
+    if not p or not target or p.mapID~=target.mapID or A.Terrain.Segment(p,p) and not A.Terrain.Segment(p,target) then return nil,'Replan from your current position before resuming.' end
     J.paused=false;return true
 end
 function J.Skip(position)
     local p=point(position);local nextPoint=J.active and J.active.points[J.index+1]
-    if not p or not nextPoint or not A.Terrain.Segment(p,nextPoint) then return nil,'The next route segment cannot be skipped safely.' end
+    if not p or not nextPoint or p.mapID~=nextPoint.mapID or A.Terrain.Segment(p,p) and not A.Terrain.Segment(p,nextPoint) then return nil,'The next route segment cannot be skipped safely.' end
     J.index=J.index+1;return true
 end
 function J.Remaining(position)

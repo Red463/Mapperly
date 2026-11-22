@@ -83,6 +83,26 @@ for i=1,100 do
 end
 local _,why=A.Journey.Update(plan.points[#plan.points]);assert(why=='arrived')
 ''')
+lua.execute('''
+local plan=assert(A.Journey.Plan({mapID=1,x=.1,y=.1},{mapID=1,x=.9,y=.1,name='Restricted cell test'},{}))
+A.Journey.Install(plan)
+local target,index=A.Journey.Current(),A.Journey.index
+for _,p in ipairs({{mapID=1,x=.5,y=.1},{mapID=1,x=.5,y=.3},{mapID=1,x=.5,y=.5}}) do
+ assert(not A.Terrain.Segment(p,p))
+ local nextPoint=assert(A.Journey.Update(p))
+ assert(nextPoint==target and A.Journey.active==plan and A.Journey.index==index,'restricted player cells must retain the current route and waypoint')
+end
+A.Journey.Pause();assert(A.Journey.Resume({mapID=1,x=.5,y=.1}),'resume must remain available in a restricted player cell')
+assert(A.Journey.Skip({mapID=1,x=.5,y=.1}),'manual skip must remain available outside the mask')
+assert(A.Terrain.Validate(plan),'restricted player movement must not rewrite planned geometry')
+local closePlan={mapID=1,points={{mapID=1,x=.1,y=.1},{mapID=1,x=.39,y=.1},{mapID=1,x=.2,y=.2}}}
+assert(A.Terrain.Validate(closePlan))
+A.Journey.Install(closePlan)
+local p=A.Journey.Update({mapID=1,x=.41,y=.1})
+assert(p==closePlan.points[3] and A.Journey.index==3,'a restricted cell inside the arrival radius must not trap a route bend')
+A.Journey.Install(assert(A.Journey.Plan({mapID=1,x=.1,y=.1},{mapID=1,x=.39,y=.1},{})))
+local _,reason=A.Journey.Update({mapID=1,x=.41,y=.1});assert(reason=='arrived','arrival must remain available in a restricted player cell')
+''')
 print('PASS: validated terrain walking plans, blocked/unavailable endpoints, background jobs and cancellation')
 
 # Check the shipped data independently of the small algorithm fixtures.

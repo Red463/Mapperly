@@ -11,3 +11,5 @@ Use separate modules: Terrain (validated local geometry), PlanningJob (cooperati
 The Navigation settings tab will contain route mode, guidance visibility, recalculation and road/swimming/transport preferences as their backing features become available. Do not show functional-looking toggles for unsupported data.
 
 Quest scope begins with active quests. A later bundled catalogue must identify source, objective/turn-in ambiguity and coverage. Transport times are approximate without observed schedules; unknown flights are excluded until discovered or explicitly confirmed.
+
+Player movement may leave the terrain mask without stopping an installed journey. Restricted player cells preserve the current route/waypoint and permit manual resume, skip and normal arrival advancement. This does not make restricted cells valid planning endpoints or rewrite any planned segment. Missing/protected positions and another zone still pause directional guidance.

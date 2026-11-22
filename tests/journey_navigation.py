@@ -24,6 +24,16 @@ local wx,wy=hbd:GetWorldCoordinatesFromZone(bend.x,bend.y,bend.mapID)
 assert(math.abs(N.frame.bearing-N.Bearing(wx-playerX,wy-playerY))<.0001,'HUD bearing must follow a route bend rather than cut through the ridge')
 N.Pause();N.Tick();assert(N.frame.label:GetText()=='Paused')
 assert(N.Resume());N.Tick();assert(N.frame.icon:IsShown())
+local currentTarget,currentPlan,currentBend=N.target,A.Journey.active,A.Journey.Current()
+C_Map.GetPlayerMapPosition=function() return {GetXY=function() return .5,.1 end} end
+playerX,playerY=500,900
+N.Tick()
+assert(N.frame:IsShown() and N.frame.icon:IsShown() and N.target==currentTarget and A.Journey.active==currentPlan,'entering a restricted cell must not hide guidance or stop navigation')
+assert(A.Journey.Current()==currentBend,'restricted cells must preserve route progress')
+N.Pause();assert(N.Resume());assert(N.frame.icon:IsShown())
+C_Map.GetPlayerMapPosition=function() return {GetXY=function() return .1,.1 end} end
+playerX,playerY=900,900
+N.Tick();assert(N.frame.icon:IsShown(),'normal mask guidance must recover when the player returns')
 local before=N.target;local plan=A.Journey.active
 assert(not N.Start(1431,50,10,'Blocked'))
 assert(N.target==before and A.Journey.active==plan and #A.db.destinationHistory==1)

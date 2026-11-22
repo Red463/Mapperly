@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.0-preview.3 (local build)
+
+- Keep existing route guidance running when the player enters a restricted terrain-mask cell. Preserve the route geometry and current waypoint instead of hiding the arrow.
+- Allow resume, manual skip and arrival advancement from restricted player cells. Restore normal segment checks when the player returns to permitted terrain; planned paths remain mask-constrained.
+- Add follower and actual HUD regression tests for restricted-cell movement and recovery.
+
 ## 1.2.0-preview.2 (local build)
 
 - Draw walking routes above native exploration/highlight map artwork, following Gatherly's route-layer ordering; account for stitched OpenMap artwork when present.

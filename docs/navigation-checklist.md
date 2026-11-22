@@ -57,3 +57,5 @@ Status: implementation started, 22 November 2026. Branch: `feature/journey-navig
 - 2026-11-22: First walking milestone packaged and verified as an installable local preview. Thirteen suites pass, with real TOC load order and all 55 mask records checked. Fresh review findings fixed; live-client acceptance remains required. No public release or GitHub push.
 
 - 2026-11-22: Screenshot follow-up, preview.2: reproduced the Elwynn coordinates (about 1,397 yd; one local planning step). Corrected route art-layer ordering and stale pending status. Added actual OnUpdate completion tests, guarded clocks and visible display-error reporting. Core roadmap remains unchanged; cross-zone/transport work is next.
+
+- 2026-11-22: Preview.3 live-client follow-up: restricted player cells no longer suspend existing guidance. Route and waypoint remain intact, with resume/skip/arrival available; return to permitted terrain restores segment checks. RED/GREEN follower and actual HUD tests cover the behavior. Automatic recalculation must preserve this rule in the next milestone.

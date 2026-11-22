@@ -4,7 +4,7 @@
 
 A cleaner world map for **WoW Forever**. Compact and enlarged views, painted location markers, custom notes and coordinate navigation, styled to fit the original game.
 
-**Public release: 1.1.1; local navigation preview: 1.2.0-preview.2** | **Interface: 16001**
+**Public release: 1.1.1; local navigation preview: 1.2.0-preview.3** | **Interface: 16001**
 
 [Download the latest release](https://github.com/Red463/Mapperly/releases/latest) | [Report an issue](https://github.com/Red463/Mapperly/issues)
 
@@ -19,11 +19,11 @@ Use the release ZIP for installation. GitHub's automatic source archives include
 
 ## Walking navigation preview
 
-The local **1.2.0-preview.2** build adds terrain-estimated walking routes within a single zone, using bundled Gatherly terrain data without requiring Gatherly. It includes background planning, a map route, distance/time preview, bend-following guidance and Pause/Resume/Skip/Replan controls. Settings now has a **Navigation** tab with Walking route / Direct bearing and a map-line toggle.
+The local **1.2.0-preview.3** build adds terrain-estimated walking routes within a single zone, using bundled Gatherly terrain data without requiring Gatherly. It includes background planning, a map route, distance/time preview, bend-following guidance and Pause/Resume/Skip/Replan controls. Settings now has a **Navigation** tab with Walking route / Direct bearing and a map-line toggle.
 
 Open Destinations from the arrow toolbar button, enter coordinates and choose **Preview route** or **Start**. **Active journey** opens the guidance controls. Alt-right-click and `/way` use the chosen route mode. Starting a walking preview explicitly uses walking mode. The preview is not yet a multi-zone or transport planner.
 
-Unknown/blocked terrain fails explicitly and preserves the previous destination. These masks permit swimming and do not guarantee collision-free travel through buildings, bridges, caves or fences. Cross-zone journeys, transport integration, quest search and road preference remain on the [implementation checklist](docs/navigation-checklist.md). Actual native-frame appearance and terrain access need in-game testing.
+Planning into unknown/blocked terrain fails explicitly and preserves the previous destination. Once following a route, stepping into a restricted player cell keeps the arrow, route and current waypoint active. These masks permit swimming and do not guarantee collision-free travel through buildings, bridges, caves or fences. Cross-zone journeys, transport integration, quest search and road preference remain on the [implementation checklist](docs/navigation-checklist.md). Actual native-frame appearance and terrain access need in-game testing.
 
 ## Features
 
