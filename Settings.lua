@@ -30,26 +30,29 @@ function A.SyncSettings()
     end
     for name,b in pairs(A.themeChoices or {}) do b.active=A.db.theme==name;b:UpdateVisual() end
     A.settingsSyncing=nil;A.UpdateMarkerPreview()
+    if A.NavigationSettings then A.NavigationSettings.Sync() end
 end
 function A.CreateSettings()
     local f=A.Dialogs.Window('MapperlySettingsWindow','Mapperly - Settings','Map settings  |  Changes save automatically',windowWidth,windowHeight)
     A.settingsWindow=f;A.settingsControls={};A.settingsLayerIcons={};A.markerPreviews={}
     local display=CreateFrame('Frame',nil,f);display:SetAllPoints(f)
     local layers=CreateFrame('Frame',nil,f);layers:SetAllPoints(f);layers:Hide()
-    f.displayPage=display;f.layersPage=layers
+    local navigation=CreateFrame('Frame',nil,f);navigation:SetAllPoints(f);navigation:Hide()
+    f.displayPage=display;f.layersPage=layers;f.navigationPage=navigation
     local function action(parent,text,x,y,width,fn)
         local b=A.CreateMapButton(parent,text,width-16,0,fn)
         b:ClearAllPoints();b:SetPoint('TOPLEFT',parent,'TOPLEFT',x,-y);b:SetSize(width,28);b:UpdateVisual();return b
     end
     A.settingsTabs={}
     local function selectPage(page)
-        if page=='display' then display:Show();layers:Hide() else display:Hide();layers:Show() end
+        display:SetShown(page=='display');layers:SetShown(page=='layers');navigation:SetShown(page=='navigation')
         for key,tab in pairs(A.settingsTabs) do tab.active=key==page;A.Theme.ButtonRole(tab,'tab') end
         A.SyncSettings()
     end
     A.settingsTabs.display=action(f,'Map appearance',24,88,170,function() selectPage('display') end)
     A.settingsTabs.layers=action(f,'Location layers',202,88,170,function() selectPage('layers') end)
-    A.settingsTabs.display.active=true;A.Theme.ButtonRole(A.settingsTabs.display,'tab');A.Theme.ButtonRole(A.settingsTabs.layers,'tab')
+    A.settingsTabs.navigation=action(f,'Navigation',380,88,170,function() selectPage('navigation') end)
+    A.settingsTabs.display.active=true;A.Theme.ButtonRole(A.settingsTabs.display,'tab');A.Theme.ButtonRole(A.settingsTabs.layers,'tab');A.Theme.ButtonRole(A.settingsTabs.navigation,'tab')
     local themes=panel(f,24,132,592,58)
     label(themes,'Appearance theme',16,21,'GameFontNormal')
     A.themeChoices={}
@@ -133,6 +136,7 @@ function A.CreateSettings()
     coverage:SetWidth(330);coverage:SetWordWrap(false)
     action(layers,'Show all',376,662,112,function() for _,k in ipairs(A.categories) do A.db.filters[k]=true end;A.SyncSettings();changed() end)
     action(layers,'Hide all',496,662,112,function() for _,k in ipairs(A.categories) do A.db.filters[k]=false end;A.SyncSettings();changed() end)
+    if A.NavigationSettings then A.NavigationSettings.Build(navigation) end
     A.Theme.ButtonRole(action(f,'Reset map position',24,704,162,function() A.ResetMapPosition();changed(false) end),'primary')
     A.Theme.ButtonRole(action(f,'Done',496,704,120,function() f:Hide() end),'primary')
     f:Hide()

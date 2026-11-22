@@ -40,6 +40,7 @@ function A.Refresh()
     if not A.map or not A.db or not A.map:IsShown() then return end
     if A.LoadServices then A.LoadServices() end
     A.RefreshPins();A.RefreshReveal()
+    if A.JourneyView then A.JourneyView.Refresh() end
     A.AttachZoneLevels()
     A.UpdateNavigation()
     A.UpdateButtonStates()

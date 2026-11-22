@@ -30,6 +30,8 @@ end
 function A.InitStore(raw)
     local db = type(raw)=='table' and raw or {}
     if db.theme~='gatherly' and db.theme~='original' then db.theme='gatherly' end
+    if db.navigationMode~='terrain' and db.navigationMode~='direct' then db.navigationMode='terrain' end
+    if type(db.showJourneyRoute)~='boolean' then db.showJourneyRoute=true end
     for k,v in pairs(defaults) do
         if type(v)=='boolean' then if type(db[k])~='boolean' then db[k]=v end end
     end

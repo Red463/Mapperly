@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.2.0-preview.1 (local walking-navigation milestone)
+
+- Bundle 55 terrain masks and local pathfinding independently of Gatherly, with explicit coverage/provenance.
+- Plan walking routes in cancellable background jobs and follow their validated bends with the navigation arrow. Failures preserve the last successful destination and history.
+- Add walking map lines, a themed preview with approximate distance/time and Start/Pause/Resume/Skip/Replan/Stop controls.
+- Add Navigation settings with Walking route / Direct bearing and map-route visibility.
+- Keep preview/map geometry synchronized after replanning; preserve pending replacement requests when the old target arrives.
+- This first milestone is single-zone walking only. Transport, cross-zone, quest-search and road-preference features remain on docs/navigation-checklist.md.
+
 ## 1.1 - 2026-11-22
 
 Release build **1.1.1**. This entry consolidates all changes since 1.0.0, including the initial 1.1 release and subsequent local development builds.

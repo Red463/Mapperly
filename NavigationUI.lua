@@ -44,6 +44,14 @@ local function build()
             f.savedRecord=record;f.error:SetText('');f.status:SetText('Destination saved.')
         else f.error:SetText('This destination was removed. Reopen it from Saved.') end
     end)
+    if A.JourneyView then
+        f.preview=U.Action(f.entryPage,'Preview route',260,398,132,function()
+            local p=read(f);if not p then return end
+            local ok,reason=A.JourneyView.Preview(p)
+            if ok then f.status:SetText('Planning walking preview...') else f.error:SetText(reason or 'Unable to preview route.') end
+        end)
+        f.journey=U.Action(f.entryPage,'Active journey',404,398,152,A.JourneyView.OpenCurrent)
+    end
     f.stop=U.Action(f,'Stop',486,494,110,function() A.Navigation.Stop();f.status:SetText('Navigation stopped.') end)
     f.status=U.Label(f,'',24,494,'GameFontDisableSmall');f.status:SetSize(440,36);f.status:SetWordWrap(true)
     f.library=U.List(f.libraryPage,10,10,548,300)

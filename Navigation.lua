@@ -26,6 +26,7 @@ local function library() return LibStub and LibStub('HereBeDragons-2.0',true) en
 local function refresh()
     if A.map and A.RefreshPins then A.RefreshPins() end
     if A.UpdateButtonStates then A.UpdateButtonStates() end
+    if A.JourneyView then A.JourneyView.Refresh() end
 end
 local function facing()
     if not GetPlayerFacing then return end
@@ -66,7 +67,7 @@ function N.Build()
     f:SetScript('OnEnter',function(self)
         GameTooltip:SetOwner(self,'ANCHOR_RIGHT');GameTooltip:SetText('Mapperly navigation')
         if N.target then GameTooltip:AddLine(string.format('%s: %.4f, %.4f',N.target.zone,N.target.x*100,N.target.y*100),1,.82,0,true) end
-        GameTooltip:AddLine('Straight-line direction; terrain and travel routes are not calculated.',1,1,1,true)
+        GameTooltip:AddLine(A.Journey and A.Journey.active and 'Following a terrain-estimated walking route.' or 'Straight-line direction; no walking path is calculated.',1,1,1,true)
         GameTooltip:AddLine('Drag to move. Left-click to edit. Right-click to stop.',1,.82,0,true);GameTooltip:Show()
     end)
     f:SetScript('OnLeave',function() GameTooltip:Hide() end)
@@ -79,7 +80,15 @@ function N.Build()
     end)
     f:Hide()
 end
-function N.Start(map,x,y,name)
+local function activate(candidate,plan)
+    N.pending=nil;N.planningError=nil;N.target=candidate
+    if A.Journey then if plan then A.Journey.Install(plan) else A.Journey.Clear() end end
+    if A.Destinations then A.Destinations.Remember(candidate) end
+    N.Build();N.frame.bearing=nil;N.frame.renderAngle=nil
+    N.frame.destination:SetText(string.format('%s (%.1f, %.1f)',candidate.name,candidate.x*100,candidate.y*100))
+    N.Tick();refresh()
+end
+function N.Start(map,x,y,name,options)
     local nx,ny=N.Parse(x,y)
     if nx==nil then return nil,ny end
     map=tonumber(map)
@@ -92,12 +101,22 @@ function N.Start(map,x,y,name)
     local zone=info and info.name or 'Map '..map
     name=type(name)=='string' and name:sub(1,120) or zone
     if name:match('^%s*$') then name=zone end
-    N.target={map=map,x=nx,y=ny,worldX=wx,worldY=wy,instance=instance,category='navigation',name=name,zone=zone}
-    if A.Destinations then A.Destinations.Remember(N.target) end
-    N.Build()
-    N.frame.bearing=nil;N.frame.renderAngle=nil
-    N.frame.destination:SetText(string.format('%s (%.1f, %.1f)',name,nx*100,ny*100))
-    N.Tick();refresh();return true
+    local candidate={map=map,x=nx,y=ny,worldX=wx,worldY=wy,instance=instance,category='navigation',name=name,zone=zone}
+    if A.Journey and (options and options.mode or A.db.navigationMode)~='direct' then
+        local accepted,reason=A.Journey.Request(candidate,function(plan) activate(candidate,plan) end,function(why)
+            N.pending=nil;N.planningError=why
+            if A.Print then A.Print(why) end
+            if not N.target and N.frame then waiting(why or 'No walking route found') end
+            refresh()
+        end)
+        if not accepted then return nil,reason end
+        N.pending=candidate;N.planningError=nil;N.Build()
+        if not N.target then waiting('Planning walking route...') end
+        return true
+    end
+    if A.PlanningJob then A.PlanningJob.Cancel() end
+    activate(candidate)
+    return true
 end
 function N.ToPin(pin)
     if not A.ValidPin(pin) then return nil,'This marker has no usable map coordinates.' end
@@ -106,23 +125,45 @@ function N.ToPin(pin)
     return ok,reason
 end
 function N.Stop(arrived)
-    N.target=nil
+    local pending=arrived and N.pending or nil
+    if A.PlanningJob and not pending then A.PlanningJob.Cancel() end
+    if A.Journey then A.Journey.Clear() end
+    N.pending=pending;N.planningError=nil;N.target=nil
     if N.frame then N.frame:Hide() end
     GameTooltip:Hide();refresh()
+    if pending then N.Build();waiting('Planning walking route...') end
     if arrived and A.Print then A.Print('Arrived at your navigation destination.') end
 end
 function N.Tick()
     local target=N.target
-    if not target then if N.frame then N.frame:Hide() end;return end
+    if not target then
+        if N.pending then N.Build();waiting('Planning walking route...')
+        elseif N.planningError then N.Build();waiting(N.planningError)
+        elseif N.frame then N.frame:Hide() end
+        return
+    end
     local hbd=library()
     if not hbd or type(hbd.GetPlayerWorldPosition)~='function' then waiting('Position unavailable');return end
     local ok,px,py,instance=pcall(hbd.GetPlayerWorldPosition,hbd)
     if not ok or not number(px) or not number(py) or not number(instance) then waiting('Position unavailable');return end
     if instance~=target.instance then waiting('Different continent / instance');return end
-    local dx,dy=target.worldX-px,target.worldY-py
-    local distance=math.sqrt(dx*dx+dy*dy)
+    local aimX,aimY=target.worldX,target.worldY
+    local remaining
+    if A.Journey and A.Journey.active then
+        local player=A.Journey.PlayerPosition()
+        local bend,reason=A.Journey.Update(player)
+        if not bend then
+            if reason=='arrived' then N.Stop(true) else waiting(reason) end
+            return
+        end
+        local projected,x,y=pcall(hbd.GetWorldCoordinatesFromZone,hbd,bend.x,bend.y,bend.mapID)
+        if not projected or not number(x) or not number(y) then waiting('Route position unavailable');return end
+        aimX,aimY=x,y;remaining=A.Journey.Remaining(player)
+    end
+    local dx,dy=aimX-px,aimY-py
+    local distance=remaining or math.sqrt(dx*dx+dy*dy)
     if not number(distance) then waiting('Position unavailable');return end
-    if distance<=10 then N.Stop(true);return end
+    if not (A.Journey and A.Journey.active) and distance<=10 then N.Stop(true);return end
     local heading=facing()
     if heading==nil then waiting('Direction unavailable');return end
     local f=N.frame
@@ -131,6 +172,25 @@ function N.Tick()
     f.label:SetText(string.format('%d yd',math.floor(distance+.5)))
     if f.renderAngle==nil then rotate(f,normalize(f.bearing-heading)) end
     f.icon:Show();f.shadow:Show();f:Show()
+end
+function N.Pause()
+    if A.Journey then A.Journey.Pause();N.Tick();refresh() end
+end
+function N.Resume()
+    if not A.Journey then return end
+    local ok,reason=A.Journey.Resume(A.Journey.PlayerPosition())
+    if not ok and A.Print then A.Print(reason) end
+    N.Tick();refresh();return ok,reason
+end
+function N.Skip()
+    if not A.Journey then return end
+    local ok,reason=A.Journey.Skip(A.Journey.PlayerPosition())
+    if not ok and A.Print then A.Print(reason) end
+    N.Tick();refresh();return ok,reason
+end
+function N.Replan()
+    local t=N.target
+    if t then return N.Start(t.map,t.x*100,t.y*100,t.name,{mode=A.Journey and A.Journey.active and 'terrain' or A.db.navigationMode}) end
 end
 function N.Animate(elapsed)
     local f=N.frame

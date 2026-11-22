@@ -130,7 +130,8 @@ WorldMapFrame.AcquirePin=function(self,template,data)
  pin:OnLoad();pin:OnAcquired(data);pin:Show();table.insert(self.nativePins,pin);return pin
 end
 ''')
-for name in ['Data/Places.lua','Data/FlightData.lua','Data/ZoneLevels.lua','ZoneLevels.lua','Places.lua','Data/Services.lua','Services.lua','Theme.lua','Destinations.lua','Navigation.lua','Pins.lua','Reveal.lua','Shell.lua','Opacity.lua','Settings.lua','Buttons.lua','Dialogs.lua','NavigationUI.lua','NotesUI.lua','MapInteractions.lua','Map.lua','Commands.lua','Core.lua']:
+module_names = [line.strip() for line in (root/'Mapperly.toc').read_text().splitlines() if line.strip() and not line.startswith('#') and not line.startswith('Libs/') and line.endswith('.lua')]
+for name in module_names:
     lua.execute('assert(loadstring(...))("Mapperly", A)', (root/name).read_text(encoding='utf-8-sig'))
 lua.execute('''
 A.AttachMap()
