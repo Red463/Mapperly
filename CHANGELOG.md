@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.2.0-preview.4 (local build)
+
+- Draw navigation routes on the minimap, with movement/zoom/rotation updates, round/square clipping and a gap around the native player arrow.
+- Add a Smart routing checkbox, enabled by default. Switching it off immediately converts the active or pending destination to straight-line guidance; switching on plans a walking route.
+- Keep world-map and minimap line toggles separate. Direct guidance draws a live straight line on both maps and has a matching preview.
+- Refresh the active direct-journey view as the player moves, and remove its geometry when navigation stops.
+
 ## 1.2.0-preview.3 (local build)
 
 - Keep existing route guidance running when the player enters a restricted terrain-mask cell. Preserve the route geometry and current waypoint instead of hiding the arrow.

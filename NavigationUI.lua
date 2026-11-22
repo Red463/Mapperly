@@ -47,8 +47,9 @@ local function build()
     if A.JourneyView then
         f.preview=U.Action(f.entryPage,'Preview route',260,398,132,function()
             local p=read(f);if not p then return end
+            f.status:SetText('Planning route...')
             local ok,reason=A.JourneyView.Preview(p)
-            if ok then f.status:SetText('Planning walking preview...') else f.error:SetText(reason or 'Unable to preview route.') end
+            if not ok then f.status:SetText('');f.error:SetText(reason or 'Unable to preview route.') end
         end)
         f.journey=U.Action(f.entryPage,'Active journey',404,398,152,A.JourneyView.OpenCurrent)
     end

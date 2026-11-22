@@ -27,6 +27,7 @@ local function refresh()
     if A.map and A.RefreshPins then A.RefreshPins() end
     if A.UpdateButtonStates then A.UpdateButtonStates() end
     if A.JourneyView then A.JourneyView.Refresh() end
+    if A.MinimapRoute then A.MinimapRoute.Update() end
 end
 local function facing()
     if not GetPlayerFacing then return end
@@ -191,6 +192,27 @@ end
 function N.Replan()
     local t=N.target
     if t then return N.Start(t.map,t.x*100,t.y*100,t.name,{mode=A.Journey and A.Journey.active and 'terrain' or A.db.navigationMode}) end
+end
+function N.SetSmartRouting(enabled)
+    local mode=enabled and 'terrain' or 'direct'
+    if A.db.navigationMode==mode then return true end
+    local target=N.pending or N.target
+    A.db.navigationMode=mode
+    if A.PlanningJob then A.PlanningJob.Cancel() end
+    N.pending=nil;N.planningError=nil
+    -- A preview belongs to its planning mode. Close it rather than letting an
+    -- old walking preview contradict an explicit switch to direct guidance.
+    if A.JourneyView then A.JourneyView.CancelPreview() end
+    local ok,reason=true
+    if target and mode=='direct' then activate(target)
+    elseif target then ok,reason=N.Start(target.map,target.x*100,target.y*100,target.name,{mode=mode})
+    else
+        if A.Journey then A.Journey.Clear() end
+        N.Tick();refresh()
+    end
+    if A.NavigationSettings then A.NavigationSettings.Sync() end
+    if not ok and A.Print then A.Print(reason) end
+    return ok,reason
 end
 function N.Animate(elapsed)
     local f=N.frame

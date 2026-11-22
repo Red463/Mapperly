@@ -6,9 +6,9 @@ Status: implementation started, 22 November 2026. Branch: `feature/journey-navig
 
 - [x] 1. Bundle standalone terrain masks and validated walking pathfinding.
 - [x] 2. Plan in bounded background jobs; handle unavailable/partial terrain explicitly.
-- [x] 3. Draw walking route previews on zone/continent maps.
+- [x] 3. Draw route previews on zone/continent maps and the minimap.
 - [x] 4. Follow terrain bends with the arrow; pause, resume and skip safely.
-- [x] 5. Add a dedicated Navigation settings tab.
+- [x] 5. Add a dedicated Navigation settings tab with Smart routing (default on) and display toggles.
 - [ ] 6. Recalculate after meaningful deviations, with throttling and cancellation.
 - [ ] 7. Connect walking routes across verified zone exits.
 - [ ] 8. Route using boats, zeppelins and airships.
@@ -59,3 +59,5 @@ Status: implementation started, 22 November 2026. Branch: `feature/journey-navig
 - 2026-11-22: Screenshot follow-up, preview.2: reproduced the Elwynn coordinates (about 1,397 yd; one local planning step). Corrected route art-layer ordering and stale pending status. Added actual OnUpdate completion tests, guarded clocks and visible display-error reporting. Core roadmap remains unchanged; cross-zone/transport work is next.
 
 - 2026-11-22: Preview.3 live-client follow-up: restricted player cells no longer suspend existing guidance. Route and waypoint remain intact, with resume/skip/arrival available; return to permitted terrain restores segment checks. RED/GREEN follower and actual HUD tests cover the behavior. Automatic recalculation must preserve this rule in the next milestone.
+
+- 2026-11-22: Preview.4 completes minimap route display and live Smart routing switching. Minimap checks cover HBD axes, rotation/ignored rotation, zoom, clipping and the native arrow gap. Direct mode now renders straight lines on both maps, previews without terrain work and preserves the destination through mode changes. Fresh review found and fixed a frozen active-direct view; regression added. Cross-zone/transport/quest/road work remains next.

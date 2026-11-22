@@ -29,6 +29,24 @@ function J.Plan(start,goal,options)
         mapID=a.mapID,name=goal.name or 'Destination',coverage=zone.status,
         legs={{kind='walk',name='Walk to '..(goal.name or 'destination'),points=points,distance=distance,estimatedSeconds=distance/speed}}}
 end
+function J.DirectPlan(candidate)
+    local hbd=LibStub and LibStub('HereBeDragons-2.0',true)
+    if not hbd or type(hbd.GetPlayerWorldPosition)~='function' then return nil,'Player position is unavailable.' end
+    local function valid(v) return not (issecretvalue and issecretvalue(v)) and type(v)=='number' and v==v and math.abs(v)<math.huge end
+    local ok,px,py,instance=pcall(hbd.GetPlayerWorldPosition,hbd)
+    if not ok or not valid(px) or not valid(py) or not valid(instance) then return nil,'Player position is unavailable.' end
+    local wx,wy,wi=candidate.worldX,candidate.worldY,candidate.instance
+    if not valid(wx) or not valid(wy) or not valid(wi) then
+        local good
+        good,wx,wy,wi=pcall(hbd.GetWorldCoordinatesFromZone,hbd,candidate.x,candidate.y,candidate.map or candidate.mapID)
+        if not good or not valid(wx) or not valid(wy) or not valid(wi) then return nil,'Destination coordinates are unavailable.' end
+    end
+    if wi~=instance then return nil,'Direct guidance waits until you reach the destination continent or instance.' end
+    local length=math.sqrt((wx-px)^2+(wy-py)^2)
+    return {kind='direct',name=candidate.name or 'Destination',distance=length,estimatedSeconds=length/7,coverage='not checked',
+        points={{worldX=px,worldY=py,instance=instance},{worldX=wx,worldY=wy,instance=wi}},
+        legs={{kind='direct',name='Head towards '..(candidate.name or 'destination')}}}
+end
 function J.PlayerPosition()
     if not C_Map or not C_Map.GetBestMapForUnit or not C_Map.GetPlayerMapPosition then return nil,'Player position is unavailable.' end
     local ok,map=pcall(C_Map.GetBestMapForUnit,'player')

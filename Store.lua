@@ -32,6 +32,7 @@ function A.InitStore(raw)
     if db.theme~='gatherly' and db.theme~='original' then db.theme='gatherly' end
     if db.navigationMode~='terrain' and db.navigationMode~='direct' then db.navigationMode='terrain' end
     if type(db.showJourneyRoute)~='boolean' then db.showJourneyRoute=true end
+    if type(db.showMinimapRoute)~='boolean' then db.showMinimapRoute=true end
     for k,v in pairs(defaults) do
         if type(v)=='boolean' then if type(db[k])~='boolean' then db[k]=v end end
     end

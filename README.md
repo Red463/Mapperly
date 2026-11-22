@@ -4,7 +4,7 @@
 
 A cleaner world map for **WoW Forever**. Compact and enlarged views, painted location markers, custom notes and coordinate navigation, styled to fit the original game.
 
-**Public release: 1.1.1; local navigation preview: 1.2.0-preview.3** | **Interface: 16001**
+**Public release: 1.1.1; local navigation preview: 1.2.0-preview.4** | **Interface: 16001**
 
 [Download the latest release](https://github.com/Red463/Mapperly/releases/latest) | [Report an issue](https://github.com/Red463/Mapperly/issues)
 
@@ -19,9 +19,9 @@ Use the release ZIP for installation. GitHub's automatic source archives include
 
 ## Walking navigation preview
 
-The local **1.2.0-preview.3** build adds terrain-estimated walking routes within a single zone, using bundled Gatherly terrain data without requiring Gatherly. It includes background planning, a map route, distance/time preview, bend-following guidance and Pause/Resume/Skip/Replan controls. Settings now has a **Navigation** tab with Walking route / Direct bearing and a map-line toggle.
+The local **1.2.0-preview.4** build adds terrain-estimated walking routes within a single zone, using bundled Gatherly terrain data without requiring Gatherly. It includes background planning, a map route, distance/time preview, bend-following guidance and Pause/Resume/Skip/Replan controls. Settings now has a **Navigation** tab with **Smart routing** enabled by default and separate world-map/minimap route toggles. Turning Smart routing off immediately converts the current destination to straight-line guidance. Both modes draw their route on the map and minimap; minimap lines follow movement, zoom and rotation.
 
-Open Destinations from the arrow toolbar button, enter coordinates and choose **Preview route** or **Start**. **Active journey** opens the guidance controls. Alt-right-click and `/way` use the chosen route mode. Starting a walking preview explicitly uses walking mode. The preview is not yet a multi-zone or transport planner.
+Open Destinations from the arrow toolbar button, enter coordinates and choose **Preview route** or **Start**. **Active journey** opens the guidance controls. Alt-right-click and `/way` use the chosen route mode. Previews follow the chosen routing mode; changing modes closes a stale preview. The preview is not yet a multi-zone or transport planner.
 
 Planning into unknown/blocked terrain fails explicitly and preserves the previous destination. Once following a route, stepping into a restricted player cell keeps the arrow, route and current waypoint active. These masks permit swimming and do not guarantee collision-free travel through buildings, bridges, caves or fences. Cross-zone journeys, transport integration, quest search and road preference remain on the [implementation checklist](docs/navigation-checklist.md). Actual native-frame appearance and terrain access need in-game testing.
 
@@ -105,6 +105,7 @@ python tests/way_command.py
 python tests/journey.py
 python tests/journey_navigation.py
 python tests/journey_ui.py
+python tests/minimap_route.py
 python tests/services_builder.py
 python tools/package.py
 ```

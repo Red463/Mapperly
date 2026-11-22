@@ -2,13 +2,29 @@ local _,A=...
 local V={lines={}};A.JourneyView=V
 local function finite(v) return not (issecretvalue and issecretvalue(v)) and type(v)=='number' and v==v and math.abs(v)<math.huge end
 function V.Project(p,map)
-    if p.mapID==map then return p.x,p.y end
+    if p.mapID==map and finite(p.x) and finite(p.y) then return p.x,p.y end
     local hbd=LibStub and LibStub('HereBeDragons-2.0',true)
     if not hbd then return end
-    local ok,wx,wy,instance=pcall(hbd.GetWorldCoordinatesFromZone,hbd,p.x,p.y,p.mapID)
+    local ok,wx,wy,instance=true,p.worldX,p.worldY,p.instance
+    if not finite(wx) or not finite(wy) or not finite(instance) then ok,wx,wy,instance=pcall(hbd.GetWorldCoordinatesFromZone,hbd,p.x,p.y,p.mapID) end
     if not ok or not finite(wx) or not finite(wy) or not finite(instance) then return end
-    local good,x,y=pcall(hbd.GetZoneCoordinatesFromWorldInstance,hbd,wx,wy,instance,map)
+    local good,x,y=pcall(hbd.GetZoneCoordinatesFromWorldInstance,hbd,wx,wy,instance,map,true)
     if good and finite(x) and finite(y) then return x,y end
+end
+function V.DisplayPlan()
+    if V.window and V.window:IsShown() and V.followDirect then
+        local target=A.Navigation.target
+        if not target or A.Journey.active then
+            V.window:Hide();V.followDirect=false;V.plan=nil
+        else
+            local plan,reason=A.Journey.DirectPlan(target)
+            if not plan then V.steps:SetText(reason or 'Position unavailable.');return end
+            V.plan=plan;V.candidate=target;V.WriteSummary()
+        end
+    end
+    if V.window and V.window:IsShown() and V.plan then return V.plan end
+    if A.Journey and A.Journey.active then return A.Journey.active end
+    if A.Journey and A.Navigation and A.Navigation.target then return A.Journey.DirectPlan(A.Navigation.target) end
 end
 local function layerLevel(canvas)
     local level=canvas:GetFrameLevel()+10
@@ -49,7 +65,7 @@ function V.Refresh()
             V.plan=active;V.candidate=A.Navigation.target;V.WriteSummary()
         end
     end
-    local plan=V.window and V.window:IsShown() and V.plan or A.Journey and A.Journey.active
+    local plan=V.DisplayPlan()
     if not plan or not A.map or not A.db.showJourneyRoute then return end
     if #plan.points>2049 then return end -- Never replace omitted bends with unsafe shortcuts.
     local canvas=A.map:GetCanvas()
@@ -70,7 +86,7 @@ function V.Refresh()
     end
 end
 function V.Show(plan,candidate)
-    V.plan=plan;V.candidate=candidate;V.followActive=A.Journey and A.Journey.active==plan
+    V.plan=plan;V.candidate=candidate;V.followActive=A.Journey and A.Journey.active==plan;V.followDirect=false
     local U=A.Dialogs
     if not V.window then
         local f=U.Window('MapperlyJourneyPreview','Journey preview','Review the route before starting, or manage your active journey.',640,524);V.window=f
@@ -79,10 +95,10 @@ function V.Show(plan,candidate)
         local steps=U.Card(f,24,242,592,124)
         V.steps=U.Label(steps,'',16,14);V.steps:SetSize(558,98);V.steps:SetWordWrap(true)
         local warning=U.Label(f,'Terrain estimate: check obstacles in game. Swimming is currently allowed. Start replans from your current position.',28,380,'GameFontDisableSmall')
-        warning:SetSize(580,42);warning:SetWordWrap(true)
+        warning:SetSize(580,42);warning:SetWordWrap(true);V.warning=warning
         V.start=U.Action(f,'Start',24,440,100,function()
             local p=V.candidate
-            local ok,reason=A.Navigation.Start(p.map or p.mapID,p.x*100,p.y*100,p.name,{mode='terrain'})
+            local ok,reason=A.Navigation.Start(p.map or p.mapID,p.x*100,p.y*100,p.name,{mode=V.plan.kind=='walking' and 'terrain' or 'direct'})
             if ok then f:Hide() else V.steps:SetText(reason or 'Unable to start route.') end
         end);A.Theme.ButtonRole(V.start,'primary')
         V.pause=U.Action(f,'Pause',134,440,100,function() A.Navigation.Pause() end)
@@ -98,7 +114,13 @@ function V.Show(plan,candidate)
 end
 function V.WriteSummary()
     local plan=V.plan
-    V.summary:SetText(string.format('%s\nWalking distance: %d yd || About %d min on foot\nTerrain coverage: %s',plan.name or 'Destination',math.floor(plan.distance+.5),math.max(1,math.ceil(plan.estimatedSeconds/60)),plan.coverage or 'unknown'))
+    if plan.kind=='direct' then
+        V.summary:SetText(string.format('%s\nStraight-line distance: %d yd\nSmart routing is off; terrain is not checked.',plan.name or 'Destination',math.floor(plan.distance+.5)))
+        V.warning:SetText('Straight-line guidance does not avoid obstacles. Start uses your current position.')
+    else
+        V.summary:SetText(string.format('%s\nWalking distance: %d yd || About %d min on foot\nTerrain coverage: %s',plan.name or 'Destination',math.floor(plan.distance+.5),math.max(1,math.ceil(plan.estimatedSeconds/60)),plan.coverage or 'unknown'))
+        V.warning:SetText('Terrain estimate: check obstacles in game. Swimming is currently allowed. Start replans from your current position.')
+    end
     local text={}
     for i,leg in ipairs(plan.legs or {}) do text[#text+1]=i..'. '..leg.name end
     V.steps:SetText(table.concat(text,'\n'))
@@ -107,9 +129,24 @@ function V.WriteSummary()
 end
 function V.OpenCurrent()
     if A.Journey and A.Journey.active and A.Navigation.target then V.Show(A.Journey.active,A.Navigation.target)
-    else A.Print('Start or preview a walking journey first.') end
+    elseif A.Navigation.target then
+        local plan,reason=A.Journey.DirectPlan(A.Navigation.target)
+        if plan then V.Show(plan,A.Navigation.target);V.followDirect=true;V.Refresh() else A.Print(reason) end
+    else A.Print('Start or preview a journey first.') end
+end
+function V.CancelPreview()
+    if V.window then V.window:Hide() end
+    V.plan=nil;V.candidate=nil;V.followActive=false;V.followDirect=false
+    if A.navigationWindow then A.navigationWindow.status:SetText('Routing preference changed.') end
 end
 function V.Preview(candidate)
+    if A.db.navigationMode=='direct' then
+        local plan,reason=A.Journey.DirectPlan(candidate)
+        if not plan then return nil,reason end
+        V.Show(plan,candidate)
+        if A.navigationWindow then A.navigationWindow.status:SetText('Straight-line preview ready.') end
+        return true
+    end
     if A.PlanningJob.IsRunning() then return nil,'A route is already being planned. Wait or stop it first.' end
     return A.Journey.Request(candidate,function(plan)
         V.Show(plan,candidate)

@@ -34,6 +34,13 @@ N.Pause();assert(N.Resume());assert(N.frame.icon:IsShown())
 C_Map.GetPlayerMapPosition=function() return {GetXY=function() return .1,.1 end} end
 playerX,playerY=900,900
 N.Tick();assert(N.frame.icon:IsShown(),'normal mask guidance must recover when the player returns')
+assert(A.db.navigationMode=='terrain','smart routing must default on')
+assert(N.SetSmartRouting(false))
+assert(A.db.navigationMode=='direct' and N.target and not A.Journey.active and not N.pending and not A.PlanningJob.IsRunning(),'turning smart routing off must switch the active destination immediately')
+assert(#A.db.destinationHistory==1,'mode changes must not duplicate history')
+assert(N.SetSmartRouting(true));assert(N.pending)
+while A.PlanningJob.IsRunning() do A.PlanningJob.Step() end
+assert(A.Journey.active and A.db.navigationMode=='terrain','turning smart routing back on must plan the current destination')
 local before=N.target;local plan=A.Journey.active
 assert(not N.Start(1431,50,10,'Blocked'))
 assert(N.target==before and A.Journey.active==plan and #A.db.destinationHistory==1)
@@ -55,6 +62,12 @@ playerX,playerY=100,900
 N.Tick()
 assert(N.pending and A.PlanningJob.IsRunning() and not N.target,'arrival at the previous target must not cancel the replacement request')
 N.Stop()
+C_Map.GetPlayerMapPosition=function() return {GetXY=function() return .1,.1 end} end
+playerX,playerY=900,900
+assert(N.Start(1431,90,30,'Pending mode switch'))
+assert(N.pending and N.SetSmartRouting(false))
+assert(N.target and N.target.name=='Pending mode switch' and not N.pending and not A.PlanningJob.IsRunning(),'turning smart routing off must immediately convert a pending destination')
+
 
 ''')
 print('PASS: transactional walking navigation, bend-following HUD, pause/resume, cancellation and explicit direct mode')
