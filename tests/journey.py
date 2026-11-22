@@ -51,6 +51,18 @@ A.PlanningJob.Start(function() for i=1,100 do A.PlanningJob.Checkpoint() end;ret
 A.PlanningJob.Step();assert(not published,'a frozen profiling clock must still yield after bounded work')
 for i=1,20 do A.PlanningJob.Step() end
 assert(published,'bounded checkpoints must eventually finish')
+local displayError
+A.PlanningJob.Start(function() return plan end,function() error('native preview widget failed') end,function(reason) displayError=reason end)
+assert(pcall(A.PlanningJob.Step),'display errors must be reported rather than leave the UI looking stuck')
+assert(displayError and displayError:find('native preview widget failed',1,true) and not A.PlanningJob.IsRunning())
+local profiling=debugprofilestop
+local timerCompleted=false
+debugprofilestop=function() error('profiling unavailable') end
+A.PlanningJob.Start(function() return plan end,function() timerCompleted=true end)
+assert(pcall(A.PlanningJob.Step) and timerCompleted,'unavailable profiling APIs must not strand a job before coroutine resume')
+debugprofilestop=profiling
+
+
 
 ''')
 lua.execute('''
@@ -87,3 +99,14 @@ end
 assert(supported==55 and partial==12,'coverage must match the supplied mask inventory')
 ''')
 print('PASS: all 55 bundled terrain masks validate; 12 partial maps retain explicit coverage')
+
+lua.execute('''
+local a={mapID=1429,x=.825,y=.686}
+local b={mapID=1429,x=.42265799844097,y=.665577526985558,name='Elwynn screenshot'}
+local result,reason
+A.PlanningJob.Start(function() return A.Journey.Plan(a,b,{}) end,function(p) result=p end,function(r) reason=r end)
+for i=1,100 do A.PlanningJob.Step();if not A.PlanningJob.IsRunning() then break end end
+assert(result,reason)
+assert(A.Terrain.Validate(result) and result.distance>1300 and result.distance<1450,'the supplied Elwynn route must finish with valid geometry')
+''')
+print('PASS: screenshot Elwynn coordinates calculate a validated walking preview')

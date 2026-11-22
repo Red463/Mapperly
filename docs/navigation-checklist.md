@@ -55,3 +55,5 @@ Status: implementation started, 22 November 2026. Branch: `feature/journey-navig
 - 2026-11-22: Fresh review found three important state bugs (arrival cancelling replacement; walking preview obeying direct-mode preference; stale active preview after Replan). Reproduced each RED and fixed together. All regressions now pass. Walking preview version: 1.2.0-preview.1. Remaining next milestone: features 6-12, cross-zone and transport journeys.
 
 - 2026-11-22: First walking milestone packaged and verified as an installable local preview. Thirteen suites pass, with real TOC load order and all 55 mask records checked. Fresh review findings fixed; live-client acceptance remains required. No public release or GitHub push.
+
+- 2026-11-22: Screenshot follow-up, preview.2: reproduced the Elwynn coordinates (about 1,397 yd; one local planning step). Corrected route art-layer ordering and stale pending status. Added actual OnUpdate completion tests, guarded clocks and visible display-error reporting. Core roadmap remains unchanged; cross-zone/transport work is next.

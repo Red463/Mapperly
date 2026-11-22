@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.2.0-preview.2 (local build)
+
+- Draw walking routes above native exploration/highlight map artwork, following Gatherly's route-layer ordering; account for stitched OpenMap artwork when present.
+- Clear the pending preview message on success and report native display errors instead of leaving an apparent planning stall.
+- Use an explicitly visible, noninteractive background worker frame and guarded profiling-clock fallbacks.
+- Add regressions for the supplied Elwynn coordinates, real frame-callback completion, native map-art tiers and display/timer failures.
+
 ## 1.2.0-preview.1 (local walking-navigation milestone)
 
 - Bundle 55 terrain masks and local pathfinding independently of Gatherly, with explicit coverage/provenance.

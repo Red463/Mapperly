@@ -10,6 +10,36 @@ function V.Project(p,map)
     local good,x,y=pcall(hbd.GetZoneCoordinatesFromWorldInstance,hbd,wx,wy,instance,map)
     if good and finite(x) and finite(y) then return x,y end
 end
+local function layerLevel(canvas)
+    local level=canvas:GetFrameLevel()+10
+    if A.map.GetPinFrameLevelsManager then
+        local ok,manager=pcall(A.map.GetPinFrameLevelsManager,A.map)
+        if ok and (type(manager)=='table' or type(manager)=='userdata') and type(manager.GetFrameLevelStart)=='function' then
+            -- Exploration/highlight art is drawn by pins above the tile canvas.
+            -- Use the top of those art tiers, as Gatherly's route layer does.
+            for _,kind in ipairs({'PIN_FRAME_LEVEL_DEFAULT','PIN_FRAME_LEVEL_MAP_EXPLORATION','PIN_FRAME_LEVEL_MAP_HIGHLIGHT'}) do
+                local good,base=pcall(manager.GetFrameLevelStart,manager,kind)
+                if good and finite(base) then
+                    local range=1
+                    if type(manager.GetFrameLevelRange)=='function' then
+                        local valid,n=pcall(manager.GetFrameLevelRange,manager,kind)
+                        if valid and finite(n) and n>=1 then range=n end
+                    end
+                    level=math.max(level,base+range)
+                end
+            end
+        end
+    end
+    local api=OpenMapAPI
+    if type(api)=='table' and api.major==1 and type(api.IsStitched)=='function' and type(api.ArtTopLevel)=='function' then
+        local ok,stitched=pcall(api.IsStitched)
+        if ok and stitched then
+            local good,top=pcall(api.ArtTopLevel)
+            if good and finite(top) then level=math.max(level,top+1) end
+        end
+    end
+    return level
+end
 function V.Refresh()
     for _,line in pairs(V.lines) do line:Hide() end
     if V.window and V.window:IsShown() and V.followActive then
@@ -25,8 +55,9 @@ function V.Refresh()
     local canvas=A.map:GetCanvas()
     if not V.overlay then
         V.overlay=CreateFrame('Frame',nil,canvas);V.overlay:SetAllPoints(canvas)
-        V.overlay:EnableMouse(false);V.overlay:SetClipsChildren(true);V.overlay:SetFrameLevel(canvas:GetFrameLevel()+1)
+        V.overlay:EnableMouse(false);V.overlay:SetClipsChildren(true)
     end
+    V.overlay:SetFrameLevel(layerLevel(canvas))
     local map=A.map:GetMapID();local width,height=canvas:GetWidth(),canvas:GetHeight()
     for i=1,#plan.points-1 do
         local ax,ay=V.Project(plan.points[i],map);local bx,by=V.Project(plan.points[i+1],map)
@@ -67,7 +98,7 @@ function V.Show(plan,candidate)
 end
 function V.WriteSummary()
     local plan=V.plan
-    V.summary:SetText(string.format('%s\nWalking distance: %d yd | About %d min on foot\nTerrain coverage: %s',plan.name or 'Destination',math.floor(plan.distance+.5),math.max(1,math.ceil(plan.estimatedSeconds/60)),plan.coverage or 'unknown'))
+    V.summary:SetText(string.format('%s\nWalking distance: %d yd || About %d min on foot\nTerrain coverage: %s',plan.name or 'Destination',math.floor(plan.distance+.5),math.max(1,math.ceil(plan.estimatedSeconds/60)),plan.coverage or 'unknown'))
     local text={}
     for i,leg in ipairs(plan.legs or {}) do text[#text+1]=i..'. '..leg.name end
     V.steps:SetText(table.concat(text,'\n'))
@@ -80,7 +111,10 @@ function V.OpenCurrent()
 end
 function V.Preview(candidate)
     if A.PlanningJob.IsRunning() then return nil,'A route is already being planned. Wait or stop it first.' end
-    return A.Journey.Request(candidate,function(plan) V.Show(plan,candidate) end,function(reason)
+    return A.Journey.Request(candidate,function(plan)
+        V.Show(plan,candidate)
+        if A.navigationWindow then A.navigationWindow.status:SetText('Walking preview ready.') end
+    end,function(reason)
         A.Print(reason)
         if A.navigationWindow then A.navigationWindow.status:SetText(reason or 'No walking route found.') end
     end)
