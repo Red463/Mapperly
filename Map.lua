@@ -12,23 +12,25 @@ function A.UpdateCoordinates()
     -- FontStrings escape a literal pipe as ||.
     A.coordinateText:SetText(text..'  ||  '..cursor)
 end
-function A.ApplyLayout()
+function A.ApplyLayout(restorePosition)
     if A.applying then return end
+    if A.dragging then A.dragLayoutPending=true;return end
     if InCombatLockdown() then A.layoutPending=true;return end
     A.layoutPending=nil
     local f=A.map
+    -- Preserve the actual position before native sizing or theme changes touch it.
+    -- Opening/resolution changes restore the saved point instead of sampling a
+    -- temporary anchor supplied by Blizzard's panel manager.
+    if not restorePosition and A.layoutReady and A.layoutCompact==A.db.compact and f:IsShown() then A.SaveMapPosition() end
     A.applying=true
-    -- Always use the windowed canvas. Native fullscreen is never a Mapperly mode.
-    if f.Minimize then f:Minimize() end
+    -- Repeated Minimize calls invoke UpdateUIPanelPositions/RestoreUIPanelArea,
+    -- letting Blizzard's panel layout move a window that Mapperly already owns.
+    if f.Minimize and (not A.nativeWindowed or f.IsMaximized and f:IsMaximized()) then f:Minimize() end
+    A.nativeWindowed=true
     A.LayoutShell()
-    f:SetMovable(A.db.compact and not A.db.locked);f:SetClampedToScreen(true)
-    f:ClearAllPoints()
-    if A.db.compact and A.db.position then
-        local p=A.db.position
-        f:SetPoint('TOPLEFT',UIParent,'TOPLEFT',p.x,p.y)
-    else
-        f:SetPoint('CENTER',UIParent,'CENTER',0,0)
-    end
+    f:SetMovable(not A.db.locked)
+    A.PositionMap()
+    A.layoutReady=true;A.layoutCompact=A.db.compact
     A.UpdateButtonStates()
     A.applying=nil
     A.UpdateOpacity()
@@ -89,11 +91,16 @@ function A.AttachMap()
     footer:SetFrameStrata('HIGH');footer:SetFrameLevel(f:GetFrameLevel()+2500)
     footer:SetBackdrop({bgFile='Interface\\Tooltips\\UI-Tooltip-Background'});footer:SetBackdropColor(.025,.022,.018,1)
     bar:EnableMouse(true);bar:RegisterForDrag('LeftButton')
-    bar:SetScript('OnDragStart',function() if A.db.compact and not A.db.locked and not InCombatLockdown() then f:StartMoving();A.dragging=true end end)
+    bar:SetScript('OnDragStart',function() if not A.db.locked and not InCombatLockdown() then A.dragging=true;f:StartMoving() end end)
     bar:SetScript('OnDragStop',function()
-        if not A.dragging then return end;f:StopMovingOrSizing();A.dragging=nil
-        local ratio=f:GetEffectiveScale()/UIParent:GetEffectiveScale()
-        A.db.position={x=f:GetLeft(),y=f:GetTop()-UIParent:GetHeight()/ratio}
+        if not A.dragging then return end
+        -- StopMoving may itself fire layout/viewport callbacks. Keep the drag
+        -- guard active until the final position has been captured.
+        f:StopMovingOrSizing();A.SaveMapPosition();A.dragging=nil
+        local layout,viewport=A.dragLayoutPending,A.dragViewportPending
+        A.dragLayoutPending=nil;A.dragViewportPending=nil
+        if layout then A.ApplyLayout(true)
+        else A.PositionMap();if viewport then A.QueueViewportFit() end end
     end)
     local function toggleSize()
         if InCombatLockdown() then A.Print('Map size can be changed after combat.');return end
@@ -181,7 +188,7 @@ function A.AttachMap()
     end
     A.AttachZoneLevels()
     if type(f.AdjustOverlayFrames)=='function' then hooksecurefunc(f,'AdjustOverlayFrames',A.PositionMapPinButton) end
-    f:HookScript('OnShow',function() A.UpdateOpacity(true);A.ApplyLayout();A.Refresh() end)
+    f:HookScript('OnShow',function() A.UpdateOpacity(true);A.ApplyLayout(true);A.Refresh() end)
     if f.SetMapID then hooksecurefunc(f,'SetMapID',A.Refresh) end
     if f.Maximize then hooksecurefunc(f,'Maximize',function() if not A.applying then A.db.compact=false;A.ApplyLayout() end end) end
     if f.Minimize then hooksecurefunc(f,'Minimize',function() if not A.applying then A.db.compact=true;A.ApplyLayout() end end) end

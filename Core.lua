@@ -6,8 +6,10 @@ for _,event in ipairs({'ADDON_LOADED','PLAYER_LOGIN','PLAYER_REGEN_ENABLED','DIS
 events:SetScript('OnEvent',function(_,event,name)
     if event=='ADDON_LOADED' and name=='Mapperly' then MapperlyDB=A.InitStore(MapperlyDB) end
     if not A.db then return end
+    if event=='PLAYER_LOGIN' then A.wayCommandsReady=true end
+    if event=='PLAYER_LOGIN' or event=='ADDON_LOADED' then A.UpdateWayCommand() end
     if event=='PLAYER_LOGIN' or event=='ADDON_LOADED' then A.AttachMap()
-    elseif event=='DISPLAY_SIZE_CHANGED' or event=='UI_SCALE_CHANGED' then if A.map then A.ApplyLayout() end
+    elseif event=='DISPLAY_SIZE_CHANGED' or event=='UI_SCALE_CHANGED' then if A.map then A.ApplyLayout(true) end
     elseif event=='PLAYER_REGEN_ENABLED' then if A.layoutPending and A.map then A.ApplyLayout() end
     elseif event=='MAIL_SHOW' then A.Observe('mail','Mailbox');A.Refresh()
     elseif event=='TAXIMAP_OPENED' then A.Observe('flight',UnitName('npc') or 'Flight master');A.Refresh()
@@ -22,6 +24,8 @@ end)
 SLASH_MAPPERLY1='/mapperly'
 SlashCmdList.MAPPERLY=function(msg)
     if not A.db then return end
+    local way=msg:match('^%s*way%s+(.*)$')
+    if way or msg:match('^%s*way%s*$') then return A.NavigateCommand(way or '') end
     if msg=='debug' then
         A.Print('Build '..A.version..'; map '..tostring(A.map and A.map:GetMapID())..'; registered pins '..#A.pinPool)
         for i,pin in ipairs(A.pinPool) do
@@ -43,7 +47,7 @@ SlashCmdList.MAPPERLY=function(msg)
         local p={category=category,map=tonumber(m),x=tonumber(cx)/100,y=tonumber(cy)/100,name=label:sub(1,120)}
         if allowed and A.ValidPin(p) then table.insert(A.db.observed,p);A.Refresh() else A.Print('Invalid pin category or coordinates.') end;return
     end
-    if msg=='help' then A.Print('/mapperly: open map; /mapperly note <mapID> <x%> <y%> <name>; /mapperly pin <mail|inn|dungeon|flight|transport|portal|border> <mapID> <x%> <y%> <name>');return end
+    if msg=='help' then A.Print('/mapperly: open map; /way <x%> <y%> [name] (if unclaimed); /mapperly way <x%> <y%> [name]; /mapperly note <mapID> <x%> <y%> <name>; /mapperly pin <mail|inn|dungeon|flight|transport|portal|border> <mapID> <x%> <y%> <name>');return end
     A.AttachMap()
     if not A.map then A.Print('Native world map is not loaded yet. Open it with M, then try again.');return end
     if not A.map:IsShown() then if ToggleWorldMap then ToggleWorldMap() else A.map:Show() end else ToggleDropDownMenu(1,nil,A.menu,A.bar,0,0) end

@@ -47,7 +47,10 @@ function A.InitStore(raw)
     end
     db.notes=type(db.notes)=='table' and db.notes or {}
     db.observed=type(db.observed)=='table' and db.observed or {}
-    if type(db.position)~='table' or type(db.position.x)~='number' or type(db.position.y)~='number' or A.Number(db.position.x,-10000,10000,nil)~=db.position.x or A.Number(db.position.y,-10000,10000,nil)~=db.position.y then db.position=nil end
+    for _,key in ipairs({'position','largePosition'}) do
+        local p=db[key]
+        if type(p)~='table' or type(p.x)~='number' or type(p.y)~='number' or A.Number(p.x,-10000,10000,nil)~=p.x or A.Number(p.y,-10000,10000,nil)~=p.y then db[key]=nil end
+    end
     A.db=db
     local notes={}
     for _,p in ipairs(A.ArrayValues(db.notes)) do

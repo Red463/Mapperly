@@ -4,13 +4,13 @@
 
 A cleaner world map for **WoW Forever**. Compact and enlarged views, painted location markers, custom notes and coordinate navigation, styled to fit the original game.
 
-**Version: 1.1.0** | **Interface: 16001**
+**Version: 1.1.1** | **Interface: 16001**
 
 [Download the latest release](https://github.com/Red463/Mapperly/releases/latest) | [Report an issue](https://github.com/Red463/Mapperly/issues)
 
 ## Installation
 
-1. Download **Mapperly-1.1.0.zip** from the release page.
+1. Download **Mapperly-1.1.1.zip** from the release page.
 2. Extract the `Mapperly` folder into your WoW Forever `Interface/AddOns` directory.
 3. Restart the game or run `/reload` when updating an existing installation.
 4. Open the world map with **M**.
@@ -19,10 +19,10 @@ Use the release ZIP for installation. GitHub's automatic source archives include
 
 ## Features
 
-- **Two remembered map sizes:** a substantial compact view and an enlarged view with game space around the edges. Drag the compact map's title bar to move it; use Lock to keep it in place.
+- **Two remembered map sizes:** a substantial compact view and an enlarged view with game space around the edges. Drag the title bar in either view to move it; each view remembers its own position. Use Lock to keep it in place. Theme and settings changes preserve placement, and screen bounds include the crest and frame trim.
 - **Location markers:** inns, mailboxes, dungeon entrances with level ranges, flight masters, boats/zeppelins, zone exits where supported, and custom notes.
 - **Simple layer controls:** toggle individual categories in Filters. In Settings, choose which also appear on continent/world maps. Dungeons are enabled there by default; the other layers default to zone maps.
-- **Switchable themes:** the Default theme uses warm Classic panels, native window trim and red primary actions. Choose **Original** in **Settings > Appearance theme** for the previous charcoal look. The choice is remembered and applies immediately to open windows without losing drafts; Gatherly is not required.
+- **Switchable themes:** the Default theme uses warm Classic panels, native window trim and red primary actions. Choose **Minimal Charcoal** in **Settings > Appearance theme** for the previous charcoal look. The choice is remembered and applies immediately to open windows without losing drafts; Gatherly is not required.
 - **Dedicated settings window:** grouped display, sizing and opacity controls; matching icons beside location names; a live marker-size preview.
 - **Optional quest pane:** the quest icon opens or closes the native quest list and remembers your choice.
 - **Useful map details:** player/cursor coordinates, recommended zone levels when reliable data is available, optional unexplored-area reveal and a repeatable player-location ping.
@@ -62,9 +62,13 @@ The guide provides a **straight-line bearing**, not a terrain or transport route
 
 - `/mapperly` opens the map or its filter menu.
 - `/mapperly help` lists commands.
+- `/way 10.23 52.65` starts navigation when no other addon owns `/way`. Add an optional name after the coordinates.
+- `/mapperly way 10.23 52.65` always starts Mapperly navigation, including when another addon handles `/way`.
 - `/mapperly note 1431 25 50 Meeting point` adds a permanent custom note.
 - `/mapperly pin portal 1453 50 50 Destination name` adds a manually verified location.
 - `/mapperly debug` prints build/map/pin diagnostics for bug reports.
+
+Waypoint commands use the viewed map while it is open, otherwise your character's current zone. Coordinates are percentages from 0 to 100. Invalid input leaves the current destination unchanged. Mapperly respects existing and late-loaded `/way` handlers; it does not run a second navigation arrow alongside them.
 
 ## Coverage and compatibility
 
@@ -88,6 +92,8 @@ python tests/themes.py
 python tests/destinations.py
 python tests/destination_ui.py
 python tests/map_interactions.py
+python tests/map_position.py
+python tests/way_command.py
 python tests/services_builder.py
 python tools/package.py
 ```

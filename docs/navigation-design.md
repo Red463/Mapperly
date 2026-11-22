@@ -22,3 +22,12 @@ Alt-right-click places a waypoint immediately. High-priority native canvas/pin h
 Custom notes have names, descriptions (up to 1,000 characters), optional groups and twelve new painted symbols (with older icon choices retained). Their category stays Custom notes. Click to edit; Alt-right-click to navigate; Shift-click to share into an edit box; right-click to delete. The draggable note window uses the same styling as Settings and offers a searchable My notes browser sorted by group/name. Empty names and stale note references cannot overwrite saved records. Saved data migration keeps existing note objects and validates new optional fields.
 
 Validation also covers persistence, malformed saved records, coordinate precision, cross-map list actions, history dedup/capping, note creation/editing/deletion, search and icon selection, modifier-click consumption and small-screen window fitting. In-game rendering and the user's particular addon mix still need client verification.
+
+
+## Slash waypoints
+
+`/way X Y [name]` starts the existing navigation engine with percentage coordinates (0-100, decimals supported). The visible map supplies the destination map; otherwise `C_Map.GetBestMapForUnit('player')` supplies the current zone. A visible unprojectable map reports the navigation error instead of silently substituting another zone. Failed parsing or navigation preserves the current destination and history. `/mapperly way X Y [name]` is always available.
+
+`Commands.lua` registers the optional `/way` alias at PLAYER_LOGIN after normal addon loading, then rechecks on ADDON_LOADED. It examines global SLASH aliases, the public cached slash/chat-owner tables, and native secure command ownership. Other addons take precedence. Only Mapperly-owned aliases/cache entries are released; an already-imported competing handler is restored to the cache so subsequent commands keep working. A stale Mapperly callback also yields and delegates when another addon registered dynamically. No global chat parser or competing handler is replaced or hooked.
+
+Regression checks cover precision, map context, optional names, coordinate boundaries, malformed input, unavailable map geometry, history, existing/cached/late registrations, Blizzard's SlashCmdList proxy, repeated foreign command use and native secure ownership.

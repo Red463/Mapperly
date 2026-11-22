@@ -32,6 +32,8 @@ assert(A.InitStore(db).notes[1].x==.1)
 assert(A.InitStore({position={x=math.huge,y=0}}).position==nil)
 assert(A.InitStore({position={x=0/0,y=0}}).position==nil)
 assert(A.InitStore({position={}}).position==nil)
+assert(A.InitStore({layoutVersion=2,largePosition={x=math.huge,y=0}}).largePosition==nil)
+assert(A.InitStore({layoutVersion=2,largePosition={x=250,y=-80}}).largePosition.x==250)
 A.InitStore(db)
 assert(not A.ValidPin({map=1,x=-1,y=0,name='bad'}))
 ''')
@@ -128,7 +130,7 @@ WorldMapFrame.AcquirePin=function(self,template,data)
  pin:OnLoad();pin:OnAcquired(data);pin:Show();table.insert(self.nativePins,pin);return pin
 end
 ''')
-for name in ['Data/Places.lua','Data/FlightData.lua','Data/ZoneLevels.lua','ZoneLevels.lua','Places.lua','Data/Services.lua','Services.lua','Theme.lua','Destinations.lua','Navigation.lua','Pins.lua','Reveal.lua','Shell.lua','Opacity.lua','Settings.lua','Buttons.lua','Dialogs.lua','NavigationUI.lua','NotesUI.lua','MapInteractions.lua','Map.lua','Core.lua']:
+for name in ['Data/Places.lua','Data/FlightData.lua','Data/ZoneLevels.lua','ZoneLevels.lua','Places.lua','Data/Services.lua','Services.lua','Theme.lua','Destinations.lua','Navigation.lua','Pins.lua','Reveal.lua','Shell.lua','Opacity.lua','Settings.lua','Buttons.lua','Dialogs.lua','NavigationUI.lua','NotesUI.lua','MapInteractions.lua','Map.lua','Commands.lua','Core.lua']:
     lua.execute('assert(loadstring(...))("Mapperly", A)', (root/name).read_text(encoding='utf-8-sig'))
 lua.execute('''
 A.AttachMap()

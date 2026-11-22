@@ -12,6 +12,38 @@ function A.HideChrome(value)
     end
 end
 A.hiddenChrome={}
+local function positionKey() return A.db.compact and 'position' or 'largePosition' end
+function A.SaveMapPosition()
+    local f=A.map
+    if not f then return end
+    local left,top=f:GetLeft(),f:GetTop()
+    if type(left)~='number' or type(top)~='number' then return end
+    local ratio=f:GetEffectiveScale()/UIParent:GetEffectiveScale()
+    -- Frame coordinates use its effective scale; saved offsets use UIParent units.
+    local x=left*ratio-(UIParent:GetLeft() or 0)
+    local y=top*ratio-(UIParent:GetTop() or UIParent:GetHeight())
+    if A.Number(x,-10000,10000,nil)==x and A.Number(y,-10000,10000,nil)==y then
+        A.db[positionKey()]={x=x,y=y}
+    end
+end
+function A.PositionMap()
+    if A.dragging then return end
+    local f=A.map
+    local sw,sh=UIParent:GetWidth(),UIParent:GetHeight()
+    -- Native portrait/trim extends beyond the logical frame rectangle.
+    local side,bottom,top=12,12,16
+    f:SetClampedToScreen(true);f:SetClampRectInsets(-side,side,top,-bottom)
+    local p=A.db[positionKey()]
+    local x=p and p.x or (sw-f:GetWidth())/2
+    local y=p and p.y or -(sh-f:GetHeight())/2
+    x=math.max(side,math.min(sw-f:GetWidth()-side,x))
+    y=math.min(-top,math.max(f:GetHeight()+bottom-sh,y))
+    f:ClearAllPoints();f:SetPoint('TOPLEFT',UIParent,'TOPLEFT',x,y)
+end
+function A.ResetMapPosition()
+    A.db.position=nil;A.db.largePosition=nil
+    A.ApplyLayout(true)
+end
 function A.PositionMapPinButton()
     local f=A.map
     local pin=f and f.WorldMapTrackingPinButton
@@ -43,7 +75,11 @@ end
 function A.FitViewport()
     local f=A.map
     if not f or not f:IsShown() then return end
+    if A.dragging then A.dragViewportPending=true;return end
     if InCombatLockdown() then A.layoutPending=true;return end
+    -- ShowUIPanel can finish anchoring after OnShow. Reassert the saved,
+    -- decorated screen bounds once that native layout has settled.
+    A.PositionMap()
     -- Native Minimize recalculates these before our final dimensions are applied.
     -- Rebuild zoom levels from the settled viewport, then discard the old pan ratio.
     if f.OnFrameSizeChanged then f:OnFrameSizeChanged() end

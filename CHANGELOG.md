@@ -1,38 +1,42 @@
 # Changelog
 
-## 1.1.0 - 2026-11-21
+## 1.1 - 2026-11-22
 
-All changes since 1.0.0 are consolidated into this release. Interim local development build numbers are superseded by 1.1.0.
+Release build **1.1.1**. This entry consolidates all changes since 1.0.0, including the initial 1.1 release and subsequent local development builds.
 
 ### Navigation and destinations
 
-- Navigate directly to map markers or place a quick waypoint with **Alt-right-click**, preserving normal marker actions and the game's Ctrl-click ping system.
-- Save named destinations and revisit the latest 20 unique destinations through Coordinates, Saved and Recent tabs. Favourites and history survive reloads.
-- Preserve exact marker positions for Mapperly and supported native/addon pins, and avoid placing waypoints while dragging.
+- Navigate directly to markers or place quick waypoints with **Alt-right-click**, preserving normal marker actions and the game's Ctrl-click ping system.
+- Use **`/way X Y [name]`** to start navigation with decimal coordinates. Mapperly claims `/way` only when free and yields to other addons, including late-loaded handlers and cached registrations.
+- Use **`/mapperly way X Y [name]`** whenever another addon owns `/way`. Commands use the viewed map while it is open, otherwise your character's current zone. Invalid input preserves the active destination.
+- Save named destinations and revisit the latest **20 unique destinations** through Coordinates, Saved and Recent tabs. Favourites and history survive reloads.
+- Preserve exact positions for supported Mapperly, native and addon markers; dragging does not place a waypoint.
 
 ### Custom notes
 
 - Add and edit note names, descriptions, groups and icons in a dedicated window matching Settings.
-- Browse and search notes across all zones, navigate to them, share coordinates with Shift-click, or remove them with right-click.
-- Choose from twelve new painted symbols with transparent, size-matched textures. Icons have no purpose labels, so players can use each symbol however they wish. Existing notes and older icon choices are preserved.
+- Browse and search notes across zones, navigate to them, share coordinates with Shift-click, or remove them with right-click.
+- Choose from **twelve new painted symbols** with transparent, size-matched textures. The picker has no purpose labels, so each symbol can represent whatever the player chooses. Existing notes and older icon choices are preserved.
 
-### Appearance and map layout
+### Themes and map appearance
 
-- Add the new **Default** theme with warm Classic panels, Blizzard-style frames, native tabs and primary actions. Retain **Original** as a remembered Settings option, with immediate switching that preserves open drafts.
-- Refine settings, notes and destination windows, including native button captions and tab spacing.
-- Add a fitted original Mapperly crest and standard Blizzard close button. Show Mapperly and the installed version in the title bar.
-- Match the right toolbar and footer to the brown header styling, with consistent borders and controls positioned below the header.
-- Centre the zone name and level range in larger white outlined text; keep native hover/POI labels on a separate row.
+- Add the **Default** theme with warm Classic panels, Blizzard-style frames, native tabs and primary actions. Keep the previous look as **Minimal Charcoal** in Settings. Theme choices save immediately and switch without losing open drafts.
+- Refine settings, note and destination windows, including button captions and inactive-tab spacing. Reset map position uses the native primary-button treatment, matching the red Blizzard Done button in Default.
+- Fit the original Mapperly crest into its circular frame and use a standard Blizzard close button. Show Mapperly and the installed version in the title bar.
+- Match the toolbar and footer to the brown header, keep frame borders consistent, and position toolbar controls below the header.
+- Centre the zone name and level range in larger white outlined text; place native hover/POI labels on a separate row.
 - Move Blizzard's Map Pin control to the upper-right of the map, clear of the crest and left-side addon controls.
 
-### Usability and compatibility
+### Position, sizing and usability
 
-- Extend compact map sizing down to **50%**, keeping text, marker sizes and the native quest-pane width intact. Fit all toolbar actions on smaller screens.
+- Remember **independent compact and enlarged positions**, and allow dragging either unlocked view. Theme, lock and quest-pane changes preserve placement.
+- Fit restored positions to the current display with room for the crest and borders, including ultrawide resolutions and UI-scale changes.
+- Defer fitting/layout callbacks during dragging, save the released position first, then apply pending updates. Stop repeatedly invoking Blizzard's minimise/reposition routine on ordinary settings changes.
+- Extend compact sizing down to **50%**, retaining readable text, marker sizes and native quest-pane width. Fit all toolbar actions on smaller screens.
 - Keep player and cursor coordinates together at the left of the footer, separated by a pipe.
 - Refresh hovered toolbar tooltips immediately after clicks and state changes.
-- Expand automated coverage for saved destinations, note editing, themes, native pin interactions, map layout and small-screen fitting.
 
-Updating from 1.0.0 preserves saved settings, custom notes and other existing preferences. No Gatherly or Questie dependency is added.
+Updating from 1.0.0 preserves existing settings, notes and preferences. No Gatherly or Questie dependency is added. Existing third-party licenses and notices are retained.
 
 ## 1.0.0
 
