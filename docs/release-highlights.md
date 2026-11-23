@@ -2,6 +2,11 @@
 
 Keep each release to at most four short, plain-language bullets (180 characters each). Packaging requires a section matching the TOC version and regenerates Data/ReleaseNotes.lua.
 
+## 1.2.2
+
+- Fix opening the closed map with M or /mapperly during combat, including the first opening after login.
+- Keep your map size and quest-pane settings; finish deferred layout after combat. Native map-disable rules and protected-frame restrictions still apply.
+
 ## 1.2.1
 
 - New blue-and-gold Mapperly branding, with a clearer small icon and M badges for the map and addon windows.

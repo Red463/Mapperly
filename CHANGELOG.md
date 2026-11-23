@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.2 - 2026-11-23
+
+- Fix opening the map from closed during combat through M and `/mapperly`. Show the normal unprotected frame without calling the addon-blocked ShowUIPanel helper; retain the native global game-rule check and out-of-combat opening path.
+- Defer the native first-show display-mode transition and restore Mapperly's saved layout after combat, without overwriting size/quest-pane choices, losing position or closing the reopened map.
+- Add regressions for combat opening, repeated toggles, first-open initialization, native disabled-map rules, protected-frame guards and the actual combat-end event handler. Keep existing movement/closing behavior.
+
 ## 1.2.1 - 2026-11-23
 
 Consolidates all local updates since 1.2.0.

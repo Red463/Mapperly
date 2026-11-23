@@ -1,3 +1,3 @@
 -- Generated from docs/release-highlights.md; keep current with the TOC.
 local _,A=...
-A.ReleaseNotes={version="1.2.1",changes={"New blue-and-gold Mapperly branding, with a clearer small icon and M badges for the map and addon windows.","Move the unlocked map and close it with X or M during combat when the game permits the frame operations.","Warn when EnhanceQoL's World Map mover is enabled, with the setting to disable. Other EnhanceQoL preferences are left unchanged.","Fix map-report capture blocking dragging, and include more useful frame and mouse-input details in diagnostic reports."}}
+A.ReleaseNotes={version="1.2.2",changes={"Fix opening the closed map with M or /mapperly during combat, including the first opening after login.","Keep your map size and quest-pane settings; finish deferred layout after combat. Native map-disable rules and protected-frame restrictions still apply."}}

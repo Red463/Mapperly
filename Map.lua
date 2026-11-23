@@ -104,12 +104,24 @@ function A.AttachMap()
     local f=A.map
     -- Native M handling can request another open display state when character
     -- miniWorldMap/questLogOpen preferences disagree with our windowed shell.
-    -- Only the visible-map action changes: retain the native opening path,
-    -- global binding/rule checks and panel close lifecycle.
+    -- Keep native opening outside combat and global binding/rule checks.
+    -- Combat opening uses the unprotected frame and defers mode changes.
     local nativeToggle=f.HandleUserActionToggleSelf
     if type(nativeToggle)=='function' then
         f.HandleUserActionToggleSelf=function(self,...)
             if self==f and self:IsShown() then return closeMap(self) end
+            if self==f and InCombatLockdown() then
+                if self.IsProtected and self:IsProtected() then A.Print('The game currently protects this map frame. Try opening it after combat.');return end
+                -- The global map binding already checked the game's disabled-map
+                -- rules. Show the unprotected frame without entering the blocked
+                -- panel helper or changing native size/quest display states.
+                A.panelClosePending=nil;A.combatMapOpened=true;A.layoutPending=true
+                -- Native OnShow otherwise performs its first-open mode change
+                -- through the protected panel delegate. Our deferred layout
+                -- applies the remembered mode after combat instead.
+                self.needUpdateDisplayState=nil
+                return self:Show()
+            end
             return nativeToggle(self,...)
         end
     end
