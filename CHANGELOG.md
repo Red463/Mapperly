@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.3 - 2026-11-23
+
+- Restore and verify the native movable flag before starting an unlocked map drag. Native display/first-show changes can clear it independently of Mapperly's saved lock option.
+- Guard rejected movement attempts, stop any partial move, clear the dragging guard and drain deferred layout work without saving a failed drag. Record failures in active map diagnostic captures.
+- Retain lock and protected-frame combat checks. Extend the native frame test double to model movable state; reproduce the reported StartMoving error and cover both sizes/themes in/out of combat, forced refusal and failed-start cleanup.
+
 ## 1.2.2 - 2026-11-23
 
 - Fix opening the map from closed during combat through M and `/mapperly`. Show the normal unprotected frame without calling the addon-blocked ShowUIPanel helper; retain the native global game-rule check and out-of-combat opening path.

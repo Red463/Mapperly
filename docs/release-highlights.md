@@ -2,6 +2,11 @@
 
 Keep each release to at most four short, plain-language bullets (180 characters each). Packaging requires a section matching the TOC version and regenerates Data/ReleaseNotes.lua.
 
+## 1.2.3
+
+- Fix the map-drag error when native display changes clear the frame's movable flag, including deferred combat opening.
+- Check movement readiness before starting and clean up safely if movement is rejected, without leaving the map stuck in dragging mode.
+
 ## 1.2.2
 
 - Fix opening the closed map with M or /mapperly during combat, including the first opening after login.

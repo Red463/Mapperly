@@ -1,3 +1,3 @@
 -- Generated from docs/release-highlights.md; keep current with the TOC.
 local _,A=...
-A.ReleaseNotes={version="1.2.2",changes={"Fix opening the closed map with M or /mapperly during combat, including the first opening after login.","Keep your map size and quest-pane settings; finish deferred layout after combat. Native map-disable rules and protected-frame restrictions still apply."}}
+A.ReleaseNotes={version="1.2.3",changes={"Fix the map-drag error when native display changes clear the frame's movable flag, including deferred combat opening.","Check movement readiness before starting and clean up safely if movement is rejected, without leaving the map stuck in dragging mode."}}

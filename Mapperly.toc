@@ -2,7 +2,7 @@
 ## Title: Mapperly
 ## Notes: Native world map improvements. /mapperly
 ## Author: Tom
-## Version: 1.2.2
+## Version: 1.2.3
 ## IconTexture: Interface\AddOns\Mapperly\Media\Icon32
 ## SavedVariables: MapperlyDB
 ## OptionalDeps: Blizzard_WorldMap, Gatherly, RareScanner

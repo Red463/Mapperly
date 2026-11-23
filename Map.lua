@@ -135,19 +135,36 @@ function A.AttachMap()
     footer:SetFrameStrata('HIGH');footer:SetFrameLevel(f:GetFrameLevel()+2500)
     footer:SetBackdrop({bgFile='Interface\\Tooltips\\UI-Tooltip-Background'});footer:SetBackdropColor(.025,.022,.018,1)
     bar:EnableMouse(true);bar:RegisterForDrag('LeftButton')
+    local function finishDragWork(reanchor)
+        local layout,viewport=A.dragLayoutPending,A.dragViewportPending
+        A.dragLayoutPending=nil;A.dragViewportPending=nil
+        if layout then A.ApplyLayout(true)
+        elseif reanchor then A.PositionMap();if viewport then A.QueueViewportFit() end
+        elseif viewport then A.QueueViewportFit() end
+    end
     bar:SetScript('OnDragStart',function()
         if A.db.locked or InCombatLockdown() and f.IsProtected and f:IsProtected() then return end
-        A.dragging=true;f:StartMoving()
+        A.dragging=true
+        local ok,started=pcall(function()
+            -- Native first-show/display changes can clear this independently
+            -- of Mapperly's lock option, especially with deferred layout.
+            f:SetMovable(true)
+            if not f:IsMovable() then return false end
+            f:StartMoving();return true
+        end)
+        if not ok or not started then
+            -- A failed/partially started move must not strand the drag guard.
+            pcall(f.StopMovingOrSizing,f);A.dragging=nil
+            if A.MapReport then A.MapReport.Log('drag-start-failed',type(started)=='string' and started or 'Native map is not movable',true) end
+            finishDragWork(false)
+        end
     end)
     bar:SetScript('OnDragStop',function()
         if not A.dragging then return end
         -- StopMoving may itself fire layout/viewport callbacks. Keep the drag
         -- guard active until the final position has been captured.
         f:StopMovingOrSizing();A.SaveMapPosition();A.dragging=nil
-        local layout,viewport=A.dragLayoutPending,A.dragViewportPending
-        A.dragLayoutPending=nil;A.dragViewportPending=nil
-        if layout then A.ApplyLayout(true)
-        else A.PositionMap();if viewport then A.QueueViewportFit() end end
+        finishDragWork(true)
     end)
     local function toggleSize()
         if InCombatLockdown() then A.Print('Map size can be changed after combat.');return end
