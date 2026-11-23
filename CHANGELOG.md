@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.2.4 - 2026-11-23
+## 1.2.1 - 2026-11-23
 
 Consolidates all local updates since 1.2.0.
 
@@ -10,7 +10,7 @@ Consolidates all local updates since 1.2.0.
 - Fix diagnostic capture enabling mouse input on decorative trim and blocking title-bar dragging. Retain global mouse-focus/setter tracing, and include trim/title-bar geometry, input state and protected status in reports.
 - Include regression coverage for native mouse-hook side effects, read-only conflict detection and combat movement/closing. Reload after installing to clear old diagnostic hooks.
 
-See [release details](docs/release-1.2.4.md).
+See [release details](docs/release-1.2.1.md).
 
 ## 1.2.0 - 2026-11-23
 

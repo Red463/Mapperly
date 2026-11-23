@@ -1,4 +1,4 @@
-Mapperly 1.2.4 includes all updates since 1.2.0.
+Mapperly 1.2.1 includes all updates since 1.2.0.
 
 ## Changes
 
@@ -9,7 +9,7 @@ Mapperly 1.2.4 includes all updates since 1.2.0.
 
 ## Installation
 
-Download **Mapperly-1.2.4.zip**, extract the `Mapperly` folder into `Interface/AddOns` and run `/reload` or restart the game. Reloading clears any diagnostic mouse handlers left by older builds. Existing settings, notes and saved destinations are preserved.
+Download **Mapperly-1.2.1.zip**, extract the `Mapperly` folder into `Interface/AddOns` and run `/reload` or restart the game. Reloading clears any diagnostic mouse handlers left by older builds. Existing settings, notes and saved destinations are preserved.
 
 ## Navigation feedback
 

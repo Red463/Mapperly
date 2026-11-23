@@ -4,17 +4,17 @@
 
 A cleaner world map for **WoW Forever**. Compact and enlarged views, painted location markers, custom notes and coordinate navigation, styled to fit the original game.
 
-**Version: 1.2.4** | **Interface: 16001**
+**Version: 1.2.1** | **Interface: 16001**
 
 [Download the latest release](https://github.com/Red463/Mapperly/releases/latest) | [Report an issue](https://github.com/Red463/Mapperly/issues)
 
 Version 1.2.0 adds smart journey navigation, quest and service search, road/swimming preferences, supported travel methods, route recovery and copyable diagnostics. See the [release notes](docs/release-1.2.0.md) and [in-game test guide](docs/testing-1.2.0.md) for features and coverage limits.
 
-Version 1.2.4 adds updated branding, combat map controls, an EnhanceQoL mover warning and map-diagnostic fixes. See the [latest release notes](docs/release-1.2.4.md).
+Version 1.2.1 adds updated branding, combat map controls, an EnhanceQoL mover warning and map-diagnostic fixes. See the [latest release notes](docs/release-1.2.1.md).
 
 ## Installation
 
-1. Download **Mapperly-1.2.4.zip** from the release page.
+1. Download **Mapperly-1.2.1.zip** from the release page.
 2. Extract the `Mapperly` folder into your WoW Forever `Interface/AddOns` directory.
 3. Restart the game or run `/reload` when updating an existing installation.
 4. Open the world map with **M**.
