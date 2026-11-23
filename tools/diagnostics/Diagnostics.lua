@@ -129,7 +129,8 @@ end
 local function scripts(f,label)
     if not f then return end
     D.watched[f]=D.watched[f] or {}
-    for _,script in ipairs({'OnDragStart','OnDragStop','OnMouseDown','OnMouseUp','OnShow','OnHide','OnSizeChanged'}) do
+    -- Keep decorative chrome input-transparent; global events trace clicks.
+    for _,script in ipairs({'OnDragStart','OnDragStop','OnShow','OnHide','OnSizeChanged'}) do
         local key='script:'..script
         if not D.watched[f][key] then
             local ok=pcall(f.HookScript,f,script,function(_,arg) D.Log(label..'.'..script,value(arg),true) end)

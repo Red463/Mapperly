@@ -4,15 +4,17 @@
 
 A cleaner world map for **WoW Forever**. Compact and enlarged views, painted location markers, custom notes and coordinate navigation, styled to fit the original game.
 
-**Version: 1.2.0** | **Interface: 16001**
+**Version: 1.2.4** | **Interface: 16001**
 
 [Download the latest release](https://github.com/Red463/Mapperly/releases/latest) | [Report an issue](https://github.com/Red463/Mapperly/issues)
 
 Version 1.2.0 adds smart journey navigation, quest and service search, road/swimming preferences, supported travel methods, route recovery and copyable diagnostics. See the [release notes](docs/release-1.2.0.md) and [in-game test guide](docs/testing-1.2.0.md) for features and coverage limits.
 
+Version 1.2.4 adds updated branding, combat map controls, an EnhanceQoL mover warning and map-diagnostic fixes. See the [latest release notes](docs/release-1.2.4.md).
+
 ## Installation
 
-1. Download **Mapperly-1.2.0.zip** from the release page.
+1. Download **Mapperly-1.2.4.zip** from the release page.
 2. Extract the `Mapperly` folder into your WoW Forever `Interface/AddOns` directory.
 3. Restart the game or run `/reload` when updating an existing installation.
 4. Open the world map with **M**.
@@ -116,6 +118,8 @@ Dungeon, flight and transport metadata is bundled from OpenMap. Recommended zone
 **Portals are manual locations only:** no verified portal-location dataset is bundled. Enabling the layer does not create portal pins automatically.
 
 The map keeps native pin providers so Questie, Gatherly, RareScanner and other map addons can continue drawing their own markers. Mapperly filters affect its own pins. Other addons that resize or replace the map can conflict. Compatibility depends on the addon mix; please include it with bug reports.
+
+Mapperly warns if EnhanceQoL's mover is enabled for World Map. To prevent position resets, open `/eqol` > Interface > Mover > World, untick **World Map**, then `/reload`. Other mover features can remain enabled. Mapperly reads the active configuration without changing it; the warning appears once per session on map open and waits during combat or other dialogs.
 
 Scheduled journeys now include **25 directed boat, zeppelin and airship links across 12 services**, with faction-appropriate choices in Navigation settings. Follow the walking route to the land approach, board manually and follow the travel/disembarking instructions. Through sailings keep you aboard at intermediate stops. Travel choices changed aboard take effect after landing. Blue map/minimap lines show native sailing pieces; total times include planning assumptions, not live timetables. See [transport sources and limits](Data/Transports-SOURCES.md).
 

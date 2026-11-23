@@ -47,7 +47,7 @@ function U.Window(name,title,subtitle,w,h)
     f:SetBackdrop({bgFile='Interface\\Buttons\\WHITE8X8',edgeFile='Interface\\DialogFrame\\UI-DialogBox-Border',edgeSize=24,insets={left=6,right=6,top=6,bottom=6}})
     f:SetBackdropColor(.035,.04,.05,1)
     local heading=U.Card(f,12,12,w-24,64)
-    local icon=heading:CreateTexture(nil,'ARTWORK');icon:SetSize(46,46);icon:SetPoint('LEFT',heading,'LEFT',10,0);icon:SetTexture('Interface\\AddOns\\Mapperly\\Media\\Icon')
+    local icon=heading:CreateTexture(nil,'ARTWORK');icon:SetSize(46,46);icon:SetPoint('LEFT',heading,'LEFT',10,0);icon:SetTexture('Interface\\AddOns\\Mapperly\\Media\\Portrait')
     local titleLabel=U.Label(heading,title,68,13,'GameFontNormalLarge');U.Label(heading,subtitle,68,38,'GameFontDisableSmall')
     f.themeTitleLabel=titleLabel
     local close=CreateFrame('Button',nil,heading,'UIPanelCloseButton');close:SetPoint('TOPRIGHT',heading,'TOPRIGHT',0,0);close:SetScript('OnClick',function() f:Hide() end)

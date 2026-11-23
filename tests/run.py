@@ -141,7 +141,7 @@ assert(A.bar.backdrop==nil and A.headerHeight==26,'Default must remove the zone 
 assert(A.mapThemeTrim.themeChrome and A.mapThemeTrim.themeChrome:IsShown(),'Default map must display its native title/portrait chrome')
 assert(A.mapInset==6 and A.footer.point[5]==6 and A.actionRail.point[4]==-6,'map surfaces must leave the native bottom/right frame visible')
 assert(A.mapThemeTrim.themeChrome.title=='Mapperly test-version','map title must include the installed version')
-assert(A.mapThemeTrim.themeChrome.themePortrait:GetWidth()==58 and A.mapThemeTrim.themeChrome.themePortrait.texture:find('Media\\\\Icon',1,true),'map badge must retain the original Mapperly crest')
+assert(A.mapThemeTrim.themeChrome.themePortrait:GetWidth()==58 and A.mapThemeTrim.themeChrome.themePortrait.texture:find('Media\\\\Portrait',1,true),'map badge must use the supplied small Mapperly emblem')
 assert(A.mapThemeTrim.themeChrome.themePortrait.coords[1]==0 and A.mapThemeTrim.themeChrome.themePortrait.coords[2]==1,'crest must reset inherited portrait cropping')
 A.Theme.Set('original')
 assert(A.bar.mapperlyThemeStyle=='original' and not A.mapThemeTrim:IsShown(),'Original must restore the unframed map')

@@ -36,6 +36,7 @@ context={'__file__':str(root/'tests/run.py')}
 exec(compile(source,str(root/'tests/run.py'),'exec'),context)
 l=context['lua']
 l.execute("""
+InCombatLockdown=function()return false end
 local f=A.map
 for _,nativeMax in ipairs({true,false}) do
  for _,nativeQuest in ipairs({true,false}) do

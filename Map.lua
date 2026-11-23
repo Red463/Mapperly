@@ -1,8 +1,24 @@
 local _,A=...
 local button=A.CreateIconButton
 local function closeMap(frame)
+    if InCombatLockdown() then
+        if frame.IsProtected and frame:IsProtected() then A.Print('The game currently protects this map frame. Try closing it after combat.');return end
+        -- HideUIPanel rejects all insecure addon calls during combat, even for
+        -- the unprotected world map. Its normal OnHide lifecycle still runs.
+        A.panelClosePending=true
+        return frame:Hide()
+    end
+    A.panelClosePending=nil
     if HideUIPanel then return HideUIPanel(frame) end
     return frame:Hide()
+end
+function A.FinishMapClose()
+    if not A.panelClosePending or InCombatLockdown() then return end
+    A.panelClosePending=nil
+    local f=A.map
+    -- skipShownCheck reconciles the panel manager after the immediate Hide.
+    -- Never close a map the player has reopened since that request.
+    if f and not f:IsShown() and HideUIPanel then HideUIPanel(f,true,true) end
 end
 function A.UpdateCoordinates()
     if not A.coordinateText then return end
@@ -107,7 +123,10 @@ function A.AttachMap()
     footer:SetFrameStrata('HIGH');footer:SetFrameLevel(f:GetFrameLevel()+2500)
     footer:SetBackdrop({bgFile='Interface\\Tooltips\\UI-Tooltip-Background'});footer:SetBackdropColor(.025,.022,.018,1)
     bar:EnableMouse(true);bar:RegisterForDrag('LeftButton')
-    bar:SetScript('OnDragStart',function() if not A.db.locked and not InCombatLockdown() then A.dragging=true;f:StartMoving() end end)
+    bar:SetScript('OnDragStart',function()
+        if A.db.locked or InCombatLockdown() and f.IsProtected and f:IsProtected() then return end
+        A.dragging=true;f:StartMoving()
+    end)
     bar:SetScript('OnDragStop',function()
         if not A.dragging then return end
         -- StopMoving may itself fire layout/viewport callbacks. Keep the drag

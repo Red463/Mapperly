@@ -21,6 +21,8 @@ local function name(f)
     if not readable(f) then return '<secret>' end
     if f==A.map then return 'WorldMapFrame' end
     if f==A.bar then return 'Mapperly.titlebar' end
+    if f==A.mapThemeTrim then return 'Mapperly.trim' end
+    if A.mapThemeTrim and f==A.mapThemeTrim.themeChrome then return 'Mapperly.chrome' end
     if f==UIParent then return 'UIParent' end
     if type(f)=='table' or type(f)=='userdata' then return scalar(method(f,'GetName')) end
     return scalar(f)
@@ -32,8 +34,10 @@ local function rect(f)
     end
     result[#result+1]='shown='..scalar(method(f,'IsShown'))
     result[#result+1]='movable='..scalar(method(f,'IsMovable'))
+    result[#result+1]='protected='..scalar(method(f,'IsProtected'))
     result[#result+1]='clamped='..scalar(method(f,'IsClampedToScreen'))
     result[#result+1]='userPlaced='..scalar(method(f,'IsUserPlaced'))
+    result[#result+1]='mouse='..scalar(method(f,'IsMouseEnabled'))
     result[#result+1]='parent='..name(method(f,'GetParent'))
     if f and type(f.GetPoint)=='function' then
         local count=method(f,'GetNumPoints');count=type(count)=='number' and math.min(4,math.max(0,count)) or 1
@@ -96,7 +100,9 @@ local function attach()
         if f then
             for _,key in ipairs({'SetPoint','ClearAllPoints','SetAllPoints','StartMoving','StopMovingOrSizing','SetScale','SetSize','SetMovable','SetUserPlaced','SetClampedToScreen','SetClampRectInsets','SetParent'}) do watch(f,key,label) end
             R.watched[f]=R.watched[f] or {}
-            for _,script in ipairs({'OnDragStart','OnDragStop','OnMouseDown','OnMouseUp','OnShow','OnHide','OnSizeChanged'}) do
+            -- Adding mouse scripts enables input even on decorative trim that
+            -- covers the title bar. Observe clicks through global events only.
+            for _,script in ipairs({'OnDragStart','OnDragStop','OnShow','OnHide','OnSizeChanged'}) do
                 local key='script:'..script
                 if not R.watched[f][key] then
                     local ok=pcall(f.HookScript,f,script,function() R.Log(label..'.'..script,'',true) end)
@@ -123,6 +129,7 @@ function R.Build()
     end
     for _,k in ipairs({'useUiScale','uiScale','gxWindowedResolution','gxResolution','gxMonitor','gxMaximize','gxWindow'}) do add('CVar',k..'='..scalar(call(GetCVar,k))) end
     add('UIParent',rect(UIParent));add('Map',snapshot())
+    add('Title bar',rect(A.bar));add('Map trim',rect(A.mapThemeTrim))
     if A.map then add('Canvas',rect(call(A.map.GetCanvas,A.map)));add('Viewport',rect(A.map.ScrollContainer)) end
     local addons=C_AddOns or {};local loaded={}
     local count=call(addons.GetNumAddOns or GetNumAddOns)

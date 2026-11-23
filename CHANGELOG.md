@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.2.4 - 2026-11-23
+
+Consolidates all local updates since 1.2.0.
+
+- Replace addon branding with the supplied blue-and-gold icons, M portrait badge and full wordmark. Preserve transparency, supplied native-size pixels and existing portrait fitting; retain crest-free compact route panels.
+- Allow unlocked, unprotected map dragging and immediate X/M closing during combat. Finish native panel-manager cleanup after combat without closing a reopened map; retain lock, resizing and protected-frame restrictions.
+- Warn once per session when EnhanceQoL's active World Map mover can override Mapperly positioning. Include exact configuration instructions, defer during combat/other dialogs and leave external preferences unchanged.
+- Fix diagnostic capture enabling mouse input on decorative trim and blocking title-bar dragging. Retain global mouse-focus/setter tracing, and include trim/title-bar geometry, input state and protected status in reports.
+- Include regression coverage for native mouse-hook side effects, read-only conflict detection and combat movement/closing. Reload after installing to clear old diagnostic hooks.
+
+See [release details](docs/release-1.2.4.md).
+
 ## 1.2.0 - 2026-11-23
 
 Consolidates all navigation previews, release candidates and subsequent fixes since 1.1.1.

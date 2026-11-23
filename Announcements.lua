@@ -64,11 +64,12 @@ local function busy()
  for _,key in ipairs({'settingsWindow','navigationWindow','noteWindow'}) do
   local f=A[key];if f and f:IsShown() then return true end
  end
- for _,module in ipairs({A.JourneySession or {},A.PlanningStatus or {},A.RouteReport or {},A.MapReport or {},A.JourneyView or {},A.TransportLinks or {}}) do
+ for _,module in ipairs({A.JourneySession or {},A.PlanningStatus or {},A.RouteReport or {},A.MapReport or {},A.JourneyView or {},A.TransportLinks or {},A.Compatibility or {}}) do
   local f=module.frame or module.window;if f and f:IsShown() then return true end
  end
  return false
 end
+W.IsBusy=busy
 function W.TryShow()
  if not W.worldReady or not A.db or not A.Dialogs or busy() then return false end
  local kind,v=pending()

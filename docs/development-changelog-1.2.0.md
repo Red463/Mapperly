@@ -330,3 +330,31 @@ Archived preview and release-candidate notes; the final 1.2.0 changelog describe
 - Keep preview/map geometry synchronized after replanning; preserve pending replacement requests when the old target arrives.
 - This first milestone is single-zone walking only. Transport, cross-zone, quest-search and road-preference features remain on docs/navigation-checklist.md.
 
+
+# Post-1.2.0 local development builds
+
+## 1.2.4 (local branding build)
+
+- Replace addon branding with the supplied blue-and-gold artwork: small icon for the addon list, M badge for map/dialog portraits and full wordmark for the README. Preserve supplied alpha and native-resolution pixels in uncompressed WoW-compatible TGA textures.
+- Keep existing portrait fitting, masks and placement. Preserve crest-free compact route windows and existing map-marker/toolbar symbols.
+- Include the prior combat controls, diagnostics and EnhanceQoL conflict warning.
+
+## 1.2.3 (local combat-controls build)
+
+- Allow title-bar dragging in combat for the normal unprotected world map while retaining Lock map position and actual protected-frame guards. Save the released point for compact and enlarged views as usual.
+- Close the unprotected map immediately with X or visible-map M during combat, bypassing the addon-blocked HideUIPanel helper. Keep native OnHide behavior; reconcile panel-manager bookkeeping once combat ends using skipShownCheck, unless the map has been reopened.
+- Continue deferring resizing and layout changes that require out-of-combat work. Add protected-state information to map diagnostics.
+- Include the prior diagnostic input fix and EnhanceQoL mover warning.
+
+## 1.2.2 (local compatibility build)
+
+- Detect the confirmed EnhanceQoL World Map mover conflict using its active runtime DB and read-only entry metadata. Respect the global/per-map enable flags and defaults; do not initialize or change EnhanceQoL saved settings.
+- Show a themed warning once per session on map open, with Interface > Mover > World > World Map instructions and a reload reminder. Defer during combat/loading or other Mapperly dialogs; hide the warning if the conflict is disabled.
+- Include the 1.2.1 diagnostic mouse-input hotfix.
+
+## 1.2.1 (local hotfix build)
+
+- Fix `/mapperly mapreport start` installing mouse handlers on decorative trim, enabling its mouse input and intercepting title-bar clicks. Keep drag/setter tracing and use global mouse events for click/focus observation.
+- Apply the same correction to the legacy diagnostic-build observer. Add a regression reproducing native HookScript mouse-enable behavior, verifying dragging before/during/after capture in both themes.
+- Include title-bar/trim geometry and mouse-input state in reports, and identify decorative frames in mouse-focus chains. A reload is required after installing to clear hooks from the old build.
+

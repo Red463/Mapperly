@@ -14,7 +14,9 @@ events:SetScript('OnEvent',function(_,event,name)
     if event=='PLAYER_LOGIN' or event=='ADDON_LOADED' then A.UpdateWayCommand() end
     if event=='PLAYER_LOGIN' or event=='ADDON_LOADED' then A.AttachMap()
     elseif event=='DISPLAY_SIZE_CHANGED' or event=='UI_SCALE_CHANGED' then if A.map then A.ApplyLayout(true) end
-    elseif event=='PLAYER_REGEN_ENABLED' then if A.layoutPending and A.map then A.ApplyLayout() end
+    elseif event=='PLAYER_REGEN_ENABLED' then
+        A.FinishMapClose()
+        if A.layoutPending and A.map then A.ApplyLayout() end
     elseif event=='MAIL_SHOW' then A.Observe('mail','Mailbox');A.Refresh()
     elseif event=='TAXIMAP_OPENED' then if A.Flights then A.Flights.Opened() end;A.Observe('flight',UnitName('npc') or 'Flight master');A.Refresh()
     elseif event=='TAXIMAP_CLOSED' then if A.Flights then A.Flights.Closed() end

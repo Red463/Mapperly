@@ -59,7 +59,7 @@ local function chrome(f,title)
     local portrait=object(c.portrait) and c.portrait or object(container.portrait) and container.portrait
     if not portrait then portrait=c:CreateTexture(nil,'ARTWORK') end
     portrait:ClearAllPoints();portrait:SetPoint('CENTER',container,'TOPLEFT',26,-24);portrait:SetSize(58,58)
-    portrait:SetTexture('Interface\\AddOns\\Mapperly\\Media\\Icon')
+    portrait:SetTexture('Interface\\AddOns\\Mapperly\\Media\\Portrait')
     portrait:SetTexCoord(0,1,0,1);portrait:SetVertexColor(1,1,1,1)
     if object(c.PortraitContainer) and object(c.PortraitContainer.CircleMask) then
         local mask=c.PortraitContainer.CircleMask
