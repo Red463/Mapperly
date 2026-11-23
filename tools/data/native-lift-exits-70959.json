@@ -1,0 +1,443 @@
+{
+  "version": 1,
+  "build": 70959,
+  "coordinateOrder": [
+    "north",
+    "east",
+    "z"
+  ],
+  "links": [
+    {
+      "id": "lift:great-lift:1413:1441",
+      "kind": "lift",
+      "method": "manualLift",
+      "arrivalExits": [
+        {
+          "mapID": 1441,
+          "x": 0.3319128787878788,
+          "y": 0.2521306818181819,
+          "radius": 8,
+          "region": 1,
+          "continent": 1,
+          "worldPosition": [
+            -4706.249749289773,
+            -1893.7498670928028,
+            -44.28073581621836
+          ],
+          "groundHeight": -44.28073581621836,
+          "groundHeightProof": {
+            "fdid": 785595,
+            "height": -44.28073581621836,
+            "hole": false,
+            "slope": 5.943228821880863,
+            "liquid": false,
+            "area": 485,
+            "permitted": true
+          },
+          "distanceToHandoffYards": 93.6341808024817,
+          "nativeStaticProjectionClearanceYards": 31.64066345527689,
+          "minimumProjectionClearanceWithinDiskYards": 23.64066345527689,
+          "nativeStaticIdentity": {
+            "rootFileDataID": 112647,
+            "placementUID": 283429,
+            "groupFileDataIDs": [
+              112648,
+              112649
+            ],
+            "collisionTriangleCount": 1027
+          },
+          "nativeDryProof": {
+            "boundingSquareHalfExtentYards": 8,
+            "stepYards": 1,
+            "sampleCount": 289,
+            "allNativePermitted": true,
+            "allMaskDry": true,
+            "allRegion1": true,
+            "minimumGroundHeight": -44.75652421608561,
+            "maximumGroundHeight": -41.872715660957624,
+            "maximumRootCellSlope": 44.61026121085532,
+            "corners": [
+              {
+                "world": [
+                  -4714.249749289773,
+                  -1901.7498670928028,
+                  -44.33108604326555
+                ],
+                "ground": {
+                  "fdid": 785595,
+                  "height": -44.33108604326555,
+                  "hole": false,
+                  "slope": 21.898193524264702,
+                  "liquid": false,
+                  "area": 2097,
+                  "permitted": true
+                },
+                "allowed": true,
+                "region": 1
+              },
+              {
+                "world": [
+                  -4714.249749289773,
+                  -1885.7498670928028,
+                  -41.93355703058653
+                ],
+                "ground": {
+                  "fdid": 785595,
+                  "height": -41.93355703058653,
+                  "hole": false,
+                  "slope": 32.349733091898244,
+                  "liquid": false,
+                  "area": 485,
+                  "permitted": true
+                },
+                "allowed": true,
+                "region": 1
+              },
+              {
+                "world": [
+                  -4698.249749289773,
+                  -1901.7498670928028,
+                  -42.866307455090364
+                ],
+                "ground": {
+                  "fdid": 785595,
+                  "height": -42.866307455090364,
+                  "hole": false,
+                  "slope": 36.0491275187198,
+                  "liquid": false,
+                  "area": 2097,
+                  "permitted": true
+                },
+                "allowed": true,
+                "region": 1
+              },
+              {
+                "world": [
+                  -4698.249749289773,
+                  -1885.7498670928028,
+                  -44.740787195082206
+                ],
+                "ground": {
+                  "fdid": 785595,
+                  "height": -44.740787195082206,
+                  "hole": false,
+                  "slope": 7.64460894985798,
+                  "liquid": false,
+                  "area": 485,
+                  "permitted": true
+                },
+                "allowed": true,
+                "region": 1
+              }
+            ]
+          },
+          "directSegmentToHandoff": true,
+          "destinationHandoff": {
+            "mapID": 1441,
+            "x": 0.31202651515151514,
+            "y": 0.24076704545454541,
+            "worldPosition": [
+              -4672.916419744318,
+              -1806.249873058712,
+              -50.887675774459446
+            ]
+          },
+          "secondaryRegion1441": 1
+        },
+        {
+          "mapID": 1441,
+          "x": 0.329068590618313,
+          "y": 0.2510470171644338,
+          "radius": 1,
+          "region": 1,
+          "continent": 1,
+          "worldPosition": [
+            -4703.071,
+            -1881.235,
+            -44.76644984436053
+          ],
+          "groundHeight": -44.76644984436053,
+          "groundHeightProof": {
+            "fdid": 785595,
+            "height": -44.76644984436053,
+            "hole": false,
+            "slope": 8.124221047447554,
+            "liquid": false,
+            "area": 485,
+            "permitted": true
+          },
+          "distanceToHandoffYards": 80.82120991916315,
+          "nativeStaticProjectionClearanceYards": 18.83502601055651,
+          "minimumProjectionClearanceWithinDiskYards": 17.83502601055651,
+          "nativeStaticIdentity": {
+            "rootFileDataID": 112647,
+            "placementUID": 283429,
+            "groupFileDataIDs": [
+              112648,
+              112649
+            ],
+            "collisionTriangleCount": 1027
+          },
+          "nativeDryProof": {
+            "boundingSquareHalfExtentYards": 1,
+            "stepYards": 1,
+            "sampleCount": 9,
+            "allNativePermitted": true,
+            "allMaskDry": true,
+            "allRegion1": true,
+            "minimumGroundHeight": -44.906130986328314,
+            "maximumGroundHeight": -44.63130885314959,
+            "maximumRootCellSlope": 8.124221047447554,
+            "corners": [
+              {
+                "world": [
+                  -4704.071,
+                  -1882.235,
+                  -44.637644302368344
+                ],
+                "ground": {
+                  "fdid": 785595,
+                  "height": -44.637644302368344,
+                  "hole": false,
+                  "slope": 8.124221047447554,
+                  "liquid": false,
+                  "area": 485,
+                  "permitted": true
+                },
+                "allowed": true,
+                "region": 1
+              },
+              {
+                "world": [
+                  -4704.071,
+                  -1880.235,
+                  -44.63130885314959
+                ],
+                "ground": {
+                  "fdid": 785595,
+                  "height": -44.63130885314959,
+                  "hole": false,
+                  "slope": 8.124221047447554,
+                  "liquid": false,
+                  "area": 485,
+                  "permitted": true
+                },
+                "allowed": true,
+                "region": 1
+              },
+              {
+                "world": [
+                  -4702.071,
+                  -1882.235,
+                  -44.84457957580577
+                ],
+                "ground": {
+                  "fdid": 785595,
+                  "height": -44.84457957580577,
+                  "hole": false,
+                  "slope": 8.124221047447554,
+                  "liquid": false,
+                  "area": 485,
+                  "permitted": true
+                },
+                "allowed": true,
+                "region": 1
+              },
+              {
+                "world": [
+                  -4702.071,
+                  -1880.235,
+                  -44.906130986328314
+                ],
+                "ground": {
+                  "fdid": 785595,
+                  "height": -44.906130986328314,
+                  "hole": false,
+                  "slope": 8.124221047447554,
+                  "liquid": false,
+                  "area": 485,
+                  "permitted": true
+                },
+                "allowed": true,
+                "region": 1
+              }
+            ]
+          },
+          "directSegmentToHandoff": true,
+          "destinationHandoff": {
+            "mapID": 1441,
+            "x": 0.31202651515151514,
+            "y": 0.24076704545454541,
+            "worldPosition": [
+              -4672.916419744318,
+              -1806.249873058712,
+              -50.887675774459446
+            ]
+          },
+          "secondaryRegion1441": 1
+        }
+      ]
+    },
+    {
+      "id": "lift:great-lift:1441:1413",
+      "kind": "lift",
+      "method": "manualLift",
+      "arrivalExits": [
+        {
+          "mapID": 1413,
+          "x": 0.44181743421052627,
+          "y": 0.9195437731196056,
+          "radius": 8,
+          "region": 1,
+          "continent": 1,
+          "worldPosition": [
+            -4600.167625184958,
+            -1854.1666860608552,
+            86.10979371756144
+          ],
+          "groundHeight": 86.10979371756144,
+          "groundHeightProof": {
+            "fdid": 785595,
+            "height": 86.10979371756144,
+            "hole": false,
+            "slope": 0.111357890490727,
+            "liquid": false,
+            "area": 485,
+            "permitted": true
+          },
+          "distanceToHandoffYards": 29.157675277435374,
+          "nativeStaticProjectionClearanceYards": 17.525604912222885,
+          "minimumProjectionClearanceWithinDiskYards": 9.525604912222885,
+          "nativeStaticIdentity": {
+            "rootFileDataID": 112647,
+            "placementUID": 283429,
+            "groupFileDataIDs": [
+              112648,
+              112649
+            ],
+            "collisionTriangleCount": 1027
+          },
+          "nativeDryProof": {
+            "boundingSquareHalfExtentYards": 8,
+            "stepYards": 1,
+            "sampleCount": 289,
+            "allNativePermitted": true,
+            "allMaskDry": true,
+            "allRegion1": true,
+            "minimumGroundHeight": 86.07415728610856,
+            "maximumGroundHeight": 86.11108856559294,
+            "maximumRootCellSlope": 0.3047448828708713,
+            "corners": [
+              {
+                "world": [
+                  -4608.167625184958,
+                  -1862.1666860608552,
+                  86.07415728610856
+                ],
+                "ground": {
+                  "fdid": 785595,
+                  "height": 86.07415728610856,
+                  "hole": false,
+                  "slope": 0.3047448828708713,
+                  "liquid": false,
+                  "area": 485,
+                  "permitted": true
+                },
+                "allowed": true,
+                "region": 1
+              },
+              {
+                "world": [
+                  -4608.167625184958,
+                  -1846.1666860608552,
+                  86.10657260918987
+                ],
+                "ground": {
+                  "fdid": 785595,
+                  "height": 86.10657260918987,
+                  "hole": false,
+                  "slope": 0.10904679289964192,
+                  "liquid": false,
+                  "area": 485,
+                  "permitted": true
+                },
+                "allowed": true,
+                "region": 1
+              },
+              {
+                "world": [
+                  -4592.167625184958,
+                  -1862.1666860608552,
+                  86.11097189687646
+                ],
+                "ground": {
+                  "fdid": 785595,
+                  "height": 86.11097189687646,
+                  "hole": false,
+                  "slope": 0.05786408840541884,
+                  "liquid": false,
+                  "area": 485,
+                  "permitted": true
+                },
+                "allowed": true,
+                "region": 1
+              },
+              {
+                "world": [
+                  -4592.167625184958,
+                  -1846.1666860608552,
+                  86.11107635498047
+                ],
+                "ground": {
+                  "fdid": 785595,
+                  "height": 86.11107635498047,
+                  "hole": false,
+                  "slope": 0.0,
+                  "liquid": false,
+                  "area": 485,
+                  "permitted": true
+                },
+                "allowed": true,
+                "region": 1
+              }
+            ]
+          },
+          "directSegmentToHandoff": true,
+          "destinationHandoff": {
+            "mapID": 1413,
+            "x": 0.44181743421052627,
+            "y": 0.9238594327990137,
+            "worldPosition": [
+              -4629.325300462393,
+              -1854.1666860608552,
+              85.33392632627574
+            ]
+          },
+          "secondaryRegion1441": 11
+        }
+      ]
+    }
+  ],
+  "provenance": {
+    "method": "Native root-terrain permitted/dry cells and runtime dry masks/regions. Conservative2D circles extend at least8yd outside every projected static WMO collision triangle. Each center has direct runtime Terrain.Segment to certified existing handoff. Native terrain heights provide expected-ground evidence; traceZ=0 never used as floor evidence.",
+    "nativeWmoRootSha256": "127224685b4a141549e0f6846d24436df6bf2a141ced0569d4ce1a14ba6e6794",
+    "nativeWmoGroupSha256": {
+      "112648": "4b589fd16f7d0a423ce1f15c8e808e41e4b5dad7feff3f81ff59407e8c445ac4",
+      "112649": "c2f88f934eaf6273825e83d9397146cabc852ff4cbe0ccc3e353ce67850f92d7"
+    },
+    "nativeTerrainWdtFileDataID": 782779,
+    "evidenceFiles": {
+      "trace-2d.json": "fdc897ae73daddecd1e63211f11ef1016a57d6a34f9ce9a5fd2fd5473fd01bd7",
+      "exit-zones-2d.json": "03af4d27f55d21e4988845f5fee0061b0210d2767ec43f908449197989f7fd4f",
+      "exit-0-all-native-samples.json": "35869da96686f21c588645f312c7eadb8eb010305001f257d2311b5435371478",
+      "exit-1-all-native-samples.json": "8778d7d718ffe68e272f8f5089a927b54cf031e05acb468ce1477020efd60239",
+      "exit-2-all-native-samples.json": "7d60cd53f84ef76755e73b5a13920a2acd88d5aeac215a54a72cd17a5cf49e3e"
+    }
+  },
+  "limitations": [
+    "An active lift leg is required. Membership in checked destination ground can finish it without a departure sample; it proves destination access, not that a vehicle was ridden.",
+    "Requires actual destination mask dryness and destination map/region validation at runtime.",
+    "No exact moving platform identity, dynamic shaft projection or native travel duration is claimed.",
+    "Small bottom disk radius1 is intentional: radius2 around captured bottomaway intersects native root cells with52.964-degree slope."
+  ]
+}

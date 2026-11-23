@@ -1,0 +1,7 @@
+# Ironforge indoor routing rejection
+
+User reports no routes from inside Ironforge, including local journeys. Reproduced with native1455 starts24.9,75.3 and60,40: Terrain.Segment(start,start) is false and Journey.Request/Plan immediately rejects every goal. Native root terrain does not model the city's WMO floors reliably.
+
+Fix: allow valid Ironforge city endpoints for normal navigation and prefer existing native paths. When a city-local path cannot be found, return explicitly labeled city-direction guidance, following the previously approved high-level city wayfinding approach. Apply within Ironforge and to local access legs entering/leaving through existing native city connections. Keep outdoor terrain permissions, walking-only nearest-service comparisons and certified dock/floor paths unchanged. Reuse coarse-leg following without off-route loops or backwards start aims; retain protected structure following. Verify native coordinates plus the actual Navigation.Start/Request/activation path and package rc.6. Live affected-position confirmation remains requested through a pending optional report question.
+
+Confirmed user report: installedrc.1/client71037, map1455 start33.1534,65.3159, four synchronous rejected requests with the reproduced endpoint error. Exact coordinates/settings (Prefer roads,Firm) now pass through real Navigation.Start/Request/activation. Independent review caught inherited gate state; native7706 handoff regression verifies it remains on the protected floor and clears after leaving, without repeated recovery.

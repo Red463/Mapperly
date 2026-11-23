@@ -18,9 +18,11 @@ local function populate(f,p,savedRecord)
 end
 local function build()
     local U=A.Dialogs
-    local f=U.Window('MapperlyNavigationWindow','Destinations','Save useful places and revisit recent stops.',620,548);A.navigationWindow=f
+    local f=U.Window('MapperlyNavigationWindow','Destinations','Set destinations, find quests and navigate to nearby services.',620,548);A.navigationWindow=f
     f.entryPage=CreateFrame('Frame',nil,f);f.entryPage:SetAllPoints(f)
     f.libraryPage=U.Card(f,24,132,572,344);f.libraryPage:Hide()
+    if A.QuestNavigationUI then A.QuestNavigationUI.Build(f) end
+    if A.NearestServicesUI then A.NearestServicesUI.Build(f) end
     local card=U.Card(f.entryPage,24,132,572,306)
     f.zone=U.Label(card,'',16,16,'GameFontNormal');f.zone:SetWidth(540);f.zone:SetWordWrap(false)
     U.Label(card,'Destination name (optional)',16,48,'GameFontNormal');f.nameInput=U.Input(card,20,70,532,28,120)
@@ -58,7 +60,12 @@ local function build()
     f.library=U.List(f.libraryPage,10,10,548,300)
     f.empty=U.Label(f.libraryPage,'',20,30,'GameFontDisableSmall')
     local function select(page)
+        if f.page=='services' and page~='services' and A.NearestServicesUI then A.NearestServicesUI.Cancel(f) end
         f.page=page;U.Tabs(f.tabs,page);f.status:SetText('')
+        if f.questPage then f.questPage:Hide() end
+        if f.servicePage then f.servicePage:Hide() end
+        if page=='services' then f.entryPage:Hide();f.libraryPage:Hide();f.clear:Hide();f.servicePage:Show();return end
+        if page=='quests' then f.entryPage:Hide();f.libraryPage:Hide();f.clear:Hide();f.questPage:Show();f.SelectQuests();return end
         if page=='entry' then f.entryPage:Show();f.libraryPage:Hide();f.clear:Hide();return end
         f.entryPage:Hide();f.libraryPage:Show();f.clear:SetShown(page=='recent')
         local records=page=='saved' and A.db.savedDestinations or A.db.destinationHistory
@@ -81,9 +88,11 @@ local function build()
         end)
     end
     f.tabs={}
-    f.tabs.entry=U.Action(f,'Coordinates',24,88,170,function() select('entry') end)
-    f.savedTab=U.Action(f,'Saved',202,88,170,function() select('saved') end);f.tabs.saved=f.savedTab
-    f.recentTab=U.Action(f,'Recent',380,88,170,function() select('recent') end);f.tabs.recent=f.recentTab
+    f.tabs.entry=U.Action(f,'Coordinates',24,88,108,function() select('entry') end,'tab')
+    f.savedTab=U.Action(f,'Saved',140,88,108,function() select('saved') end,'tab');f.tabs.saved=f.savedTab
+    f.recentTab=U.Action(f,'Recent',256,88,108,function() select('recent') end,'tab');f.tabs.recent=f.recentTab
+    if A.QuestNavigationUI then f.tabs.quests=U.Action(f,'Quests',372,88,108,function() select('quests') end,'tab') end
+    if A.NearestServicesUI then f.tabs.services=U.Action(f,'Services',488,88,108,function() select('services') end,'tab') end
     f.clear=U.Action(f,'Clear history',24,446,130,function() A.Destinations.ClearHistory();select('recent') end)
     for _,e in ipairs({f.nameInput,f.xInput,f.yInput}) do e:SetScript('OnEscapePressed',function() f:Hide() end);e:SetScript('OnEnterPressed',start) end
     f.nameInput:SetScript('OnTabPressed',function() f.xInput:SetFocus() end)

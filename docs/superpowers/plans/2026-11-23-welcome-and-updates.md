@@ -1,0 +1,5 @@
+# Welcome and update announcements
+
+Show a brief account-wide welcome once when no welcome state exists. Showing it also marks the current addon version so first launch does not immediately produce a second update popup. Later unseen installed versions show What's new once; reloads, zoning and other characters do not repeat it. Use existing themed dialog controls, native close/Escape and Got it. Defer automatic display until world entry, outside combat and other Mapperly modal dialogs. Persist only welcome/version history, marked after successful display. Bound version history to128 entries and validate corrupt saved state. Keep concise player-facing release highlights separate from technical changelog; packaging regenerates and verifies current-version notes, requiring notes for each release. Test lifecycle, shared state, unseen updates, both themes, corrupt state and deferred display; package rc.7.
+
+Existing pre-feature installs are detected before SavedVariables initialization and receive update notes; fresh installs persist a pending welcome immediately so combat/logout cannot incorrectly migrate them to an existing-user flow.

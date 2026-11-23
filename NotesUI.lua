@@ -79,8 +79,8 @@ local function build()
         f.save:SetShown(page=='edit');f.navigate:SetShown(page=='edit');f.delete:SetShown(page=='edit' and f.editing~=nil)
         if page=='browser' then renderNotes() end
     end
-    f.tabs={};f.tabs.edit=U.Action(f,'Edit note',24,88,170,function() select('edit') end)
-    f.browserTab=U.Action(f,'My notes',202,88,170,function() select('browser') end);f.tabs.browser=f.browserTab
+    f.tabs={};f.tabs.edit=U.Action(f,'Edit note',24,88,170,function() select('edit') end,'tab')
+    f.browserTab=U.Action(f,'My notes',202,88,170,function() select('browser') end,'tab');f.tabs.browser=f.browserTab
     f.search:SetScript('OnTextChanged',renderNotes)
     for _,e in ipairs({f.nameInput,f.groupInput,f.descriptionInput,f.search}) do e:SetScript('OnEscapePressed',function() f:Hide() end) end
     f.nameInput:SetScript('OnEnterPressed',save);f.groupInput:SetScript('OnEnterPressed',save)

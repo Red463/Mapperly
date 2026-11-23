@@ -1,6 +1,6 @@
 -- Projection/clipping follows our Gatherly minimap route implementation.
 local _,A=...
-local R={lines={}};A.MinimapRoute=R
+local R={lines={},directions={},fragments={}};A.MinimapRoute=R
 local function number(v) return not (issecretvalue and issecretvalue(v)) and type(v)=='number' and v==v and math.abs(v)<math.huge end
 function R.Project(wx,wy,px,py,radius,width,height,facing)
     local east,north=px-wx,wy-py -- HBD's horizontal world axis increases west.
@@ -51,6 +51,8 @@ local function world(p,hbd)
 end
 function R.Update()
     for _,line in ipairs(R.lines) do line:Hide() end
+    for _,line in ipairs(R.fragments) do line:Hide() end
+    if A.RouteStyle then A.RouteStyle.Hide(R.directions) end
     if not A.db or not A.JourneyView then return end
     -- Direct-bearing map lines follow the player even with the map reopened.
     if A.Navigation and A.Navigation.target and not (A.Journey and A.Journey.active) and A.map and A.map:IsShown() then A.JourneyView.Refresh() end
@@ -86,10 +88,13 @@ function R.Update()
     end
     if R.overlay:GetParent()~=Minimap then R.overlay:SetParent(Minimap);R.overlay:SetAllPoints(Minimap) end
     R.overlay:SetFrameLevel(Minimap:GetFrameLevel()+2)
-    local used=0
+    local used=0;local segments={};local split=true
+    local marks={spacing=60,limit=3,size=5,thickness=2,strokeWidth=1.5,anchor='CENTER',inside=function(x,y)
+        return x*x+y*y>=144 and R.Clip(x,y,x,y,width,height,shape)~=nil
+    end}
     for i=1,#plan.points-1 do
         local ax,ay,ai=world(plan.points[i],hbd);local bx,by,bi=world(plan.points[i+1],hbd)
-        if ai==instance and bi==instance then
+        if ai==instance and bi==instance and not plan.points[i+1].breakBefore then
             local x1,y1=R.Project(ax,ay,px,py,radius,width,height,facing)
             local x2,y2=R.Project(bx,by,px,py,radius,width,height,facing)
             x1,y1,x2,y2=R.Clip(x1,y1,x2,y2,width,height,shape)
@@ -97,12 +102,19 @@ function R.Update()
                 for _,piece in ipairs(arrowGap(x1,y1,x2,y2)) do
                     used=used+1
                     local line=R.lines[used]
-                    if not line then line=R.overlay:CreateLine(nil,'OVERLAY');R.lines[used]=line;line:SetThickness(1.5);line:SetColorTexture(1,.77,.18,.85) end
+                    if not line then line=R.overlay:CreateLine(nil,'OVERLAY');R.lines[used]=line;line:SetThickness(1.5) end
+                    if A.RouteStyle then line:SetColorTexture(A.RouteStyle.Color(plan,i,.85))
+                    elseif plan.points[i].transport or plan.points[i+1].transport then line:SetColorTexture(.3,.75,1,.85) else line:SetColorTexture(1,.77,.18,.85) end
                     line:SetStartPoint('CENTER',R.overlay,piece[1],piece[2]);line:SetEndPoint('CENTER',R.overlay,piece[3],piece[4]);line:Show()
+                    if A.RouteStyle then
+                        segments[#segments+1]={piece[1],piece[2],piece[3],piece[4],base=line,color={A.RouteStyle.Color(plan,i,.85)},markable=not A.RouteStyle.Completed(plan,i),split=split}
+                    end
+                    split=false
                 end
-            end
-        end
+            else split=true end
+        else split=true end
     end
+    if A.RouteStyle then A.RouteStyle.Render(segments,R.directions,R.fragments,R.overlay,marks) end
 end
 local driver=CreateFrame('Frame',nil,UIParent)
 driver:SetSize(1,1);driver:SetPoint('TOPLEFT',UIParent,'TOPLEFT',0,0);driver:EnableMouse(false)

@@ -15,6 +15,7 @@ function A.LoadServices(map)
             local x,y=hbd:GetZoneCoordinatesFromWorldInstance(row.y,row.x,row.instance,map)
             local p={map=map,x=x,y=y,name=row.name,category=row.category,id=row.id,access=row.access,
                 description='Bundled Mapperly location (Forever database snapshot).'}
+            if p.category=='flight' and A.TransportLinks then p.flightNodeID=A.TransportLinks.IdentifyFlight(row.instance,row.x,row.y) end
             if A.ValidPin(p) then pins[#pins+1]=p end
         end
     end

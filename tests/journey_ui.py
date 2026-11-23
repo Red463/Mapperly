@@ -14,6 +14,25 @@ A.settingsTabs.navigation:GetScript('OnClick')()
 assert(A.settingsWindow.navigationPage:IsShown() and not A.settingsWindow.displayPage:IsShown() and not A.settingsWindow.layersPage:IsShown())
 A.smartRoutingCheck:SetChecked(false);A.smartRoutingCheck:GetScript('OnClick')(A.smartRoutingCheck);assert(A.db.navigationMode=='direct')
 A.smartRoutingCheck:SetChecked(true);A.smartRoutingCheck:GetScript('OnClick')(A.smartRoutingCheck);assert(A.db.navigationMode=='terrain')
+assert(A.preferRoadsCheck,'Navigation settings must expose road preference')
+local oldStart=A.Navigation.Start;local replans=0
+local oldTarget=A.Navigation.target;local oldPending=A.Navigation.pending
+A.Navigation.Start=function(map,x,y,name,options) replans=replans+1;assert(map==1431 and x==40 and y==60);return true end
+A.Navigation.pending={map=1431,x=.4,y=.6,name='Pending destination'}
+A.preferRoadsCheck:SetChecked(true);A.preferRoadsCheck:GetScript('OnClick')(A.preferRoadsCheck)
+assert(A.db.preferRoads and replans==1,'changing road preference must replan the latest smart destination')
+A.db.navigationMode='direct'
+A.preferRoadsCheck:SetChecked(false);A.preferRoadsCheck:GetScript('OnClick')(A.preferRoadsCheck)
+assert(not A.db.preferRoads and replans==1,'direct guidance must ignore road preference')
+A.Navigation.Start=oldStart;A.Navigation.target=oldTarget;A.Navigation.pending=oldPending;A.db.navigationMode='terrain'
+local published=false
+A.Navigation.target=nil;A.Navigation.pending=nil
+A.PlanningJob.Start(function() coroutine.yield();return {} end,function() published=true end)
+A.PlanningJob.Step();assert(A.PlanningJob.IsRunning())
+A.Navigation.SetPreferRoads(true)
+assert(not A.PlanningJob.IsRunning(),'changing road preference must cancel a pending preview even without a navigation target')
+A.PlanningJob.Step();assert(not published,'a stale preview must not reopen after changing road preference')
+A.db.preferRoads=false;A.Navigation.target=oldTarget;A.Navigation.pending=oldPending
 local plan={kind='walking',mapID=1431,name='Walking test',coverage='complete',distance=800,estimatedSeconds=800/7,
  points={{mapID=1431,x=.1,y=.2},{mapID=1431,x=.3,y=.8},{mapID=1431,x=.7,y=.8}},
  legs={{kind='walk',name='Walk to Walking test',distance=800,estimatedSeconds=800/7}}}
@@ -29,7 +48,11 @@ A.JourneyView.Refresh()
 assert(A.JourneyView.overlay:GetFrameLevel()>=artLevel+5,'walking lines must render above native exploration/highlight map artwork')
 assert(#A.JourneyView.lines==2 and A.JourneyView.lines[1]:IsShown(),'each validated segment must render without shortcuts')
 local line=A.JourneyView.lines[1]
-assert(line.lineStart[3]==100 and line.lineStart[4]==-120 and line.lineEnd[3]==300 and line.lineEnd[4]==-480,'route lines must use normalized canvas coordinates')
+local reached=math.abs(line.lineEnd[3]-300)<.0001 and math.abs(line.lineEnd[4]+480)<.0001
+for _,fragment in ipairs(A.JourneyView.fragments or {}) do
+ if fragment:IsShown() and math.abs(fragment.lineEnd[3]-300)<.0001 and math.abs(fragment.lineEnd[4]+480)<.0001 then reached=true end
+end
+assert(line.lineStart[3]==100 and line.lineStart[4]==-120 and reached,'gapped route strokes must retain normalized canvas endpoints')
 A.JourneyView.Show(plan,{map=1431,x=.7,y=.8,name='Walking test'})
 assert(A.JourneyView.window:IsShown() and A.JourneyView.summary:GetText():find('800',1,true))
 assert(A.JourneyView.pause:IsEnabled() and A.JourneyView.resume:IsEnabled(),'active journey controls must be exposed')
@@ -52,7 +75,7 @@ A.db.showJourneyRoute=false;A.JourneyView.Refresh();assert(not line:IsShown(),'r
 A.Journey.Clear();A.JourneyView.window:Hide();A.JourneyView.Refresh();assert(not line:IsShown())
 -- Complete the preview through the worker frame's OnUpdate, as the client does.
 local createFrame=CreateFrame;local driver
-CreateFrame=function(...) local frame=createFrame(...);driver=frame;return frame end
+CreateFrame=function(...) local frame=createFrame(...);driver=driver or frame;return frame end
 assert(loadstring(PLANNING_JOB_SOURCE))('Mapperly',A)
 local request=A.Journey.Request
 A.Journey.Request=function(candidate,done,failed)
@@ -81,7 +104,9 @@ A.JourneyView.window:Hide();A.Journey.Clear();A.db.navigationMode='direct';A.db.
 A.Navigation.target={map=1431,x=.8,y=.5,worldX=-800,worldY=-500,instance=0,name='Direct destination'}
 A.JourneyView.Refresh()
 local directLine=A.JourneyView.lines[1]
-assert(directLine:IsShown() and directLine.lineStart[3]==500 and directLine.lineEnd[3]==800,'direct mode must draw a straight player-to-destination line on the map')
+local directEnd=math.abs(directLine.lineEnd[3]-800)<.0001
+for _,fragment in ipairs(A.JourneyView.fragments or {}) do if fragment:IsShown() and math.abs(fragment.lineEnd[3]-800)<.0001 then directEnd=true end end
+assert(directLine:IsShown() and directLine.lineStart[3]==500 and directEnd,'gapped direct line must still reach the destination')
 playerWX=-600;A.JourneyView.Refresh();assert(directLine.lineStart[3]==600,'direct map line must follow player movement')
 A.JourneyView.OpenCurrent();playerWX=-650;A.JourneyView.Refresh()
 assert(A.JourneyView.plan.points[1].worldX==-650 and directLine.lineStart[3]==650,'the active direct journey window must track the player instead of freezing a preview')
@@ -97,3 +122,10 @@ LibStub=oldLib
 
 ''')
 print('PASS: dedicated Navigation settings, mode persistence, normalized route geometry and themed preview controls')
+lua.execute('''
+local legs={};for i=1,12 do legs[i]={kind='walk',name='Walk through zone '..i} end
+A.JourneyView.Show({kind='walking',mapID=1431,name='Long journey',distance=1000,estimatedSeconds=150,coverage='complete',
+ points={{mapID=1431,x=.1,y=.1},{mapID=1431,x=.9,y=.9}},legs=legs},{map=1431,x=.9,y=.9,name='Long journey'})
+assert(A.JourneyView.stepScroll and A.JourneyView.stepScroll:GetScrollChild():GetHeight()>=216,'all zone legs must be accessible in a scrolling preview')
+assert(A.JourneyView.steps:GetText():find('zone 12',1,true))
+''')

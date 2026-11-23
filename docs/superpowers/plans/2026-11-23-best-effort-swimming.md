@@ -1,0 +1,3 @@
+# Best-effort swimming preference
+
+User request: prefer dry routes but allow swimming when no alternative is found. Replace the hard UI prohibition with Avoid swimming if possible; retain default ordinary swimming and migrate the former disabled choice. Try a complete dry itinerary under existing bounded planning, then retry with permitted swimming. Scope policy per cooperative search so arrival checks, cancellation and other jobs remain unaffected. Preserve strict internal checks. Disclose fallback in preview and reports. Test migration, dry alternatives, water destinations, coroutine isolation and native Elwynn masks; revalidate prepared data proofs and package rc.2. No external publication requested.

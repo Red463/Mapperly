@@ -71,3 +71,32 @@ assert(N.target and N.target.name=='Pending mode switch' and not N.pending and n
 
 ''')
 print('PASS: transactional walking navigation, bend-following HUD, pause/resume, cancellation and explicit direct mode')
+
+lua.execute('''
+local N=A.Navigation
+N.Stop();A.db.navigationMode='terrain'
+A.TerrainData={version=1,zones={[1431]={status='complete',w=2,h=2,widthYards=1000,heightYards=1000,rows={'w','w'}}}}
+local p={mapID=1431,x=.8,y=.2}
+local bend={mapID=1431,x=.8,y=.8}
+local goal={mapID=1431,x=.2,y=.2}
+local wx,wy=hbd:GetWorldCoordinatesFromZone(goal.x,goal.y,1431)
+N.target={map=1431,x=goal.x,y=goal.y,name='West destination',zone='Test zone',worldX=wx,worldY=wy,instance=0}
+A.Journey.Install({kind='walking',mapID=1431,points={p,bend,goal}})
+C_Map.GetPlayerMapPosition=function() return {GetXY=function() return p.x,p.y end} end
+-- A walking HUD must use the route's player-position feed rather than mixing
+-- it with a separately sampled/offset world-position feed.
+playerX,playerY,playerInstance=900,100,0;facing=0
+N.Tick()
+assert(math.abs(math.abs(N.frame.bearing)-math.pi)<.00001,'the HUD must guide south along the next leg even though the destination is west')
+assert(N.frame.label:GetText()=='600 yd','primary distance must be to the next turn, not the final destination')
+assert(N.frame.remaining and N.frame.remaining:GetText():find('remaining'),'total remaining distance must be labelled separately')
+p.x=.8;p.y=.8
+N.Tick()
+assert(A.Journey.index==3 and N.frame.bearing>0 and N.frame.bearing<math.pi/2,'at a bend guidance must advance along the next route leg')
+local original=hbd.GetPlayerWorldPosition
+hbd.GetPlayerWorldPosition=function() return nil end
+N.Tick();assert(N.frame.icon:IsShown(),'walking direction should not depend on a second world-position feed')
+hbd.GetPlayerWorldPosition=original
+N.Stop()
+''')
+print('PASS: winding-route HUD uses local route geometry, next-turn distance and automatic bend advancement')

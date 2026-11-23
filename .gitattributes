@@ -5,5 +5,9 @@
 *.py text eol=lf
 *.md text eol=lf
 *.json text eol=lf
+# Keep byte-verified datasets and their routing input unchanged across checkout.
+Data/*.lua -text whitespace=cr-at-eol
+tools/data/*.json -text whitespace=cr-at-eol
+Water.lua -text whitespace=cr-at-eol
 *.png binary
 *.tga binary

@@ -1,33 +1,21 @@
 # Changelog
 
-## 1.2.0-preview.4 (local build)
+## 1.2.0 - 2026-11-23
 
-- Draw navigation routes on the minimap, with movement/zoom/rotation updates, round/square clipping and a gap around the native player arrow.
-- Add a Smart routing checkbox, enabled by default. Switching it off immediately converts the active or pending destination to straight-line guidance; switching on plans a walking route.
-- Keep world-map and minimap line toggles separate. Direct guidance draws a live straight line on both maps and has a matching preview.
-- Refresh the active direct-journey view as the player moves, and remove its geometry when navigation stops.
+Consolidates all navigation previews, release candidates and subsequent fixes since 1.1.1.
 
-## 1.2.0-preview.3 (local build)
+- Add default-on smart terrain routing across supported zones, optional straight-line guidance, road preference with five strengths, and best-effort swimming avoidance.
+- Combine walking with eligible discovered flights, boats, zeppelins, airships, bundled Deeprun Tram and native Great Lift guidance. Show transport links and hover previews across continent/world maps.
+- Draw world-map and minimap routes with visible direction indicators and faded completed sections. Follow upcoming turns with the navigation arrow and show up to ten route steps; collapse to the current step.
+- Add planning progress/cancellation, preview and active-journey controls, safe detour replanning, later-route rejoins and character-specific resumable destinations.
+- Search active quest objectives and turn-ins, search the standalone quest catalogue for recorded pickups, add native quest-log Navigate to actions, and find nearby reachable services by walking route.
+- Accelerate planning with validated precomputed walking paths, bounded caches, road lookup optimizations and prioritized complete transport itineraries.
+- Improve road/dock data, boat walking handoffs, takeoff/landing progression, Great Lift exits, simple tram portal stages and labeled Ironforge city guidance where indoor terrain is unavailable.
+- Refine themed settings/navigation panels, classic red buttons, route-step spacing and icons. Fix M not closing the map with some native per-character preferences.
+- Add first-launch welcome and once-per-version update windows, shared across characters. Add copyable route reports and opt-in map-position reset diagnostics.
+- Retain existing settings, custom notes, saved/recent destinations, themes and addon pin compatibility. Terrain/quest coverage limits and the remaining ultrawide snap-back investigation are documented in the release notes.
 
-- Keep existing route guidance running when the player enters a restricted terrain-mask cell. Preserve the route geometry and current waypoint instead of hiding the arrow.
-- Allow resume, manual skip and arrival advancement from restricted player cells. Restore normal segment checks when the player returns to permitted terrain; planned paths remain mask-constrained.
-- Add follower and actual HUD regression tests for restricted-cell movement and recovery.
-
-## 1.2.0-preview.2 (local build)
-
-- Draw walking routes above native exploration/highlight map artwork, following Gatherly's route-layer ordering; account for stitched OpenMap artwork when present.
-- Clear the pending preview message on success and report native display errors instead of leaving an apparent planning stall.
-- Use an explicitly visible, noninteractive background worker frame and guarded profiling-clock fallbacks.
-- Add regressions for the supplied Elwynn coordinates, real frame-callback completion, native map-art tiers and display/timer failures.
-
-## 1.2.0-preview.1 (local walking-navigation milestone)
-
-- Bundle 55 terrain masks and local pathfinding independently of Gatherly, with explicit coverage/provenance.
-- Plan walking routes in cancellable background jobs and follow their validated bends with the navigation arrow. Failures preserve the last successful destination and history.
-- Add walking map lines, a themed preview with approximate distance/time and Start/Pause/Resume/Skip/Replan/Stop controls.
-- Add Navigation settings with Walking route / Direct bearing and map-route visibility.
-- Keep preview/map geometry synchronized after replanning; preserve pending replacement requests when the old target arrives.
-- This first milestone is single-zone walking only. Transport, cross-zone, quest-search and road-preference features remain on docs/navigation-checklist.md.
+See [release details](docs/release-1.2.0.md), [in-game checks](docs/testing-1.2.0.md) and [archived development notes](docs/development-changelog-1.2.0.md).
 
 ## 1.1 - 2026-11-22
 
@@ -120,7 +108,7 @@ First public release for WoW Forever (Interface 16001).
 
 # Earlier development changes
 
-0.1.11 — development build
+0.1.11 â€” development build
 
 ![Mapperly logo](Media/Logo.png)
 
@@ -132,7 +120,7 @@ Native world map enhancements for WoW Forever (Interface 16001).
 
 0.1.9 replaces the native inn and flight-master markers with generated transparent hearthstone and winged-boot artwork matching the other painted map symbols. Source PNGs and generation prompts are in `assets`; the install ZIP contains the two 128?128 RGBA TGA textures. All ten marker textures pass transparency and encoding checks.
 
-0.1.8 replaces square inventory-art markers with a generated transparent map-symbol set: sailing boat, zeppelin, airship, portal, dungeon entrance, mail, note and zone exit. Transport records retain their subtype so each route uses the right symbol. Inns and flight masters retain the native transparent hearthstone and winged boot. Textures are uncompressed 128×128 RGBA TGAs, drawn at the configured marker size (18px by default). Their alpha channels and encoding are checked by the test runner. Rebuild them with `python Mapperly/tools/build_markers.py`; the generated source atlas lives in `assets` and is excluded from the install ZIP.
+0.1.8 replaces square inventory-art markers with a generated transparent map-symbol set: sailing boat, zeppelin, airship, portal, dungeon entrance, mail, note and zone exit. Transport records retain their subtype so each route uses the right symbol. Inns and flight masters retain the native transparent hearthstone and winged boot. Textures are uncompressed 128Ã—128 RGBA TGAs, drawn at the configured marker size (18px by default). Their alpha channels and encoding are checked by the test runner. Rebuild them with `python Mapperly/tools/build_markers.py`; the generated source atlas lives in `assets` and is excluded from the install ZIP.
 
 0.1.7 changes the default marker size to 18px (saved sizes remain unchanged). Fixes movement-opacity flashing by removing the map from Blizzard's active and deferred movement-fade registries on each open; Mapperly alone applies its opacity preferences. Uses the client's movement-state API where available, with speed polling as a fallback. Settings sliders preview opacity immediately. Regression checks cover native-fader competition, repeated map opens, stop/start and enlarged mode.
 

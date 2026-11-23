@@ -1,0 +1,5 @@
+# Map position diagnostics
+
+Add `/mapperly mapreport` to normal builds, using the existing report-window style. Without capture it reports current display, scale, geometry, anchors, saved positions, layout flags and loaded addon identifiers. `/mapperly mapreport start` starts a bounded, session-only trace of map setters, drag callbacks, layout calls and observed geometry changes. Export freezes capture and selects the text for copying. `/mapperly mapreport stop` stops capture. Capture uses post-hooks and getters only; it must never save, reset or change map layout. Guard unavailable/secret API values and redact player name, GUID, realm and hyperlink escapes. Existing route report remains unchanged. This gathers evidence for the friend's native-client snap-back; it does not claim to fix that unreproduced bug.
+
+Validate through the real TOC/command/UI harness, simulate drag/settings/foreign setter resets, unavailable getters and bounded capture. Package a local rc.8 with reproduction instructions.

@@ -39,9 +39,8 @@ function A.CreateSettings()
     local layers=CreateFrame('Frame',nil,f);layers:SetAllPoints(f);layers:Hide()
     local navigation=CreateFrame('Frame',nil,f);navigation:SetAllPoints(f);navigation:Hide()
     f.displayPage=display;f.layersPage=layers;f.navigationPage=navigation
-    local function action(parent,text,x,y,width,fn)
-        local b=A.CreateMapButton(parent,text,width-16,0,fn)
-        b:ClearAllPoints();b:SetPoint('TOPLEFT',parent,'TOPLEFT',x,-y);b:SetSize(width,28);b:UpdateVisual();return b
+    local function action(parent,text,x,y,width,fn,role)
+        return A.Dialogs.Action(parent,text,x,y,width,fn,role)
     end
     A.settingsTabs={}
     local function selectPage(page)
@@ -49,15 +48,16 @@ function A.CreateSettings()
         for key,tab in pairs(A.settingsTabs) do tab.active=key==page;A.Theme.ButtonRole(tab,'tab') end
         A.SyncSettings()
     end
-    A.settingsTabs.display=action(f,'Map appearance',24,88,170,function() selectPage('display') end)
-    A.settingsTabs.layers=action(f,'Location layers',202,88,170,function() selectPage('layers') end)
-    A.settingsTabs.navigation=action(f,'Navigation',380,88,170,function() selectPage('navigation') end)
+    A.settingsTabs.display=action(f,'Map appearance',24,88,170,function() selectPage('display') end,'tab')
+    A.settingsTabs.layers=action(f,'Location layers',202,88,170,function() selectPage('layers') end,'tab')
+    A.settingsTabs.navigation=action(f,'Navigation',380,88,170,function() selectPage('navigation') end,'tab')
     A.settingsTabs.display.active=true;A.Theme.ButtonRole(A.settingsTabs.display,'tab');A.Theme.ButtonRole(A.settingsTabs.layers,'tab');A.Theme.ButtonRole(A.settingsTabs.navigation,'tab')
     local themes=panel(f,24,132,592,58)
     label(themes,'Appearance theme',16,21,'GameFontNormal')
     A.themeChoices={}
     A.themeChoices.gatherly=action(themes,'Default',220,15,166,function() A.Theme.Set('gatherly') end)
     A.themeChoices.original=action(themes,'Minimal Charcoal',394,15,166,function() A.Theme.Set('original') end)
+    A.Theme.ButtonRole(A.themeChoices.gatherly,'choice');A.Theme.ButtonRole(A.themeChoices.original,'choice')
     A.AttachButtonTooltip(A.themeChoices.gatherly,'Default Mapperly theme. Applies immediately.')
     A.AttachButtonTooltip(A.themeChoices.original,'Minimal Charcoal theme. Applies immediately.')
     local function check(parent,key,text,x,y,layout,filter)

@@ -60,6 +60,8 @@ function fakeUI()
  function methods:SetStartPoint(anchor,parent,x,y) self.lineStart={anchor,parent,x,y} end
  function methods:SetEndPoint(anchor,parent,x,y) self.lineEnd={anchor,parent,x,y} end
  function methods:SetThickness(v) self.thickness=v end
+ function methods:SetDrawLayer(layer,sublevel) self.drawLayer=layer;self.drawSublevel=sublevel or 0 end
+ function methods:GetDrawLayer() return self.drawLayer or 'OVERLAY',self.drawSublevel or 0 end
  function methods:SetRotation(v) self.rotation=v end
  function methods:GetPoint() return 'CENTER',nil,'CENTER',0,0 end
  function methods:GetEffectiveScale() return 1 end

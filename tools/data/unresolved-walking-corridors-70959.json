@@ -1,0 +1,1168 @@
+{
+  "schema": "native-walking-proof-audit-v1",
+  "build": 70959,
+  "canIntegrateAnyNewCorridor": false,
+  "supportedCorridors": [],
+  "timbermaw": {
+    "rootFDID": 111596,
+    "placementUID": 372018,
+    "sourceGroupsAvailable": 35,
+    "landingGridMaximumSpacing": 0.25,
+    "landingHeightTolerance": 0.3,
+    "landingBranches": {
+      "exterior_B": {
+        "uiMap": 1450,
+        "candidateFaces": 19,
+        "worldBounds": [
+          7344.426720732003,
+          -2212.558540198915,
+          533.6576359340122,
+          7375.7218757398205,
+          -2198.363621766539,
+          556.3383310252223
+        ],
+        "floorTerrainDeltaBounds": [
+          -0.19972900606694566,
+          0.23324679374695734
+        ],
+        "candidateContacts": [
+          {
+            "delta": -0.007383324794886903,
+            "face": 543,
+            "terrain": {
+              "fdid": 785705,
+              "height": 535.3955750247766,
+              "hole": false,
+              "slope": 1.8975039669230205,
+              "liquid": false,
+              "area": 493,
+              "permitted": true
+            },
+            "world": [
+              7375.704973856609,
+              -2204.586235841114,
+              535.3881916999817
+            ]
+          },
+          {
+            "delta": 0.0012912621225495968,
+            "face": 549,
+            "terrain": {
+              "fdid": 785705,
+              "height": 535.4025160600618,
+              "hole": false,
+              "slope": 1.8975039669230205,
+              "liquid": false,
+              "area": 493,
+              "permitted": true
+            },
+            "world": [
+              7375.440938313804,
+              -2205.2957293192535,
+              535.4038073221843
+            ]
+          },
+          {
+            "delta": -0.004444194071879792,
+            "face": 552,
+            "terrain": {
+              "fdid": 785705,
+              "height": 535.4318318554759,
+              "hole": false,
+              "slope": 6.004403608070958,
+              "liquid": false,
+              "area": 493,
+              "permitted": true
+            },
+            "world": [
+              7375.237887912328,
+              -2203.50106302897,
+              535.427387661404
+            ]
+          },
+          {
+            "delta": -0.0009146112982989507,
+            "face": 568,
+            "terrain": {
+              "fdid": 785705,
+              "height": 535.3924322504585,
+              "hole": false,
+              "slope": 1.8975039669230205,
+              "liquid": false,
+              "area": 493,
+              "permitted": true
+            },
+            "world": [
+              7375.7218757398205,
+              -2204.4296835697046,
+              535.3915176391602
+            ]
+          },
+          {
+            "delta": 0.001572715784391221,
+            "face": 570,
+            "terrain": {
+              "fdid": 785705,
+              "height": 535.4089659576165,
+              "hole": false,
+              "slope": 34.52576863364129,
+              "liquid": false,
+              "area": 493,
+              "permitted": true
+            },
+            "world": [
+              7374.43918100993,
+              -2208.89474137624,
+              535.4105386734009
+            ]
+          },
+          {
+            "delta": -0.007705256632675628,
+            "face": 574,
+            "terrain": {
+              "fdid": 785705,
+              "height": 535.4023899422338,
+              "hole": false,
+              "slope": 34.52576863364129,
+              "liquid": false,
+              "area": 493,
+              "permitted": true
+            },
+            "world": [
+              7373.068589952258,
+              -2209.828308953178,
+              535.3946846856011
+            ]
+          },
+          {
+            "delta": 0.0004571065306890887,
+            "face": 599,
+            "terrain": {
+              "fdid": 785705,
+              "height": 535.4083881591757,
+              "hole": false,
+              "slope": 0.22551752201483166,
+              "liquid": false,
+              "area": 493,
+              "permitted": true
+            },
+            "world": [
+              7374.915150960288,
+              -2207.146945529513,
+              535.4088452657064
+            ]
+          },
+          {
+            "delta": 0.013725974840781419,
+            "face": 601,
+            "terrain": {
+              "fdid": 785705,
+              "height": 535.4246749872952,
+              "hole": false,
+              "slope": 34.52576863364129,
+              "liquid": false,
+              "area": 493,
+              "permitted": true
+            },
+            "world": [
+              7374.302841648912,
+              -2209.0911701086784,
+              535.438400962136
+            ]
+          },
+          {
+            "delta": -0.008042297301017243,
+            "face": 680,
+            "terrain": {
+              "fdid": 785705,
+              "height": 556.0162530024736,
+              "hole": false,
+              "slope": 44.96927894276731,
+              "liquid": false,
+              "area": 493,
+              "permitted": true
+            },
+            "world": [
+              7344.426720732003,
+              -2199.2819621588583,
+              556.0082107051726
+            ]
+          },
+          {
+            "delta": -0.013178776659515279,
+            "face": 684,
+            "terrain": {
+              "fdid": 785705,
+              "height": 556.2634123939818,
+              "hole": false,
+              "slope": 44.96927894276731,
+              "liquid": false,
+              "area": 493,
+              "permitted": true
+            },
+            "world": [
+              7344.84982054261,
+              -2198.783031682857,
+              556.2502336173222
+            ]
+          },
+          {
+            "delta": -0.03990071400198758,
+            "face": 692,
+            "terrain": {
+              "fdid": 785705,
+              "height": 556.3782317392242,
+              "hole": false,
+              "slope": 44.96927894276731,
+              "liquid": false,
+              "area": 493,
+              "permitted": true
+            },
+            "world": [
+              7345.78476443236,
+              -2198.363621766539,
+              556.3383310252223
+            ]
+          },
+          {
+            "delta": 0.003356134369596475,
+            "face": 697,
+            "terrain": {
+              "fdid": 785705,
+              "height": 534.1233391170953,
+              "hole": false,
+              "slope": 45.06321140040208,
+              "liquid": false,
+              "area": 493,
+              "permitted": true
+            },
+            "world": [
+              7370.519816080731,
+              -2211.1078414916983,
+              534.1266952514649
+            ]
+          },
+          {
+            "delta": 0.002774504807689482,
+            "face": 716,
+            "terrain": {
+              "fdid": 785705,
+              "height": 534.1184235135843,
+              "hole": false,
+              "slope": 45.06321140040208,
+              "liquid": false,
+              "area": 493,
+              "permitted": true
+            },
+            "world": [
+              7370.675384521486,
+              -2211.327566782632,
+              534.121198018392
+            ]
+          },
+          {
+            "delta": 0.07055332909533263,
+            "face": 717,
+            "terrain": {
+              "fdid": 785705,
+              "height": 533.5870826049169,
+              "hole": false,
+              "slope": 46.508989118082624,
+              "liquid": false,
+              "area": 493,
+              "permitted": true
+            },
+            "world": [
+              7370.673525274368,
+              -2212.558540198915,
+              533.6576359340122
+            ]
+          },
+          {
+            "delta": -0.0010742150035412124,
+            "face": 718,
+            "terrain": {
+              "fdid": 785705,
+              "height": 533.6858967334884,
+              "hole": false,
+              "slope": 45.06321140040208,
+              "liquid": false,
+              "area": 493,
+              "permitted": true
+            },
+            "world": [
+              7370.731119791668,
+              -2212.471024286178,
+              533.6848225184849
+            ]
+          },
+          {
+            "delta": -0.19972900606694566,
+            "face": 719,
+            "terrain": {
+              "fdid": 785705,
+              "height": 534.2711019919068,
+              "hole": false,
+              "slope": 34.52576863364129,
+              "liquid": false,
+              "area": 493,
+              "permitted": true
+            },
+            "world": [
+              7371.13260904948,
+              -2211.455746968586,
+              534.0713729858398
+            ]
+          },
+          {
+            "delta": -0.19972900606694566,
+            "face": 720,
+            "terrain": {
+              "fdid": 785705,
+              "height": 534.2711019919068,
+              "hole": false,
+              "slope": 34.52576863364129,
+              "liquid": false,
+              "area": 493,
+              "permitted": true
+            },
+            "world": [
+              7371.13260904948,
+              -2211.455746968586,
+              534.0713729858398
+            ]
+          },
+          {
+            "delta": 0.23324679374695734,
+            "face": 730,
+            "terrain": {
+              "fdid": 785705,
+              "height": 533.5209493732452,
+              "hole": false,
+              "slope": 45.06321140040208,
+              "liquid": false,
+              "area": 493,
+              "permitted": true
+            },
+            "world": [
+              7370.460673014324,
+              -2212.4767659505196,
+              533.7541961669922
+            ]
+          },
+          {
+            "delta": 0.23324679374695734,
+            "face": 731,
+            "terrain": {
+              "fdid": 785705,
+              "height": 533.5209493732452,
+              "hole": false,
+              "slope": 45.06321140040208,
+              "liquid": false,
+              "area": 493,
+              "permitted": true
+            },
+            "world": [
+              7370.460673014324,
+              -2212.4767659505196,
+              533.7541961669922
+            ]
+          }
+        ]
+      },
+      "exterior_A": {
+        "uiMap": 1448,
+        "candidateFaces": 21,
+        "worldBounds": [
+          6817.63810602824,
+          -2119.0613208573336,
+          623.2704987662179,
+          6845.869911009553,
+          -2094.3038165682824,
+          646.4711164277174
+        ],
+        "floorTerrainDeltaBounds": [
+          -0.16401942514664825,
+          0.22456696441383883
+        ],
+        "candidateContacts": [
+          {
+            "delta": 0.1957739061489292,
+            "face": 915,
+            "terrain": {
+              "fdid": 785490,
+              "height": 624.7623735898361,
+              "hole": false,
+              "slope": 9.98797221834923,
+              "liquid": false,
+              "area": 1769,
+              "permitted": true
+            },
+            "world": [
+              6817.63810602824,
+              -2098.743691762287,
+              624.958147495985
+            ]
+          },
+          {
+            "delta": 0.1957739061489292,
+            "face": 965,
+            "terrain": {
+              "fdid": 785490,
+              "height": 624.7623735898361,
+              "hole": false,
+              "slope": 9.98797221834923,
+              "liquid": false,
+              "area": 1769,
+              "permitted": true
+            },
+            "world": [
+              6817.63810602824,
+              -2098.743691762287,
+              624.958147495985
+            ]
+          },
+          {
+            "delta": 0.014572976577255758,
+            "face": 1043,
+            "terrain": {
+              "fdid": 785490,
+              "height": 644.177812406697,
+              "hole": false,
+              "slope": 48.00779797778916,
+              "liquid": false,
+              "area": 1769,
+              "permitted": true
+            },
+            "world": [
+              6842.721098467925,
+              -2117.9984039837022,
+              644.1923853832742
+            ]
+          },
+          {
+            "delta": -0.16401942514664825,
+            "face": 1050,
+            "terrain": {
+              "fdid": 785490,
+              "height": 646.6351358528641,
+              "hole": false,
+              "slope": 49.67488253755693,
+              "liquid": false,
+              "area": 1769,
+              "permitted": true
+            },
+            "world": [
+              6845.869911009553,
+              -2111.67041096742,
+              646.4711164277174
+            ]
+          },
+          {
+            "delta": -0.01661418072728793,
+            "face": 1058,
+            "terrain": {
+              "fdid": 785490,
+              "height": 644.7543076384951,
+              "hole": false,
+              "slope": 48.00779797778916,
+              "liquid": false,
+              "area": 1769,
+              "permitted": true
+            },
+            "world": [
+              6843.538403834421,
+              -2117.0091879669267,
+              644.7376934577678
+            ]
+          },
+          {
+            "delta": 0.03180574678515313,
+            "face": 1059,
+            "terrain": {
+              "fdid": 785490,
+              "height": 644.7354988204053,
+              "hole": false,
+              "slope": 48.00779797778916,
+              "liquid": false,
+              "area": 1769,
+              "permitted": true
+            },
+            "world": [
+              6843.54231729263,
+              -2116.9286285149733,
+              644.7673045671904
+            ]
+          },
+          {
+            "delta": -0.004349170500745458,
+            "face": 1060,
+            "terrain": {
+              "fdid": 785490,
+              "height": 643.5177561701503,
+              "hole": false,
+              "slope": 48.00779797778916,
+              "liquid": false,
+              "area": 1769,
+              "permitted": true
+            },
+            "world": [
+              6841.694405237835,
+              -2119.0613208573336,
+              643.5134069996495
+            ]
+          },
+          {
+            "delta": 0.22456696441383883,
+            "face": 1062,
+            "terrain": {
+              "fdid": 785490,
+              "height": 623.5663635451534,
+              "hole": false,
+              "slope": 22.09690395118037,
+              "liquid": false,
+              "area": 1769,
+              "permitted": true
+            },
+            "world": [
+              6818.880692164104,
+              -2104.1657784779854,
+              623.7909305095673
+            ]
+          },
+          {
+            "delta": -0.0039492423532010434,
+            "face": 1063,
+            "terrain": {
+              "fdid": 785490,
+              "height": 623.9002029473779,
+              "hole": false,
+              "slope": 35.664301320987256,
+              "liquid": false,
+              "area": 1769,
+              "permitted": true
+            },
+            "world": [
+              6823.257760874431,
+              -2095.8724894205716,
+              623.8962537050247
+            ]
+          },
+          {
+            "delta": 0.13889794701719893,
+            "face": 1082,
+            "terrain": {
+              "fdid": 785490,
+              "height": 623.5178423607907,
+              "hole": false,
+              "slope": 20.269333572877812,
+              "liquid": false,
+              "area": 1769,
+              "permitted": true
+            },
+            "world": [
+              6824.492613474529,
+              -2094.4213097890206,
+              623.6567403078079
+            ]
+          },
+          {
+            "delta": -0.03285691679946012,
+            "face": 1083,
+            "terrain": {
+              "fdid": 785490,
+              "height": 623.5930368656061,
+              "hole": false,
+              "slope": 20.269333572877812,
+              "liquid": false,
+              "area": 1769,
+              "permitted": true
+            },
+            "world": [
+              6824.297194816954,
+              -2094.3038165682824,
+              623.5601799488066
+            ]
+          },
+          {
+            "delta": -0.0006276552471717878,
+            "face": 1084,
+            "terrain": {
+              "fdid": 785490,
+              "height": 623.6967405264172,
+              "hole": false,
+              "slope": 20.269333572877812,
+              "liquid": false,
+              "area": 1769,
+              "permitted": true
+            },
+            "world": [
+              6823.93762227013,
+              -2094.6847470601388,
+              623.69611287117
+            ]
+          },
+          {
+            "delta": 0.012173932279779365,
+            "face": 1085,
+            "terrain": {
+              "fdid": 785490,
+              "height": 623.8481397625378,
+              "hole": false,
+              "slope": 20.269333572877812,
+              "liquid": false,
+              "area": 1769,
+              "permitted": true
+            },
+            "world": [
+              6823.463452838717,
+              -2095.2020837692976,
+              623.8603136948176
+            ]
+          },
+          {
+            "delta": 0.0007535668848959176,
+            "face": 1086,
+            "terrain": {
+              "fdid": 785490,
+              "height": 623.9051971462727,
+              "hole": false,
+              "slope": 20.269333572877812,
+              "liquid": false,
+              "area": 1769,
+              "permitted": true
+            },
+            "world": [
+              6823.258698091055,
+              -2095.6444969358886,
+              623.9059507131576
+            ]
+          },
+          {
+            "delta": 0.13889794701719893,
+            "face": 1096,
+            "terrain": {
+              "fdid": 785490,
+              "height": 623.5178423607907,
+              "hole": false,
+              "slope": 20.269333572877812,
+              "liquid": false,
+              "area": 1769,
+              "permitted": true
+            },
+            "world": [
+              6824.492613474529,
+              -2094.4213097890206,
+              623.6567403078079
+            ]
+          },
+          {
+            "delta": 0.13889794701719893,
+            "face": 1097,
+            "terrain": {
+              "fdid": 785490,
+              "height": 623.5178423607907,
+              "hole": false,
+              "slope": 20.269333572877812,
+              "liquid": false,
+              "area": 1769,
+              "permitted": true
+            },
+            "world": [
+              6824.492613474529,
+              -2094.4213097890206,
+              623.6567403078079
+            ]
+          },
+          {
+            "delta": -0.022323153050024303,
+            "face": 1118,
+            "terrain": {
+              "fdid": 785490,
+              "height": 623.2928219192679,
+              "hole": false,
+              "slope": 22.471767237687946,
+              "liquid": false,
+              "area": 1769,
+              "permitted": true
+            },
+            "world": [
+              6817.870486432032,
+              -2106.476217751275,
+              623.2704987662179
+            ]
+          },
+          {
+            "delta": -6.74848107564685e-05,
+            "face": 1119,
+            "terrain": {
+              "fdid": 785490,
+              "height": 623.3340016147981,
+              "hole": false,
+              "slope": 22.471767237687946,
+              "liquid": false,
+              "area": 1769,
+              "permitted": true
+            },
+            "world": [
+              6817.898804837182,
+              -2106.2334082648854,
+              623.3339341299874
+            ]
+          },
+          {
+            "delta": 0.014462147369386003,
+            "face": 1120,
+            "terrain": {
+              "fdid": 785490,
+              "height": 623.5050410918535,
+              "hole": false,
+              "slope": 22.471767237687946,
+              "liquid": false,
+              "area": 1769,
+              "permitted": true
+            },
+            "world": [
+              6818.054497673399,
+              -2105.2540455591097,
+              623.5195032392229
+            ]
+          },
+          {
+            "delta": -0.0017259730341265822,
+            "face": 1121,
+            "terrain": {
+              "fdid": 785490,
+              "height": 623.5160010266034,
+              "hole": false,
+              "slope": 22.471767237687946,
+              "liquid": false,
+              "area": 1769,
+              "permitted": true
+            },
+            "world": [
+              6818.054673203969,
+              -2105.2142427898575,
+              623.5142750535692
+            ]
+          },
+          {
+            "delta": 0.008611125039806211,
+            "face": 1122,
+            "terrain": {
+              "fdid": 785490,
+              "height": 623.6397887192743,
+              "hole": false,
+              "slope": 22.09690395118037,
+              "liquid": false,
+              "area": 1769,
+              "permitted": true
+            },
+            "world": [
+              6818.689732753871,
+              -2104.102332317467,
+              623.6483998443141
+            ]
+          }
+        ]
+      },
+      "exterior_C": {
+        "uiMap": 1452,
+        "candidateFaces": 13,
+        "worldBounds": [
+          6900.074601672945,
+          -2299.938676089331,
+          587.0972502572196,
+          6912.365451003567,
+          -2263.9653292569237,
+          601.082493464152
+        ],
+        "floorTerrainDeltaBounds": [
+          -0.11580251604300429,
+          0.01334773184498772
+        ],
+        "candidateContacts": [
+          {
+            "delta": 0.006353382218890147,
+            "face": 1306,
+            "terrain": {
+              "fdid": 785710,
+              "height": 601.0761400819331,
+              "hole": false,
+              "slope": 46.867860386732076,
+              "liquid": false,
+              "area": 618,
+              "permitted": true
+            },
+            "world": [
+              6912.365451003567,
+              -2263.9653292569237,
+              601.082493464152
+            ]
+          },
+          {
+            "delta": -0.03362561890617144,
+            "face": 1481,
+            "terrain": {
+              "fdid": 785710,
+              "height": 587.5639987834918,
+              "hole": false,
+              "slope": 38.29886412405268,
+              "liquid": false,
+              "area": 618,
+              "permitted": true
+            },
+            "world": [
+              6910.988806842623,
+              -2299.938676089331,
+              587.5303731645856
+            ]
+          },
+          {
+            "delta": 0.0005341887314216365,
+            "face": 1482,
+            "terrain": {
+              "fdid": 785710,
+              "height": 587.9654636706784,
+              "hole": false,
+              "slope": 38.29886412405268,
+              "liquid": false,
+              "area": 618,
+              "permitted": true
+            },
+            "world": [
+              6910.460396067302,
+              -2299.2005299886055,
+              587.9659978594099
+            ]
+          },
+          {
+            "delta": 0.01334773184498772,
+            "face": 1483,
+            "terrain": {
+              "fdid": 785710,
+              "height": 588.167019002251,
+              "hole": false,
+              "slope": 38.29886412405268,
+              "liquid": false,
+              "area": 618,
+              "permitted": true
+            },
+            "world": [
+              6910.198093341647,
+              -2298.819639224096,
+              588.180366734096
+            ]
+          },
+          {
+            "delta": -0.0024155613565426393,
+            "face": 1484,
+            "terrain": {
+              "fdid": 785710,
+              "height": 588.3689447535999,
+              "hole": false,
+              "slope": 38.29886412405268,
+              "liquid": false,
+              "area": 618,
+              "permitted": true
+            },
+            "world": [
+              6909.601246788389,
+              -2297.8964545840295,
+              588.3665291922433
+            ]
+          },
+          {
+            "delta": -0.11580251604300429,
+            "face": 1485,
+            "terrain": {
+              "fdid": 785710,
+              "height": 588.4300496473907,
+              "hole": false,
+              "slope": 38.29886412405268,
+              "liquid": false,
+              "area": 618,
+              "permitted": true
+            },
+            "world": [
+              6909.22782389323,
+              -2297.7586720784493,
+              588.3142471313477
+            ]
+          },
+          {
+            "delta": 0.008533580765288207,
+            "face": 1507,
+            "terrain": {
+              "fdid": 785710,
+              "height": 588.3500410957483,
+              "hole": false,
+              "slope": 38.29886412405268,
+              "liquid": false,
+              "area": 618,
+              "permitted": true
+            },
+            "world": [
+              6909.534836069744,
+              -2297.687124633788,
+              588.3585746765136
+            ]
+          },
+          {
+            "delta": -0.028507414142268317,
+            "face": 1508,
+            "terrain": {
+              "fdid": 785710,
+              "height": 588.3549536930323,
+              "hole": false,
+              "slope": 41.72566205428255,
+              "liquid": false,
+              "area": 618,
+              "permitted": true
+            },
+            "world": [
+              6902.98878072103,
+              -2291.464645385741,
+              588.32644627889
+            ]
+          },
+          {
+            "delta": -0.10864873498690031,
+            "face": 1511,
+            "terrain": {
+              "fdid": 785710,
+              "height": 588.4228958663346,
+              "hole": false,
+              "slope": 41.72566205428255,
+              "liquid": false,
+              "area": 618,
+              "permitted": true
+            },
+            "world": [
+              6903.020929972332,
+              -2291.551778157551,
+              588.3142471313477
+            ]
+          },
+          {
+            "delta": 0.0016776910231328657,
+            "face": 1512,
+            "terrain": {
+              "fdid": 785710,
+              "height": 588.2407916606091,
+              "hole": false,
+              "slope": 41.72566205428255,
+              "liquid": false,
+              "area": 618,
+              "permitted": true
+            },
+            "world": [
+              6902.744119299027,
+              -2291.3947673979246,
+              588.2424693516323
+            ]
+          },
+          {
+            "delta": -0.010946105080051893,
+            "face": 1513,
+            "terrain": {
+              "fdid": 785710,
+              "height": 587.6472383719257,
+              "hole": false,
+              "slope": 41.72566205428255,
+              "liquid": false,
+              "area": 618,
+              "permitted": true
+            },
+            "world": [
+              6901.048063151043,
+              -2291.2016669863733,
+              587.6362922668457
+            ]
+          },
+          {
+            "delta": -0.0041976938994139346,
+            "face": 1514,
+            "terrain": {
+              "fdid": 785710,
+              "height": 587.5145804279257,
+              "hole": false,
+              "slope": 41.72566205428255,
+              "liquid": false,
+              "area": 618,
+              "permitted": true
+            },
+            "world": [
+              6900.739842696418,
+              -2291.1300701323,
+              587.5103827340263
+            ]
+          },
+          {
+            "delta": -0.046665366717775214,
+            "face": 1515,
+            "terrain": {
+              "fdid": 785710,
+              "height": 587.1439156239373,
+              "hole": false,
+              "slope": 41.72566205428255,
+              "liquid": false,
+              "area": 618,
+              "permitted": true
+            },
+            "world": [
+              6900.074601672945,
+              -2290.216383434476,
+              587.0972502572196
+            ]
+          }
+        ]
+      }
+    },
+    "pairs": [
+      {
+        "corridorID": "wmo-111596-372018-exterior_A-exterior_B",
+        "fromUiMap": 1448,
+        "toUiMap": 1450,
+        "status": "unproven",
+        "canIntegrate": false,
+        "reason": "No continuous native source-floor contact graph connects dry terrain landing candidates, even in geometry-only diagnostic retaining all upward stair faces.",
+        "fromGroup": "exterior_A",
+        "toGroup": "exterior_B",
+        "clearanceSearchReachableFaces": 5585,
+        "sharedGeometryOnlyComponents": []
+      },
+      {
+        "corridorID": "wmo-111596-372018-exterior_A-exterior_C",
+        "fromUiMap": 1448,
+        "toUiMap": 1452,
+        "status": "unproven",
+        "canIntegrate": false,
+        "reason": "No continuous native source-floor contact graph connects dry terrain landing candidates, even in geometry-only diagnostic retaining all upward stair faces.",
+        "fromGroup": "exterior_A",
+        "toGroup": "exterior_C",
+        "clearanceSearchReachableFaces": 5585,
+        "sharedGeometryOnlyComponents": []
+      },
+      {
+        "corridorID": "wmo-111596-372018-exterior_B-exterior_C",
+        "fromUiMap": 1450,
+        "toUiMap": 1452,
+        "status": "unproven",
+        "canIntegrate": false,
+        "reason": "No continuous native source-floor contact graph connects dry terrain landing candidates, even in geometry-only diagnostic retaining all upward stair faces.",
+        "fromGroup": "exterior_B",
+        "toGroup": "exterior_C",
+        "clearanceSearchReachableFaces": 6137,
+        "sharedGeometryOnlyComponents": []
+      }
+    ],
+    "geometryOnlyFaceCount": 16635,
+    "geometryOnlyComponentCount": 196,
+    "m2Models": 17,
+    "m2ModelsWithCollision": 5,
+    "m2CollisionPlacements": 24,
+    "m2CollisionAABBsOverlappingStepsA01": 0,
+    "proofBlocker": "Landing contacts exist, but no verified continuous native floor corridor joins them. This is an extraction/path-proof limitation, not proof that in-game walking is impossible.",
+    "sources": [
+      "timbermaw-dense-landing-paths-111596.json",
+      "timbermaw-bounded-riser-paths-111596.json",
+      "timbermaw-all-stair-diagnostic-111596.json",
+      "timbermaw-geometry-only-connectivity.json",
+      "timbermaw-m2-placement-proof.json"
+    ]
+  },
+  "hyjal": {
+    "rootFDID": 7960309,
+    "placementUID": 70062766,
+    "status": "not a proven walking exit",
+    "canIntegrate": false,
+    "nativeWinterspringGroundWitness": {
+      "group": "exteriorcave",
+      "point": [
+        6282.295313302284,
+        -3849.1550502727605,
+        695.8964099884033
+      ],
+      "terrain": {
+        "fdid": 786375,
+        "height": 695.8898653971164,
+        "hole": false,
+        "slope": 37.47774199710966,
+        "liquid": false,
+        "area": 2252,
+        "permitted": true
+      },
+      "delta": 0.0065445912869108724
+    },
+    "nativeWinterspringGroundAreaName": "The Ruins of Kel'Theril",
+    "nativeHyjalClosestVertexOrCentroidWitness": {
+      "group": "2",
+      "point": [
+        6099.703269320414,
+        -3714.1812461806753,
+        699.3738187154134
+      ],
+      "terrain": {
+        "fdid": 786155,
+        "height": 895.622429670141,
+        "hole": false,
+        "slope": 78.26275316445954,
+        "liquid": false,
+        "area": 616,
+        "permitted": false
+      },
+      "delta": -196.2486109547275
+    },
+    "nativeHyjalClosestDryVertexOrCentroidWitness": {
+      "group": "2",
+      "point": [
+        6077.582276714618,
+        -3690.643336245321,
+        693.2137966156006
+      ],
+      "terrain": {
+        "fdid": 786155,
+        "height": 998.3602138233739,
+        "hole": false,
+        "slope": 49.9491962294424,
+        "liquid": false,
+        "area": 616,
+        "permitted": true
+      },
+      "delta": -305.1464172077733
+    },
+    "proofBlocker": "Native cave lies beneath Hyjal terrain; dense source-floor search found no Hyjal dry landing within0.30yd. ADT/WMO bounding overlap does not establish an exit.",
+    "sources": [
+      "hyjal-boundary-assets.json",
+      "hyjal-cave-ground-contact-probe.json",
+      "hyjal-cave-ground-paths-7960309.json"
+    ]
+  },
+  "remainingKnownWalkingProofGaps": [
+    {
+      "name": "Timbermaw Hold: Felwood\u2013Moonglade\u2013Winterspring branches",
+      "status": "walking route expected; native floor/landing proof incomplete"
+    },
+    {
+      "name": "Dun Morogh\u2013Ironforge ground entrance",
+      "status": "WMO assets available; native exterior?city-floor threshold proof incomplete; interior routing not ready"
+    },
+    {
+      "name": "Tirisfal\u2013Undercity static sewer entrance",
+      "status": "All216WMOgroups available; sewer exterior?city-floor path proof incomplete; elevators excluded"
+    }
+  ],
+  "unprovenAdjacencies": [
+    {
+      "name": "Felwood\u2013Hyjal",
+      "status": "no demonstrated native walking exit; do not infer from cliff/area boundary"
+    },
+    {
+      "name": "Winterspring\u2013Hyjal",
+      "status": "no demonstrated native walking exit; inspected cave fails Hyjal landing proof"
+    }
+  ],
+  "historical": true,
+  "supersededBy": "preview.11 native-curved-corridors-70959.json and docs/walking-geometry-gaps.md; original negative result retained for provenance"
+}

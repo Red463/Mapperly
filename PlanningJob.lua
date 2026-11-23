@@ -1,6 +1,45 @@
 local _,A=...
 local J={};A.PlanningJob=J
 local active,frame
+local serial=0
+local results={}
+local function scalar(v)
+    if issecretvalue and issecretvalue(v) then return end
+    if type(v)=='string' then return v:sub(1,320) end
+    if type(v)=='boolean' then return v end
+    if type(v)=='number' and v==v and math.abs(v)<math.huge then return v end
+end
+local function copy(source,keys)
+    local out={};if type(source)=='table' then for _,key in ipairs(keys) do out[key]=scalar(source[key]) end end;return out
+end
+local counterKeys={'id','stage','paths','cells','mapID','checked','total','flightRoutes','flightSources','cacheHits','cacheMisses','source','waterCells','waterUnknown','waterRejected'}
+local function destination(p) return copy(p,{'map','mapID','x','y','walkingOnly'}) end
+function J.Recent()
+    local out={}
+    for i,row in ipairs(results) do
+        out[i]=copy(row,{'state','elapsedMS','reason','kind','coverage','source','distance'})
+        out[i].progress=copy(row.progress,counterKeys);out[i].destination=destination(row.destination)
+    end
+    return out
+end
+function J.Progress()
+    if not active then return end
+    local p={};for k,v in pairs(active.progress) do p[k]=v end;return p
+end
+function J.Report(stage,details)
+    if not active then return end
+    if active.progress.stage~=stage then active.progress.checked=nil;active.progress.total=nil end
+    active.progress.stage=stage
+    for k,v in pairs(details or {}) do active.progress[k]=v end
+end
+function J.BeginPath(map)
+    if not active then return end
+    local p=active.progress;p.paths=p.paths+1;p.mapID=map;p.stage='Finding a walking path';p.lastCells=0;p.checked=nil;p.total=nil
+end
+function J.PathProgress(count)
+    if not active then return end
+    local p=active.progress;p.cells=p.cells+math.max(0,count-p.lastCells);p.lastCells=count
+end
 local function readClock(timer,factor)
     if type(timer)~='function' then return end
     local ok,n=pcall(timer)
@@ -9,7 +48,12 @@ end
 local function clock()
     return readClock(debugprofilestop,1) or readClock(GetTimePreciseSec,1000) or readClock(GetTime,1000) or 0
 end
-function J.Cancel() active=nil end
+local function record(job,state,result,reason)
+    local row={state=state,elapsedMS=math.max(0,clock()-(job.started or clock())),reason=scalar(reason),progress=copy(job.progress,counterKeys),destination=destination(job.destination)}
+    if type(result)=='table' then for _,key in ipairs({'kind','coverage','source','distance'}) do row[key]=scalar(result[key]) end end
+    results[#results+1]=row;while #results>6 do table.remove(results,1) end
+end
+function J.Cancel() if active then record(active,'cancelled') end;active=nil end
 function J.IsRunning() return active~=nil end
 function J.Checkpoint()
     local job=active
@@ -19,6 +63,7 @@ function J.Checkpoint()
 end
 function J.Step()
     local job=active;if not job then return end
+    if not job.destination then job.destination=destination(A.Navigation and (A.Navigation.pending or A.Navigation.deferredRoutingTarget or A.Navigation.target)) end
     job.began=clock();job.checkpoints=0
     local previous=A.Terrain and A.Terrain.Checkpoint
     if A.Terrain then A.Terrain.Checkpoint=J.Checkpoint end
@@ -26,6 +71,7 @@ function J.Step()
     if A.Terrain then A.Terrain.Checkpoint=previous end
     if active~=job then return end
     if not ok or coroutine.status(job.thread)=='dead' then
+        record(job,ok and result and 'ready' or 'failed',result,ok and reason or result)
         active=nil
         if ok and result then
             if job.done then
@@ -39,7 +85,8 @@ function J.Step()
 end
 function J.Start(work,done,failed)
     J.Cancel()
-    active={thread=coroutine.create(work),done=done,failed=failed}
+    serial=serial+1
+    active={thread=coroutine.create(work),done=done,failed=failed,started=clock(),progress={id=serial,stage='Preparing route',paths=0,cells=0,lastCells=0}}
     if not frame then
         frame=CreateFrame('Frame',nil,UIParent)
         frame:SetSize(1,1);frame:SetPoint('TOPLEFT',UIParent,'TOPLEFT',0,0);frame:EnableMouse(false)

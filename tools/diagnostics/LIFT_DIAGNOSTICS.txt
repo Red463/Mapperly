@@ -1,0 +1,16 @@
+Mapperly lift diagnostic build
+
+This build observes positions and routing state. It does not change lift guidance.
+
+1. Install this Mapperly folder and fully restart WoW.
+2. Set the same route. While waiting at the upper lift, type:
+   /mapperly liftdiag start
+3. Wait five seconds, ride down, step off and walk about 30 yards away.
+4. Wait five seconds, then type:
+   /mapperly liftdiag report
+5. Press Ctrl+C and paste the report back into the conversation.
+
+The report contains coordinates, heights, lift state and build information.
+Capture is bounded to the latest five minutes. Opening the report stops capture.
+The copied report is also retained in MapperlyLiftDiagnosticsDB.
+Install the normal preview again when diagnostics are finished.

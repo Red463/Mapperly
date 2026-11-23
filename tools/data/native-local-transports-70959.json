@@ -1,0 +1,571 @@
+{
+  "version": 1,
+  "build": 70959,
+  "coordinateOrder": [
+    "north",
+    "east",
+    "z"
+  ],
+  "method": "manualLift",
+  "links": [
+    {
+      "id": "lift:great-lift:1413:1441",
+      "kind": "lift",
+      "method": "manualLift",
+      "route": "The Great Lift",
+      "name": "The Great Lift",
+      "a": {
+        "mapID": 1413,
+        "x": 0.44181743421052627,
+        "y": 0.9238594327990137,
+        "continent": 1,
+        "worldPosition": [
+          -4629.325300462393,
+          -1854.1666860608552,
+          85.33392632627574
+        ],
+        "groundHeight": 85.33392632627574,
+        "walkingRegion": 1,
+        "groundHeightProof": {
+          "fdid": 785595,
+          "height": 85.33392632627574,
+          "hole": false,
+          "slope": 27.764813170799357,
+          "liquid": false,
+          "area": 485,
+          "permitted": true
+        },
+        "dryMaskPixel": [
+          1074,
+          1498
+        ],
+        "connectedAnchor": {
+          "roadPixel": [
+            1075,
+            1462
+          ],
+          "roadPosition": [
+            -4479.371541892726,
+            -1858.3333525904604,
+            86.10831451416016
+          ],
+          "groundProof": {
+            "fdid": 785595,
+            "height": 86.10831451416016,
+            "hole": false,
+            "slope": 0.0,
+            "liquid": false,
+            "area": 1157,
+            "permitted": true
+          },
+          "lengthYards": 150.01163561250536,
+          "points": [
+            {
+              "mapID": 1413,
+              "x": 0.4422286184210526,
+              "y": 0.9016646115906289
+            },
+            {
+              "mapID": 1413,
+              "x": 0.44181743421052627,
+              "y": 0.9238594327990137
+            }
+          ]
+        },
+        "manualAccess": true,
+        "manualAccessDescription": "Walk manually between this verified dry handoff and the nearby Great Lift boarding structure; board or leave a moving lift manually.",
+        "nativeCollidableFloor": {
+          "position": [
+            -4634.379648647049,
+            -1852.7571725383887,
+            85.63908131917317
+          ],
+          "vertices": [
+            [
+              -4618.776937791724,
+              -1855.2033222810705,
+              85.63907623291016
+            ],
+            [
+              -4618.501016716506,
+              -1854.1364139056336,
+              85.63907623291016
+            ],
+            [
+              -4665.860991432918,
+              -1848.9317814284616,
+              85.63909149169922
+            ]
+          ],
+          "groupFileDataID": 112648,
+          "triangleIndex": 152,
+          "distanceToDryHandoffYards": 5.256071109816122,
+          "meaning": "Native upward static walkway floor; manual boarding access. Not a proven moving platform center or stop."
+        }
+      },
+      "b": {
+        "mapID": 1441,
+        "x": 0.31202651515151514,
+        "y": 0.24076704545454541,
+        "continent": 1,
+        "worldPosition": [
+          -4672.916419744318,
+          -1806.249873058712,
+          -50.887675774459446
+        ],
+        "groundHeight": -50.887675774459446,
+        "walkingRegion": 1,
+        "groundHeightProof": {
+          "fdid": 785595,
+          "height": -50.887675774459446,
+          "hole": false,
+          "slope": 28.784785964426696,
+          "liquid": false,
+          "area": 485,
+          "permitted": true
+        },
+        "dryMaskPixel": [
+          329,
+          169
+        ],
+        "connectedAnchor": {
+          "sourceSign": {
+            "Name_lang": "The Great Lift",
+            "Pos[0]": "-4971.2993",
+            "Pos[1]": "-1718.9219",
+            "Pos[2]": "-59.379177",
+            "Rot[0]": "0",
+            "Rot[1]": "0",
+            "Rot[2]": "0.920505",
+            "Rot[3]": "0.390731",
+            "ID": "19844",
+            "OwnerID": "1",
+            "DisplayID": "308",
+            "Flags": "0",
+            "Scale": "1",
+            "TypeID": "5",
+            "PhaseUseFlags": "0",
+            "PhaseID": "0",
+            "PhaseGroupID": "0",
+            "Field_11_0_0_54210_011": "0",
+            "PropValue[0]": "1",
+            "PropValue[1]": "1",
+            "PropValue[2]": "0",
+            "PropValue[3]": "0",
+            "PropValue[4]": "0",
+            "PropValue[5]": "0",
+            "PropValue[6]": "0",
+            "PropValue[7]": "0"
+          },
+          "approachPosition": [
+            -4971.2993,
+            -1718.9219,
+            -61.60324902728275
+          ],
+          "groundProof": {
+            "fdid": 785600,
+            "height": -61.60324902728275,
+            "hole": false,
+            "slope": 16.384686401532555,
+            "liquid": false,
+            "area": 400,
+            "permitted": true
+          },
+          "region": 1,
+          "lengthYards": 337.8697461708509,
+          "points": [
+            {
+              "mapID": 1441,
+              "x": 0.29217924719403965,
+              "y": 0.3424884934646015
+            },
+            {
+              "mapID": 1441,
+              "x": 0.30634469696969696,
+              "y": 0.32457386363636365
+            },
+            {
+              "mapID": 1441,
+              "x": 0.31202651515151514,
+              "y": 0.3117897727272727
+            },
+            {
+              "mapID": 1441,
+              "x": 0.31392045454545453,
+              "y": 0.3018465909090909
+            },
+            {
+              "mapID": 1441,
+              "x": 0.31297348484848486,
+              "y": 0.2421875
+            },
+            {
+              "mapID": 1441,
+              "x": 0.31202651515151514,
+              "y": 0.24076704545454541
+            }
+          ]
+        },
+        "manualAccess": true,
+        "manualAccessDescription": "Walk manually between this verified dry handoff and the nearby Great Lift boarding structure; board or leave a moving lift manually.",
+        "nativeCollidableFloor": {
+          "position": [
+            -4669.09491801338,
+            -1816.2559738270759,
+            -44.17824077606201
+          ],
+          "vertices": [
+            [
+              -4667.830002398906,
+              -1815.1137644306627,
+              -44.17824077606201
+            ],
+            [
+              -4672.280859485563,
+              -1816.7778767417167,
+              -44.17824077606201
+            ],
+            [
+              -4667.173892155673,
+              -1816.8762803088482,
+              -44.17824077606201
+            ]
+          ],
+          "groupFileDataID": 112649,
+          "triangleIndex": 369,
+          "distanceToDryHandoffYards": 12.638925827139445,
+          "meaning": "Native upward static walkway floor; manual boarding access. Not a proven moving platform center or stop."
+        }
+      },
+      "boardingPosition": [
+        -4634.379648647049,
+        -1852.7571725383887,
+        85.63908131917317
+      ],
+      "arrivalPosition": [
+        -4669.09491801338,
+        -1816.2559738270759,
+        -44.17824077606201
+      ],
+      "boardingGroundHeight": 85.33392632627574,
+      "arrivalGroundHeight": -50.887675774459446,
+      "sourceManualAccess": "Walk manually between this verified dry handoff and the nearby Great Lift boarding structure; board or leave a moving lift manually.",
+      "arrivalManualAccess": "Walk manually between this verified dry handoff and the nearby Great Lift boarding structure; board or leave a moving lift manually.",
+      "manualBoarding": true,
+      "manualDisembark": true,
+      "approachDistanceYards": 5.256071109816122,
+      "arrivalApproachDistanceYards": 12.638925827139445,
+      "travelSeconds": 60,
+      "waitSeconds": 60,
+      "estimatedSeconds": 120,
+      "timingIsAssumption": true,
+      "timingEvidence": "Conservative planning allowance of120seconds total:60wait+60ride/manual access. Not native timing, a measured duration or a timetable.",
+      "sourceObjectID": null,
+      "pathID": null,
+      "physicalFactionRestriction": null,
+      "geometryPieces": []
+    },
+    {
+      "id": "lift:great-lift:1441:1413",
+      "kind": "lift",
+      "method": "manualLift",
+      "route": "The Great Lift",
+      "name": "The Great Lift",
+      "a": {
+        "mapID": 1441,
+        "x": 0.31202651515151514,
+        "y": 0.24076704545454541,
+        "continent": 1,
+        "worldPosition": [
+          -4672.916419744318,
+          -1806.249873058712,
+          -50.887675774459446
+        ],
+        "groundHeight": -50.887675774459446,
+        "walkingRegion": 1,
+        "groundHeightProof": {
+          "fdid": 785595,
+          "height": -50.887675774459446,
+          "hole": false,
+          "slope": 28.784785964426696,
+          "liquid": false,
+          "area": 485,
+          "permitted": true
+        },
+        "dryMaskPixel": [
+          329,
+          169
+        ],
+        "connectedAnchor": {
+          "sourceSign": {
+            "Name_lang": "The Great Lift",
+            "Pos[0]": "-4971.2993",
+            "Pos[1]": "-1718.9219",
+            "Pos[2]": "-59.379177",
+            "Rot[0]": "0",
+            "Rot[1]": "0",
+            "Rot[2]": "0.920505",
+            "Rot[3]": "0.390731",
+            "ID": "19844",
+            "OwnerID": "1",
+            "DisplayID": "308",
+            "Flags": "0",
+            "Scale": "1",
+            "TypeID": "5",
+            "PhaseUseFlags": "0",
+            "PhaseID": "0",
+            "PhaseGroupID": "0",
+            "Field_11_0_0_54210_011": "0",
+            "PropValue[0]": "1",
+            "PropValue[1]": "1",
+            "PropValue[2]": "0",
+            "PropValue[3]": "0",
+            "PropValue[4]": "0",
+            "PropValue[5]": "0",
+            "PropValue[6]": "0",
+            "PropValue[7]": "0"
+          },
+          "approachPosition": [
+            -4971.2993,
+            -1718.9219,
+            -61.60324902728275
+          ],
+          "groundProof": {
+            "fdid": 785600,
+            "height": -61.60324902728275,
+            "hole": false,
+            "slope": 16.384686401532555,
+            "liquid": false,
+            "area": 400,
+            "permitted": true
+          },
+          "region": 1,
+          "lengthYards": 337.8697461708509,
+          "points": [
+            {
+              "mapID": 1441,
+              "x": 0.29217924719403965,
+              "y": 0.3424884934646015
+            },
+            {
+              "mapID": 1441,
+              "x": 0.30634469696969696,
+              "y": 0.32457386363636365
+            },
+            {
+              "mapID": 1441,
+              "x": 0.31202651515151514,
+              "y": 0.3117897727272727
+            },
+            {
+              "mapID": 1441,
+              "x": 0.31392045454545453,
+              "y": 0.3018465909090909
+            },
+            {
+              "mapID": 1441,
+              "x": 0.31297348484848486,
+              "y": 0.2421875
+            },
+            {
+              "mapID": 1441,
+              "x": 0.31202651515151514,
+              "y": 0.24076704545454541
+            }
+          ]
+        },
+        "manualAccess": true,
+        "manualAccessDescription": "Walk manually between this verified dry handoff and the nearby Great Lift boarding structure; board or leave a moving lift manually.",
+        "nativeCollidableFloor": {
+          "position": [
+            -4669.09491801338,
+            -1816.2559738270759,
+            -44.17824077606201
+          ],
+          "vertices": [
+            [
+              -4667.830002398906,
+              -1815.1137644306627,
+              -44.17824077606201
+            ],
+            [
+              -4672.280859485563,
+              -1816.7778767417167,
+              -44.17824077606201
+            ],
+            [
+              -4667.173892155673,
+              -1816.8762803088482,
+              -44.17824077606201
+            ]
+          ],
+          "groupFileDataID": 112649,
+          "triangleIndex": 369,
+          "distanceToDryHandoffYards": 12.638925827139445,
+          "meaning": "Native upward static walkway floor; manual boarding access. Not a proven moving platform center or stop."
+        }
+      },
+      "b": {
+        "mapID": 1413,
+        "x": 0.44181743421052627,
+        "y": 0.9238594327990137,
+        "continent": 1,
+        "worldPosition": [
+          -4629.325300462393,
+          -1854.1666860608552,
+          85.33392632627574
+        ],
+        "groundHeight": 85.33392632627574,
+        "walkingRegion": 1,
+        "groundHeightProof": {
+          "fdid": 785595,
+          "height": 85.33392632627574,
+          "hole": false,
+          "slope": 27.764813170799357,
+          "liquid": false,
+          "area": 485,
+          "permitted": true
+        },
+        "dryMaskPixel": [
+          1074,
+          1498
+        ],
+        "connectedAnchor": {
+          "roadPixel": [
+            1075,
+            1462
+          ],
+          "roadPosition": [
+            -4479.371541892726,
+            -1858.3333525904604,
+            86.10831451416016
+          ],
+          "groundProof": {
+            "fdid": 785595,
+            "height": 86.10831451416016,
+            "hole": false,
+            "slope": 0.0,
+            "liquid": false,
+            "area": 1157,
+            "permitted": true
+          },
+          "lengthYards": 150.01163561250536,
+          "points": [
+            {
+              "mapID": 1413,
+              "x": 0.4422286184210526,
+              "y": 0.9016646115906289
+            },
+            {
+              "mapID": 1413,
+              "x": 0.44181743421052627,
+              "y": 0.9238594327990137
+            }
+          ]
+        },
+        "manualAccess": true,
+        "manualAccessDescription": "Walk manually between this verified dry handoff and the nearby Great Lift boarding structure; board or leave a moving lift manually.",
+        "nativeCollidableFloor": {
+          "position": [
+            -4634.379648647049,
+            -1852.7571725383887,
+            85.63908131917317
+          ],
+          "vertices": [
+            [
+              -4618.776937791724,
+              -1855.2033222810705,
+              85.63907623291016
+            ],
+            [
+              -4618.501016716506,
+              -1854.1364139056336,
+              85.63907623291016
+            ],
+            [
+              -4665.860991432918,
+              -1848.9317814284616,
+              85.63909149169922
+            ]
+          ],
+          "groupFileDataID": 112648,
+          "triangleIndex": 152,
+          "distanceToDryHandoffYards": 5.256071109816122,
+          "meaning": "Native upward static walkway floor; manual boarding access. Not a proven moving platform center or stop."
+        }
+      },
+      "boardingPosition": [
+        -4669.09491801338,
+        -1816.2559738270759,
+        -44.17824077606201
+      ],
+      "arrivalPosition": [
+        -4634.379648647049,
+        -1852.7571725383887,
+        85.63908131917317
+      ],
+      "boardingGroundHeight": -50.887675774459446,
+      "arrivalGroundHeight": 85.33392632627574,
+      "sourceManualAccess": "Walk manually between this verified dry handoff and the nearby Great Lift boarding structure; board or leave a moving lift manually.",
+      "arrivalManualAccess": "Walk manually between this verified dry handoff and the nearby Great Lift boarding structure; board or leave a moving lift manually.",
+      "manualBoarding": true,
+      "manualDisembark": true,
+      "approachDistanceYards": 12.638925827139445,
+      "arrivalApproachDistanceYards": 5.256071109816122,
+      "travelSeconds": 60,
+      "waitSeconds": 60,
+      "estimatedSeconds": 120,
+      "timingIsAssumption": true,
+      "timingEvidence": "Conservative planning allowance of120seconds total:60wait+60ride/manual access. Not native timing, a measured duration or a timetable.",
+      "sourceObjectID": null,
+      "pathID": null,
+      "physicalFactionRestriction": null,
+      "geometryPieces": []
+    }
+  ],
+  "provenance": {
+    "sourceSnapshot": "../output/forever-datamine-70959",
+    "nativeIdentity": {
+      "rootFileDataID": 112647,
+      "placementUID": 283429,
+      "groupFileDataIDs": [
+        112648,
+        112649
+      ],
+      "groupNames": [
+        "elevator",
+        "bottom"
+      ],
+      "nativeAreaIDs": [
+        485,
+        1718
+      ],
+      "rootSha256": "127224685b4a141549e0f6846d24436df6bf2a141ced0569d4ce1a14ba6e6794"
+    },
+    "groupSha256": {
+      "112648": "4b589fd16f7d0a423ce1f15c8e808e41e4b5dad7feff3f81ff59407e8c445ac4",
+      "112649": "c2f88f934eaf6273825e83d9397146cabc852ff4cbe0ccc3e353ce67850f92d7"
+    },
+    "evidenceFiles": {
+      "probe.json": "40bf67d3b17a5445c8b750127d23deb05de6bc0bbe6735560659199fa98472d7",
+      "meshes.json": "2de5a55f12f04e10187a9191be11102ef3139a933b0d2490ee6c76b3d0dccda1",
+      "approaches.json": "e57148576a380fc7cd629438f1d03de672651a4e6a2941043001f6941e4b555b"
+    },
+    "identityMethod": "Native WMO112647 placement283429 with elevator/bottom groups within native The Great Lift area; native dry approaches/MCVT heights and runtime walking paths to native road/sign anchors establish manual ground handoffs. No exact moving platform identity/path is claimed.",
+    "areaTableSource": "terrain-research/ashenvale/raw/dbfilesclient/areatable.csv",
+    "nativeRootTerrainWdtFileDataID": 782779
+  },
+  "limitations": [
+    "Same native static elevator/bottom structure and native area identity are verified; actual moving platform spawn/transport identity is unresolved.",
+    "No moving platform center/arrival Z is asserted. Static landing heights are exact native floor evidence only.",
+    "No automatic walking connector from dry handoff to static landing or moving platform is certified. All final access remains manual.",
+    "Upper tower roof near113..115yd is not established boarding floor. Ground/upper walkway near85yd is the relevant proven surface.",
+    "Do not assign animation11898/11899 or a30-second period to these links."
+  ],
+  "excluded": [
+    {
+      "kind": "tram",
+      "reason": "Unavailable pending separate verified native transport evidence"
+    }
+  ]
+}

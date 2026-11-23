@@ -27,12 +27,33 @@ function A.ArrayValues(source)
     for _,key in ipairs(keys) do values[#values+1]=source[key] end
     return values
 end
+function A.ValidateRouteStepsAnchor(p)
+    local anchors={TOPLEFT=true,TOP=true,TOPRIGHT=true,LEFT=true,CENTER=true,RIGHT=true,BOTTOMLEFT=true,BOTTOM=true,BOTTOMRIGHT=true}
+    if type(p)=='table' and anchors[p.point] and anchors[p.relativePoint] and A.Number(p.x,-10000,10000,nil)==p.x and A.Number(p.y,-10000,10000,nil)==p.y and type(p.x)=='number' and type(p.y)=='number' then
+        return {point=p.point,relativePoint=p.relativePoint,x=p.x,y=p.y}
+    end
+end
 function A.InitStore(raw)
     local db = type(raw)=='table' and raw or {}
     if db.theme~='gatherly' and db.theme~='original' then db.theme='gatherly' end
     if db.navigationMode~='terrain' and db.navigationMode~='direct' then db.navigationMode='terrain' end
     if type(db.showJourneyRoute)~='boolean' then db.showJourneyRoute=true end
     if type(db.showMinimapRoute)~='boolean' then db.showMinimapRoute=true end
+    if type(db.showTransportLinks)~='boolean' then db.showTransportLinks=true end
+    if type(db.showRouteSteps)~='boolean' then db.showRouteSteps=true end
+    -- Older close buttons persisted false, indistinguishable from an opt-out.
+    -- Restore the requested default once; later explicit settings remain saved.
+    if db.routeStepsVisibilityVersion~=1 then db.showRouteSteps=true;db.routeStepsVisibilityVersion=1 end
+    if type(db.routeStepsCollapsed)~='boolean' then db.routeStepsCollapsed=false end
+    db.routeStepsAnchor=A.ValidateRouteStepsAnchor(db.routeStepsAnchor)
+    if type(db.preferRoads)~='boolean' then db.preferRoads=false end
+    if type(db.avoidSwimming)~='boolean' then db.avoidSwimming=db.allowSwimming==false end
+    -- Former hard exclusion becomes dry-first planning with a swimming retry.
+    db.allowSwimming=true
+    if type(db.rememberJourney)~='boolean' then db.rememberJourney=true end
+    db.roadPreferenceStrength=math.floor(A.Number(db.roadPreferenceStrength,1,5,3)+.5)
+    for _,key in ipairs({'useBoats','useZeppelins','useAirships','useFlights','useTrams','useLifts'}) do if type(db[key])~='boolean' then db[key]=true end end
+    if type(db.flightKnowledge)~='table' then db.flightKnowledge={} end
     for k,v in pairs(defaults) do
         if type(v)=='boolean' then if type(db[k])~='boolean' then db[k]=v end end
     end
@@ -71,6 +92,7 @@ function A.InitStore(raw)
     local anchor=db.navigationAnchor
     local anchors={CENTER=true,TOP=true,BOTTOM=true,LEFT=true,RIGHT=true,TOPLEFT=true,TOPRIGHT=true,BOTTOMLEFT=true,BOTTOMRIGHT=true}
     if type(anchor)~='table' or not anchors[anchor.point] or not anchors[anchor.relativePoint] or A.Number(anchor.x,-10000,10000,nil)~=anchor.x or A.Number(anchor.y,-10000,10000,nil)~=anchor.y or type(anchor.x)~='number' or type(anchor.y)~='number' then db.navigationAnchor=nil end
+    if A.JourneySession then A.JourneySession.Normalize(db) end
     return db
 end
 function A.ValidPin(p)

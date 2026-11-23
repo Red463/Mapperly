@@ -1,0 +1,58 @@
+{
+  "version": 1,
+  "build": 70959,
+  "source": "TDB_full_world_forever_2026_10_14.sql",
+  "sourceSha256": "3357f62451dcdef27123243c83c76a1a2e3251cf730aea01abf2f7f3d776d341",
+  "method": "areatrigger_teleport.PortLocID -> world_safe_locs.ID",
+  "passengerConnectionVerified": false,
+  "portals": [
+    {
+      "triggerID": 2166,
+      "name": "Deeprun Tram Ironforge - Exit",
+      "safeLocID": 1102166,
+      "destination": {
+        "continent": 0,
+        "north": -4839.51,
+        "east": -1317.74,
+        "z": 501.868
+      },
+      "transportSpawnId": null
+    },
+    {
+      "triggerID": 2171,
+      "name": "Deeprun Tram Stormwind - Exit",
+      "safeLocID": 1102171,
+      "destination": {
+        "continent": 0,
+        "north": -8354.23,
+        "east": 524.068,
+        "z": 91.7971
+      },
+      "transportSpawnId": null
+    },
+    {
+      "triggerID": 2173,
+      "name": "Deeprun Tram Stormwind - Entrance",
+      "safeLocID": 1102173,
+      "destination": {
+        "continent": 369,
+        "north": 67.7607,
+        "east": 2490.98,
+        "z": -4.29649
+      },
+      "transportSpawnId": null
+    },
+    {
+      "triggerID": 2175,
+      "name": "Deeprun Tram Ironforge - Exit",
+      "safeLocID": 1102175,
+      "destination": {
+        "continent": 369,
+        "north": 69.2277,
+        "east": 10.3932,
+        "z": -4.29665
+      },
+      "transportSpawnId": null
+    }
+  ]
+}

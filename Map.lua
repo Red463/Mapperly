@@ -1,5 +1,9 @@
 local _,A=...
 local button=A.CreateIconButton
+local function closeMap(frame)
+    if HideUIPanel then return HideUIPanel(frame) end
+    return frame:Hide()
+end
 function A.UpdateCoordinates()
     if not A.coordinateText then return end
     if not A.db.coordinates then A.coordinateText:SetText('');return end
@@ -58,7 +62,7 @@ local function current()
         end
     end
 end
-local labels={mail='Mailboxes',inn='Inns',dungeon='Dungeon entrances',flight='Flight masters',transport='Boats and zeppelins',portal='Portals',border='Zone exits',notes='Custom notes'}
+local labels={mail='Mailboxes',inn='Inns',dungeon='Dungeon entrances',flight='Flight masters',transport='Boats, zeppelins and airships',portal='Portals',border='Zone exits',notes='Custom notes'}
 local function menuEntry(text,fn,checked,tip)
     local info=UIDropDownMenu_CreateInfo();info.text=text;info.func=fn;info.checked=checked
     info.isNotRadio=true;info.keepShownOnClick=true;info.notCheckable=checked==nil
@@ -82,6 +86,17 @@ function A.AttachMap()
     if A.map or not WorldMapFrame or not WorldMapFrame.GetCanvas then return end
     A.map=WorldMapFrame
     local f=A.map
+    -- Native M handling can request another open display state when character
+    -- miniWorldMap/questLogOpen preferences disagree with our windowed shell.
+    -- Only the visible-map action changes: retain the native opening path,
+    -- global binding/rule checks and panel close lifecycle.
+    local nativeToggle=f.HandleUserActionToggleSelf
+    if type(nativeToggle)=='function' then
+        f.HandleUserActionToggleSelf=function(self,...)
+            if self==f and self:IsShown() then return closeMap(self) end
+            return nativeToggle(self,...)
+        end
+    end
     local bar=CreateFrame('Frame',nil,f,'BackdropTemplate');A.bar=bar
     bar:SetSize(540,A.headerHeight);bar:SetPoint('TOPLEFT',f,'TOPLEFT',0,0);bar:SetFrameLevel(f:GetFrameLevel()+100)
     bar:SetBackdrop({bgFile='Interface\\Tooltips\\UI-Tooltip-Background'});bar:SetBackdropColor(.025,.022,.018,1)
@@ -144,7 +159,7 @@ function A.AttachMap()
     local close=CreateFrame('Button',nil,f,'UIPanelCloseButton');A.closeButton=close
     close:SetSize(22,22);close:SetPoint('TOPRIGHT',f,'TOPRIGHT',-5,-3)
     close:SetFrameStrata('HIGH');close:SetFrameLevel(f:GetFrameLevel()+3000)
-    close:SetScript('OnClick',function() if HideUIPanel then HideUIPanel(f) else f:Hide() end end)
+    close:SetScript('OnClick',function() closeMap(f) end)
     A.AttachButtonTooltip(close,'Close map');A.controls=A.controls or {};A.controls.close=close
     A.sizeButton=control('size','Resize',function() return A.db.compact and 'Enlarge map' or 'Use compact map' end,toggleSize)
     A.navigation=control('parent','ParentMap',function()
@@ -156,7 +171,7 @@ function A.AttachMap()
         if info and info.parentMapID and info.parentMapID>0 then f:SetMapID(info.parentMapID) end
     end,10)
     control('locate','Locate','My location: return to your zone and ping your arrow',current)
-    control('navigate','Navigate','Destinations: coordinates, saved places and recent history. Alt-right-click map or marker for a quick waypoint.',function() A.ShowNavigationInput() end)
+    control('navigate','Navigate','Destinations: coordinates, saved places, quests and nearest services. Alt-right-click map or marker for a quick waypoint.',function() A.ShowNavigationInput() end)
     control('notes','AddNote','Add note at player; Alt-click to place anywhere',function()
         local id=f:GetMapID();local pos=id and C_Map.GetPlayerMapPosition(id,'player')
         if not pos then

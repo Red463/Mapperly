@@ -78,18 +78,57 @@ local function apply(f,entry)
     if role=='window' then
         if new then
             f:SetBackdrop(nil);local c=chrome(f,entry.title);c:Show()
+            if not f.themeWindowBase then
+                local base=f:CreateTexture(nil,'BACKGROUND',nil,-8);f.themeWindowBase=base
+                base:SetPoint('TOPLEFT',f,'TOPLEFT',6,-24);base:SetPoint('BOTTOMRIGHT',f,'BOTTOMRIGHT',-6,6);base:SetColorTexture(.09,.07,.045,1)
+            end
+            f.themeWindowBase:Show()
+            if object(c.Bg) then c.Bg:SetVertexColor(.9,.78,.62,1);c.Bg:SetAlpha(1) end
             if entry.titleLabel then entry.titleLabel:SetShown(c.mapperlyFallback) end
             if entry.logo then entry.logo:Hide() end
         else
             if f.themeChrome then f.themeChrome:Hide() end
+            if f.themeWindowBase then f.themeWindowBase:Hide() end
             f:SetBackdrop(originalWindow);f:SetBackdropColor(.035,.04,.05,1)
             if entry.titleLabel then entry.titleLabel:Show() end
             if entry.logo then entry.logo:Show() end
         end
+    elseif role=='compactWindow' then
+        if new then
+            f:SetBackdrop(nil)
+            if not f.themeChrome then
+                -- Same native frame family as the map, without its portrait slot.
+                -- Forever SharedUIPanelTemplates: DefaultPanelTemplate uses
+                -- the ButtonFrameTemplateNoPortrait nine-slice layout.
+                local ok,c=pcall(CreateFrame,'Frame',nil,f,'DefaultPanelTemplate')
+                if not ok or not object(c) then
+                    c=CreateFrame('Frame',nil,f,'BackdropTemplate')
+                    c:SetBackdrop({edgeFile='Interface\\DialogFrame\\UI-DialogBox-Border',edgeSize=24,insets={left=6,right=6,top=6,bottom=6}})
+                end
+                f.themeChrome=c;c.mapperlyNoPortrait=true;c:SetAllPoints(f);c:SetFrameLevel(f:GetFrameLevel());c:EnableMouse(false)
+                if object(c.NineSlice) then c.NineSlice:SetFrameLevel(f:GetFrameLevel()) end
+                for _,key in ipairs({'Bg','TopTileStreaks','TitleContainer','CloseButton','FrameGlow'}) do if object(c[key]) then c[key]:Hide() end end
+                local base=f:CreateTexture(nil,'BACKGROUND',nil,-2);f.compactFill=base
+                base:SetPoint('TOPLEFT',f,'TOPLEFT',3,-3);base:SetPoint('BOTTOMRIGHT',f,'BOTTOMRIGHT',-3,3);base:SetColorTexture(.16,.10,.055,1)
+                local leather=f:CreateTexture(nil,'BACKGROUND',nil,-1);f.compactLeather=leather;leather:SetAllPoints(base)
+                leather:SetTexture('Interface\\DialogFrame\\UI-DialogBox-Background');leather:SetHorizTile(true);leather:SetVertTile(true);leather:SetAlpha(.35)
+            end
+            f.themeChrome:Show();f.compactFill:Show();f.compactLeather:Show()
+        else
+            if f.themeChrome then f.themeChrome:Hide();f.compactFill:Hide();f.compactLeather:Hide() end
+            f:SetBackdrop({bgFile='Interface\\Buttons\\WHITE8X8',edgeFile='Interface\\Buttons\\WHITE8X8',edgeSize=1})
+            f:SetBackdropColor(.075,.08,.09,1);f:SetBackdropBorderColor(.23,.21,.16,1)
+        end
     elseif role=='card' or role=='header' then
-        f:SetBackdrop({bgFile='Interface\\Buttons\\WHITE8X8',edgeFile=new and 'Interface\\Tooltips\\UI-Tooltip-Border' or 'Interface\\Buttons\\WHITE8X8',edgeSize=new and 12 or 1,insets=new and {left=3,right=3,top=3,bottom=3} or nil})
+        local textured=new and role=='card'
+        f:SetBackdrop({bgFile=textured and 'Interface\\FrameGeneral\\UI-Background-Rock' or 'Interface\\Buttons\\WHITE8X8',tile=textured,tileSize=256,edgeFile=new and 'Interface\\Tooltips\\UI-Tooltip-Border' or 'Interface\\Buttons\\WHITE8X8',edgeSize=new and 12 or 1,insets=new and {left=3,right=3,top=3,bottom=3} or nil})
+        if textured and not f.themeCardBase then
+            local base=f:CreateTexture(nil,'BACKGROUND',nil,-8);f.themeCardBase=base
+            base:SetPoint('TOPLEFT',f,'TOPLEFT',3,-3);base:SetPoint('BOTTOMRIGHT',f,'BOTTOMRIGHT',-3,3);base:SetColorTexture(.08,.065,.045,1)
+        end
+        if f.themeCardBase then f.themeCardBase:SetShown(textured) end
         if new and role=='header' then f:SetBackdropColor(0,0,0,0);f:SetBackdropBorderColor(0,0,0,0)
-        elseif new then f:SetBackdropColor(.19,.18,.16,1);f:SetBackdropBorderColor(.52,.48,.40,1)
+        elseif new then f:SetBackdropColor(.8,.72,.58,1);f:SetBackdropBorderColor(.52,.48,.40,1)
         else f:SetBackdropColor(.075,.08,.09,1);f:SetBackdropBorderColor(.23,.21,.16,1) end
     elseif role=='zone' then
         if new then
@@ -190,7 +229,7 @@ local function nativeArt(b,role)
 end
 function T.PaintButton(b)
     local new=modern();local role=b.themeButtonRole
-    local art=new and not b.iconOnly and (role=='primary' or role=='tab') and nativeArt(b,role) or nil
+    local art=new and not b.iconOnly and (role=='primary' or role=='choice' or role=='tab') and nativeArt(b,role) or nil
     if art and role=='tab' then
         -- Classic and Mainline tab helpers use different active-region names.
         -- Let the installed helper validate its template, and retain quiet art
@@ -211,12 +250,18 @@ function T.PaintButton(b)
         art.mapperlyCaption:ClearAllPoints()
         art.mapperlyCaption:SetPoint('CENTER',object(nativeText) and nativeText or art,'CENTER',0,0)
         art.mapperlyCaption:SetText(b:GetText());art.mapperlyCaption:SetSize(math.max(1,b:GetWidth()-18),24)
-        art.mapperlyCaption:SetTextColor(1,.82,.35);art.mapperlyCaption:Show()
+        if b:IsEnabled() then art.mapperlyCaption:SetTextColor(1,.82,.35) else art.mapperlyCaption:SetTextColor(.5,.5,.5) end
+        art.mapperlyCaption:Show()
         b.activeLine:Hide()
         if role~='tab' then
-            art:SetEnabled(b:IsEnabled());art:SetButtonState(b.pressed and 'PUSHED' or 'NORMAL')
+            art:SetEnabled(b:IsEnabled());art:SetButtonState((b.pressed or role=='choice' and b.active) and 'PUSHED' or 'NORMAL')
             if b.hover then art:LockHighlight() else art:UnlockHighlight() end
         end
+        if role=='choice' and not art.mapperlySelectedMark then
+            local mark=art:CreateTexture(nil,'OVERLAY');art.mapperlySelectedMark=mark
+            mark:SetTexture('Interface\\Buttons\\UI-CheckBox-Check');mark:SetSize(18,18);mark:SetPoint('LEFT',art,'LEFT',6,0)
+        end
+        if art.mapperlySelectedMark then art.mapperlySelectedMark:SetShown(role=='choice' and b.active) end
     end
     if new then
         local fill=b.pressed and {.18,.12,.08} or b.hover and {.30,.24,.16} or b.active and {.27,.21,.12} or {.15,.145,.13}
@@ -238,6 +283,7 @@ function T.QuestBackground(scroll,background)
     background:SetAlpha(new and 0 or scroll.mapperlyOriginalBackgroundAlpha)
 end
 function T.Apply()
+    T.revision=(T.revision or 0)+1
     for f,entry in pairs(registry) do apply(f,entry) end
     if A.FitQuestBackground then A.FitQuestBackground() end
     if A.map and A.AttachZoneLevels then A.AttachZoneLevels() end

@@ -51,13 +51,23 @@ local function tooltip(self)
     if self.data.target then GameTooltip:AddLine('Click to open destination map.') end
     if self.data.category=='notes' then GameTooltip:AddLine('Click to edit; Shift-click to share; right-click to remove.') end
     if self.data.category=='navigation' then GameTooltip:AddLine('Left-click to edit; right-click to stop navigation.') end
+    if A.TransportLinks and #A.TransportLinks.ForPin(self.data)>0 then GameTooltip:AddLine('Click to choose a travel destination.',1,.82,0) end
     GameTooltip:AddLine('Alt-right-click to navigate here.',1,.82,0)
     GameTooltip:Show()
 end
-function MapperlyMapPinMixin:OnMouseEnter() tooltip(self) end
+function MapperlyMapPinMixin:OnMouseEnter()
+    tooltip(self)
+    if A.BoatLinks then A.BoatLinks.Hover(self.data) end
+end
 function MapperlyMapPinMixin:OnMouseLeave()
+    if A.BoatLinks then A.BoatLinks.Clear(self.data) end
     if self.hoverBaseLevel then self:SetFrameLevel(self.hoverBaseLevel);self.hoverBaseLevel=nil end
     GameTooltip:Hide()
+end
+function MapperlyMapPinMixin:OnReleased()
+    if self.data and A.BoatLinks then A.BoatLinks.Clear(self.data) end
+    if self.hoverBaseLevel then self:SetFrameLevel(self.hoverBaseLevel);self.hoverBaseLevel=nil end
+    if GameTooltip:IsOwned(self) then GameTooltip:Hide() end
 end
 function MapperlyMapPinMixin:OnClick(button)
     local p=self.data
@@ -72,6 +82,7 @@ function MapperlyMapPinMixin:OnClick(button)
         A.Navigation.ToPin(p.category=='navigation' and A.Navigation.target or p)
     elseif p.category=='navigation' then
         if button=='RightButton' then A.Navigation.Stop() else A.ShowNavigationInput(A.Navigation.target and A.Navigation.target.map) end
+    elseif button=='LeftButton' and A.TransportLinks and A.TransportLinks.Show(p) then return
     elseif p.target then A.map:SetMapID(p.target)
     elseif p.category=='notes' then
         if button=='RightButton' then

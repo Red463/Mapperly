@@ -1,4 +1,5 @@
 dist/
+output/
 .test-deps/
 assets/services-source/
 __pycache__/

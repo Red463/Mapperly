@@ -1,0 +1,151 @@
+{
+  "version": 1,
+  "build": 70959,
+  "coordinateOrder": [
+    "north",
+    "east",
+    "z"
+  ],
+  "method": "Original native WMO MOVT/MOVI MPY2/MOPY collision triangles, native MODF placement transform, XY barycentric height matched to pinned world_safe_locs Z",
+  "source": "TDB_full_world_forever_2026_10_14.sql",
+  "sourceSha256": "3357f62451dcdef27123243c83c76a1a2e3251cf730aea01abf2f7f3d776d341",
+  "proofFile": "output/tram-audit/native-city-exit-floors.json",
+  "proofSha256": "2705c93b733293999548e6e4ee880d43109454d371b71b91ef4f42d768e75af2",
+  "exits": [
+    {
+      "mapID": 1453,
+      "instance": 0,
+      "exitTriggerID": 2171,
+      "safeLocID": 1102171,
+      "north": -8354.23,
+      "east": 524.068,
+      "z": 91.7971,
+      "groundHeight": 91.7971288512473,
+      "heightError": 2.8851247293459892e-05,
+      "triangle": 2871,
+      "vertices": [
+        [
+          -8367.90397798532,
+          548.7411264619666,
+          91.79735088348389
+        ],
+        [
+          -8375.322500777498,
+          542.7870951841301,
+          91.79734706878662
+        ],
+        [
+          -8328.991646080605,
+          500.27606455672924,
+          91.79685878753662
+        ]
+      ],
+      "localVertices": [
+        [
+          -447.0634460449219,
+          343.53350830078125,
+          -10.15965747833252
+        ],
+        [
+          -437.5511779785156,
+          343.5750427246094,
+          -10.159661293029785
+        ],
+        [
+          -447.3463439941406,
+          405.6861572265625,
+          -10.160149574279785
+        ]
+      ],
+      "collisionFlags": 8,
+      "material": 65535,
+      "slope": 0.00045422259029277305,
+      "nativeRootFileDataID": 7962574,
+      "nativeGroupFileDataID": 7964849,
+      "nativePlacementUID": 10047,
+      "nativePlacementPosition": [
+        16527.376953125,
+        101.9570083618164,
+        25998.30078125
+      ],
+      "nativePlacementRotation": [
+        0.0,
+        38.5,
+        0.0
+      ],
+      "rootSha256": "5d0bf1e32e8aa79d09b6fee5e425fba5da1b60eabae9c4726656198603c6fea9",
+      "groupSha256": "0d006776b6c24b50019fc9397df079fc2f2db59b44635adf1e34d6841e627d4d",
+      "sourceSha256": "3357f62451dcdef27123243c83c76a1a2e3251cf730aea01abf2f7f3d776d341"
+    },
+    {
+      "mapID": 1455,
+      "instance": 0,
+      "exitTriggerID": 2166,
+      "safeLocID": 1102166,
+      "north": -4839.51,
+      "east": -1317.74,
+      "z": 501.868,
+      "groundHeight": 501.8681343282639,
+      "heightError": 0.00013432826392545394,
+      "triangle": 18257,
+      "vertices": [
+        [
+          -4848.958317889774,
+          -1351.1424677321752,
+          501.86785888671875
+        ],
+        [
+          -4839.563040849523,
+          -1352.630533375494,
+          501.8678641319275
+        ],
+        [
+          -4839.247021709405,
+          -1289.752570275019,
+          501.8683514595032
+        ]
+      ],
+      "localVertices": [
+        [
+          -488.63238525390625,
+          196.00210571289062,
+          -4.950347900390625
+        ],
+        [
+          -495.7567443847656,
+          189.69900512695312,
+          -4.950342655181885
+        ],
+        [
+          -447.4395751953125,
+          149.45985412597656,
+          -4.949855327606201
+        ]
+      ],
+      "collisionFlags": 8,
+      "material": 65535,
+      "slope": 0.0004551802819120747,
+      "nativeRootFileDataID": 7801267,
+      "nativeGroupFileDataID": 7809104,
+      "nativePlacementUID": 7706,
+      "nativePlacementPosition": [
+        17916.095703125,
+        506.8182067871094,
+        22075.193359375
+      ],
+      "nativePlacementRotation": [
+        0.0,
+        309.5,
+        0.0
+      ],
+      "rootSha256": "62652164994b5c581dd880803b16651b8429c9d547fa662afce3333cd82b2bf0",
+      "groupSha256": "f894ecd53d685323771cf773058db896d4f87eeb912a15bf54a639bb72128859",
+      "sourceSha256": "3357f62451dcdef27123243c83c76a1a2e3251cf730aea01abf2f7f3d776d341"
+    }
+  ],
+  "limitations": [
+    "Floor certificate is at exact native server exit XY; no walking corridor, radius, character sweep or embedded-M2 collision certification.",
+    "Do not use highest floor or ADT root height. Select server-matched layer; a lower floor exists about4.252yd below.",
+    "Automatic zero-Z handoff requires witnessed instance369 exit through correct paired native portal and strict native/map XY agreement; city XY alone does not establish tram use."
+  ]
+}

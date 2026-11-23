@@ -1,0 +1,179 @@
+{
+  "version": 1,
+  "build": 70959,
+  "source": "TDB_full_world_forever_2026_10_14.sql",
+  "sourceSha256": "3357f62451dcdef27123243c83c76a1a2e3251cf730aea01abf2f7f3d776d341",
+  "portalSourceSha256": "2ac1d7b5339b9f786bd6343efb6d19eedb5aa6eb13ffe99d930ace8a593443d7",
+  "floorSourceSha256": "3d6086d4771167c7067ec228ce34ec0f1fbe62a12780a7e863246eaa56730e4e",
+  "animationCsvSha256": "85967c456bff880ad3120036ca0aea657cf5a1581fd060246e2777c2583fc0e3",
+  "nativeCycleMS": 143333,
+  "templates": [
+    {
+      "entry": 176080,
+      "type": 11,
+      "displayID": 3831,
+      "name": "Subway"
+    },
+    {
+      "entry": 176081,
+      "type": 11,
+      "displayID": 3831,
+      "name": "Subway"
+    },
+    {
+      "entry": 176082,
+      "type": 11,
+      "displayID": 3831,
+      "name": "Subway"
+    },
+    {
+      "entry": 176083,
+      "type": 11,
+      "displayID": 3831,
+      "name": "Subway"
+    },
+    {
+      "entry": 176084,
+      "type": 11,
+      "displayID": 3831,
+      "name": "Subway"
+    },
+    {
+      "entry": 176085,
+      "type": 11,
+      "displayID": 3831,
+      "name": "Subway"
+    }
+  ],
+  "spawns": [
+    {
+      "entry": 176080,
+      "guid": 30018802,
+      "instance": 369,
+      "north": -45.3934,
+      "east": 2472.93,
+      "z": 6.90526
+    },
+    {
+      "entry": 176081,
+      "guid": 30018803,
+      "instance": 369,
+      "north": 4.52807,
+      "east": 8.43529,
+      "z": 6.90526
+    },
+    {
+      "entry": 176082,
+      "guid": 30018804,
+      "instance": 369,
+      "north": -45.4005,
+      "east": 2492.79,
+      "z": 6.90526
+    },
+    {
+      "entry": 176083,
+      "guid": 30018805,
+      "instance": 369,
+      "north": -45.4007,
+      "east": 2512.15,
+      "z": 6.90526
+    },
+    {
+      "entry": 176084,
+      "guid": 30018806,
+      "instance": 369,
+      "north": 4.58065,
+      "east": 28.2097,
+      "z": 6.90526
+    },
+    {
+      "entry": 176085,
+      "guid": 30018807,
+      "instance": 369,
+      "north": 4.49883,
+      "east": -11.3475,
+      "z": 6.90526
+    }
+  ],
+  "method": "Pinned native SQL Subway type11 templates/spawns, native143333ms animation, paired portal safe locations and exact native WMO exit floors. Planning allowance includes estimated station access; not a timetable.",
+  "edges": [
+    {
+      "id": "tram:deeprun:1453:1455",
+      "kind": "tram",
+      "automaticTram": true,
+      "name": "Deeprun Tram",
+      "faction": "Neutral",
+      "a": {
+        "mapID": 1453,
+        "x": 0.6957618514835074,
+        "y": 0.3027004161127123
+      },
+      "b": {
+        "mapID": 1455,
+        "x": 0.7641405217391304,
+        "y": 0.5122566193970606
+      },
+      "board": {
+        "worldX": 514.031,
+        "worldY": -8346.46,
+        "instance": 0
+      },
+      "arrival": {
+        "worldX": -1317.74,
+        "worldY": -4839.51,
+        "instance": 0
+      },
+      "boardingGroundHeight": 91.7971288512473,
+      "arrivalGroundHeight": 501.8681343282639,
+      "fromName": "Stormwind",
+      "toName": "Ironforge",
+      "interiorInstance": 369,
+      "entryTriggerID": 2173,
+      "exitTriggerID": 2166,
+      "planningSeconds": 264,
+      "waitAssumptionSeconds": 72,
+      "rideEstimateSeconds": 72,
+      "stationAccessEstimateSeconds": 120,
+      "timingIsAssumption": true
+    },
+    {
+      "id": "tram:deeprun:1455:1453",
+      "kind": "tram",
+      "automaticTram": true,
+      "name": "Deeprun Tram",
+      "faction": "Neutral",
+      "a": {
+        "mapID": 1455,
+        "x": 0.7802290592885376,
+        "y": 0.5136781381970257
+      },
+      "b": {
+        "mapID": 1453,
+        "x": 0.6899851741348509,
+        "y": 0.3094082911753022
+      },
+      "board": {
+        "worldX": -1330.46,
+        "worldY": -4840.26,
+        "instance": 0
+      },
+      "arrival": {
+        "worldX": 524.068,
+        "worldY": -8354.23,
+        "instance": 0
+      },
+      "boardingGroundHeight": 501.8681343282639,
+      "arrivalGroundHeight": 91.7971288512473,
+      "fromName": "Ironforge",
+      "toName": "Stormwind",
+      "interiorInstance": 369,
+      "entryTriggerID": 2175,
+      "exitTriggerID": 2171,
+      "planningSeconds": 264,
+      "waitAssumptionSeconds": 72,
+      "rideEstimateSeconds": 72,
+      "stationAccessEstimateSeconds": 120,
+      "timingIsAssumption": true
+    }
+  ]
+}

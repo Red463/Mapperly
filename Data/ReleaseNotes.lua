@@ -1,0 +1,3 @@
+-- Generated from docs/release-highlights.md; keep current with the TOC.
+local _,A=...
+A.ReleaseNotes={version="1.2.0",changes={"Smart navigation plans routes through supported zones using terrain, roads and available travel methods, with guidance on the map and minimap.","Search active quests, find quest pickups and navigate to nearby services. Follow route steps, recover from detours and resume saved journeys.","Choose road-preference strength and avoid swimming where possible. Bundled tram and Great Lift guidance needs no trip recording.","Welcome and update notices explain new features. Copy route diagnostics with /mapperly report or map-position diagnostics with /mapperly mapreport."}}

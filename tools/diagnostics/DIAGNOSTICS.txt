@@ -1,0 +1,34 @@
+MAPPERLY ULTRAWIDE MAP POSITION DIAGNOSTIC BUILD
+
+This is a diagnostic copy of Mapperly 1.1.1. Map movement and settings behavior
+are unchanged. Extra observers record drag events, map position/size/scale
+changes, layout callbacks and their Lua call stacks.
+
+1. Extract this ZIP into Interface/AddOns, replacing the existing Mapperly
+   folder. Keep only one installed Mapperly folder. Existing settings and notes
+   are retained. Run /reload.
+2. Type: /mapperly diagnose start
+3. Open the map with M. Make sure Lock is off. Drag the map by its title bar
+   until the snap-back happens. Wait two seconds, then try once more if useful.
+   If changing the theme or Lock triggers the problem, reproduce that too.
+4. Type: /mapperly diagnose report
+5. In the report window, click Select all, press Ctrl+C, and paste the entire
+   report into a text file or message to send back to Tom.
+
+Opening the report stops recording. Repeat from step 2 for another attempt.
+If you reloaded or logged out after the failed drag, try:
+    /mapperly diagnose previous
+
+Other commands:
+    /mapperly diagnose status
+    /mapperly diagnose stop
+
+The capture is bounded to the latest 400 events. It includes client/display/UI
+scale details, loaded addon identifiers and versions, frame positions, mouse
+focus frame ancestry, layout flags and relevant Lua stacks. It does not record
+chat text, character/account names, custom note contents or credentials. No
+report is sent automatically. Captures survive reload/logout in the separate
+MapperlyDiagnosticsDB saved variable.
+
+After testing, reinstall the normal public Mapperly release and run /reload to
+remove the diagnostic observers. This ZIP does not publish or update GitHub.

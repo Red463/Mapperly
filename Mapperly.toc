@@ -2,7 +2,7 @@
 ## Title: Mapperly
 ## Notes: Native world map improvements. /mapperly
 ## Author: Tom
-## Version: 1.2.0-preview.4
+## Version: 1.2.0
 ## IconTexture: Interface\AddOns\Mapperly\Media\Icon
 ## SavedVariables: MapperlyDB
 ## OptionalDeps: Blizzard_WorldMap, Gatherly, RareScanner
@@ -12,6 +12,8 @@ Libs/HereBeDragons-2.0.lua
 Store.lua
 Theme.lua
 Destinations.lua
+Data/QuestLocations.lua
+Data/QuestCatalog.lua
 Data/MapReveal.lua
 Data/Places.lua
 Data/FlightData.lua
@@ -21,9 +23,35 @@ Places.lua
 Data/Services.lua
 Services.lua
 Data/Terrain.lua
+Data/GroundCorrections.lua
+Data/WalkingRegions.lua
+Data/Roads.lua
+Data/RoadsSupplement.lua
+Data/Crossings.lua
+Data/Structures.lua
+Data/HarbourAccess.lua
+Data/Transports.lua
+Data/LocalTransports.lua
+Data/Trams.lua
+Data/Flights.lua
+Data/WalkingPaths.lua
+Roads.lua
+Data/Water.lua
+Water.lua
 Terrain.lua
+PathReuse.lua
+Structures.lua
+WalkingRegions.lua
 PlanningJob.lua
+TravelBounds.lua
+TravelNetwork.lua
+Flights.lua
+Transports.lua
+Trams.lua
+CityNavigation.lua
+TransportLinks.lua
 Journey.lua
+RouteRecovery.lua
 Navigation.lua
 Pins.lua
 Pins.xml
@@ -34,9 +62,25 @@ NavigationSettings.lua
 Settings.lua
 Buttons.lua
 Dialogs.lua
+Data/ReleaseNotes.lua
+Announcements.lua
+JourneySession.lua
+RouteReport.lua
+MapReport.lua
+RouteSteps.lua
+PlanningStatus.lua
+QuestNavigation.lua
+QuestCatalog.lua
+QuestContextMenu.lua
+QuestNavigationUI.lua
+NearestServices.lua
+NearestServicesUI.lua
 NavigationUI.lua
 NotesUI.lua
+TransportLinksUI.lua
+RouteStyle.lua
 JourneyView.lua
+BoatLinks.lua
 MinimapRoute.lua
 MapInteractions.lua
 Map.lua

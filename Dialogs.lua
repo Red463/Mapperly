@@ -13,9 +13,25 @@ function U.Card(parent,x,y,w,h)
     if A.Theme then A.Theme.Register(c,'card') end
     return c
 end
-function U.Action(parent,text,x,y,w,fn)
+function U.CompactWindow(parent,w,h)
+    local f=U.Card(parent,0,0,w,h)
+    if A.Theme then A.Theme.Register(f,'compactWindow') end
+    return f
+end
+function U.Action(parent,text,x,y,w,fn,role)
     local b=A.CreateMapButton(parent,text,w-16,0,fn)
-    b:ClearAllPoints();b:SetPoint('TOPLEFT',parent,'TOPLEFT',x,-y);b:SetSize(w,28);b:UpdateVisual();return b
+    b:ClearAllPoints();b:SetPoint('TOPLEFT',parent,'TOPLEFT',x,-y);b:SetSize(w,28)
+    local setText=b.SetText
+    function b:SetText(value)
+        setText(self,value)
+        for _,key in ipairs({'themeNativeButton','themeNativeTab'}) do
+            local art=self[key];if art and art.mapperlyCaption then art.mapperlyCaption:SetText(self:GetText()) end
+        end
+    end
+    local setEnabled=b.SetEnabled
+    function b:SetEnabled(value) setEnabled(self,value);self:UpdateVisual() end
+    if A.Theme and text~='' then A.Theme.ButtonRole(b,role or 'primary') else b:UpdateVisual() end
+    return b
 end
 function U.Input(parent,x,y,w,h,max,multiline)
     local e=CreateFrame('EditBox',nil,parent,'InputBoxTemplate');e:SetPoint('TOPLEFT',parent,'TOPLEFT',x,-y);e:SetSize(w,h or 28)

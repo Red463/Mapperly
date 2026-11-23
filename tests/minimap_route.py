@@ -7,7 +7,7 @@ from lupa.lua51 import LuaRuntime
 lua=LuaRuntime(unpack_returned_tuples=True)
 lua.execute((root/'tests/wow.lua').read_text())
 lua.execute("fakeUI();A={};radius=100;heading=0;shape='ROUND';rotate='0'")
-for file in ['Store.lua','MinimapRoute.lua']:
+for file in ['Store.lua','RouteStyle.lua','MinimapRoute.lua']:
  p=root/file
  if p.exists(): lua.execute('assert(loadstring(...))("Mapperly",A)',p.read_text(encoding='utf-8'))
 lua.execute('''
