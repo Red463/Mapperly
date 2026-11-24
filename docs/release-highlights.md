@@ -2,6 +2,13 @@
 
 Keep each release to at most four short, plain-language bullets (180 characters each). Packaging requires a section matching the TOC version and regenerates Data/ReleaseNotes.lua.
 
+## 1.2.4
+
+- A clearer What's new window with a prominent version heading, inset highlights and a compact layout that fits its content.
+- Defer Mapperly marker mouse-routing changes until combat ends to avoid blocked input calls while refreshing the map.
+- Show minimum and recommended fishing skill beneath the zone heading, with source details and ranges for waters with different requirements.
+- Optional travel connections now use clean curves, draw return trips once and default off. Enable them in Navigation > Routing > Show travel connections.
+
 ## 1.2.3
 
 - Fix the map-drag error when native display changes clear the frame's movable flag, including deferred combat opening.

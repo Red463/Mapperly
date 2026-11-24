@@ -15,7 +15,7 @@ local row={id='native',kind='boat',toName='Destination',board={worldX=100,worldY
 A.Transports.Edges=function() return {{transport=row}} end
 B.Update({legs={}})
 local shown={};for _,line in ipairs(B.lines) do if line:IsShown() then shown[#shown+1]=line end end
-assert(#shown==1 and shown[1].lineStart[3]==100 and shown[1].lineEnd[3]==800 and shown[1].lineEnd[4]==-480,'remote endpoint cannot hide or replace the native visible continent piece')
+assert(#shown>=16 and shown[1].lineStart[3]==100 and shown[#shown].lineEnd[3]==800 and shown[#shown].lineEnd[4]==-480,'remote endpoint cannot hide the visible native piece; draw its clean schematic arc')
 row.path={}
 for i=1,100 do row.path[i]={worldX=i<17 and 100+i or 800+i,worldY=200,instance=0,breakBefore=i==17} end
 B.Update({legs={}})

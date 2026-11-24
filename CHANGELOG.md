@@ -1,5 +1,20 @@
 # Changelog
 
+## 1.2.4 - 2026-11-24
+
+- Redraw optional world/continent background travel connections as clean schematic curves with a fine blue stroke and dark underlay. Deduplicate return trips, keep native projection gaps separate and cap complete curves in a reused pool. Active journey geometry and marker-hover previews remain independent.
+- Rename the setting to Show travel connections in Navigation > Routing, add an explanatory tooltip and default it off. Switch the former default-on layer off once on upgrade; retain all subsequent explicit choices without replanning or changing travel-method settings.
+
+- Show both minimum and recommended fishing skill below the map's quest-level heading using bundled published reference values for 43 original zones/capitals. Show ranges for Stranglethorn, Feralas and Azshara special waters. Preserve the reference-data caveat on hover and omit unsupported/overview maps without guessing.
+- Keep fishing text readable in both themes, preserve map click-through and reserve a separate native subzone-label row when fishing levels are shown. No fishing addon, tracking changes, aura queries or live server lookup is required.
+
+- Defer Mapperly pins' native mouse-passthrough setup during combat, coalescing repeated updates and restoring the latest routing after combat. Discard released or hidden pins without changing shared Blizzard mixins. Add a combat-restricted acquisition regression.
+- Add an opt-in taint diagnostic package with passive blocked-action stacks, existing native error stacks and selected taint owners. The separate aura warning still needs in-game confirmation; see docs/taint-investigation.md.
+
+- Redesign What's new with a prominent version heading, inset check-marked highlight rows, a subtle footer divider and content-sized height. Replace the fixed, vertically centered text block with larger top-aligned, wrapped release text.
+- Measure each row and keep footer/action spacing consistent for one to four highlights, reusing native Mapperly panels and the red Got it button in both themes. Top-align the welcome overview as well.
+- Preserve account-wide once-per-version tracking, existing close/Escape behavior, combat/modal deferral and announcement data format. Extend announcement tests for compact short updates, wrapped highlight rows and footer/button fit.
+
 ## 1.2.3 - 2026-11-23
 
 - Restore and verify the native movable flag before starting an unlocked map drag. Native display/first-show changes can clear it independently of Mapperly's saved lock option.

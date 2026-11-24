@@ -153,4 +153,5 @@ function A.UpdateNavigation()
     if not A.zoneHeading then return end
     local info=C_Map.GetMapInfo and C_Map.GetMapInfo(A.map:GetMapID())
     A.zoneHeading:SetText(info and A.ZoneTitle(info.mapID or A.map:GetMapID(),info.name) or 'World map')
+    if A.UpdateFishingHeading then A.UpdateFishingHeading() end
 end

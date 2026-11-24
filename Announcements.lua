@@ -52,11 +52,36 @@ local function changes(v)
  local data=A.ReleaseNotes;local list={}
  if data and data.version==v and type(data.changes)=='table' then
   for _,line in ipairs(data.changes) do
-   if type(line)=='string' and #list<4 then list[#list+1]='- '..line:sub(1,180):gsub('|','||') end
+   if type(line)=='string' and #list<4 then list[#list+1]=line:sub(1,180):gsub('|','||') end
   end
  end
- if #list==0 then return 'Mapperly has been updated. Your settings, notes and saved destinations are kept.' end
- return table.concat(list,'\n\n')
+ if #list==0 then return {'Mapperly has been updated. Your settings, notes and saved destinations are kept.'} end
+ return list
+end
+local function renderUpdate(f,v)
+ local U=A.Dialogs;local y=146
+ f.release:SetText('Version '..v)
+ for _,row in ipairs(f.rows) do row:Hide() end
+ for i,line in ipairs(changes(v)) do
+  local row=f.rows[i]
+  if not row then
+   row=U.Card(f,28,y,464,54);f.rows[i]=row
+   row.icon=row:CreateTexture(nil,'ARTWORK');row.icon:SetSize(20,20);row.icon:SetPoint('TOPLEFT',row,'TOPLEFT',12,-12)
+   row.icon:SetTexture('Interface\\Buttons\\UI-CheckBox-Check')
+   row.text=U.Label(row,'',44,12,'GameFontHighlight');row.text:SetWidth(408);row.text:SetWordWrap(true);row.text:SetJustifyH('LEFT');row.text:SetJustifyV('TOP')
+  end
+  row.text:SetHeight(0);row.text:SetText(line)
+  local measured=row.text:GetStringHeight()
+  -- A conservative fallback also keeps incomplete font metrics usable.
+  if type(measured)~='number' or measured<=0 or measured~=measured or measured==math.huge then measured=math.ceil(#line/58)*16 end
+  local height=math.max(54,math.ceil(measured)+24)
+  row:ClearAllPoints();row:SetPoint('TOPLEFT',f,'TOPLEFT',28,-y);row:SetHeight(height)
+  row.text:SetHeight(height-24);row:Show();y=y+height+8
+ end
+ f.divider:ClearAllPoints();f.divider:SetPoint('TOPLEFT',f,'TOPLEFT',28,-y-6)
+ f.hint:ClearAllPoints();f.hint:SetPoint('TOPLEFT',f,'TOPLEFT',28,-y-18)
+ f.done:ClearAllPoints();f.done:SetPoint('TOPLEFT',f,'TOPLEFT',380,-y-50)
+ f:SetHeight(y+98)
 end
 local function busy()
  if InCombatLockdown and InCombatLockdown() then return true end
@@ -78,13 +103,21 @@ function W.TryShow()
  if not f then
   local U=A.Dialogs
   local title=kind=='welcome' and 'Welcome to Mapperly!' or "What's new in Mapperly"
-  f=U.Window(kind=='welcome' and 'MapperlyWelcomeWindow' or 'MapperlyUpdateWindow',title,'Version '..v,520,424)
+  f=U.Window(kind=='welcome' and 'MapperlyWelcomeWindow' or 'MapperlyUpdateWindow',title,kind=='welcome' and 'Version '..v or '',520,424)
   f:Hide();W.windows[kind]=f
-  f.body=U.Label(f,'',28,112,'GameFontHighlightSmall');f.body:SetSize(464,218);f.body:SetWordWrap(true);f.body:SetJustifyH('LEFT')
+  if kind=='welcome' then
+   f.body=U.Label(f,'',28,112,'GameFontHighlightSmall');f.body:SetSize(464,218);f.body:SetWordWrap(true);f.body:SetJustifyH('LEFT');f.body:SetJustifyV('TOP')
+  else
+   f.rows={}
+   f.release=U.Label(f,'',28,86,'GameFontNormalLarge');f.release:SetWidth(340);f.release:SetWordWrap(false);f.release:SetJustifyH('LEFT')
+   local tag=U.Label(f,'LATEST UPDATE',374,92,'GameFontDisableSmall');tag:SetWidth(118);tag:SetJustifyH('RIGHT')
+   U.Label(f,'Release highlights',28,122,'GameFontNormal')
+   f.divider=f:CreateTexture(nil,'ARTWORK');f.divider:SetSize(464,1);f.divider:SetColorTexture(.48,.37,.2,.55)
+  end
   f.hint=U.Label(f,'',28,342,'GameFontDisableSmall');f.hint:SetSize(464,22);f.hint:SetWordWrap(true)
   f.done=U.Action(f,'Got it',380,376,112,function()f:Hide()end)
  end
- f.body:SetText(kind=='welcome' and welcome or changes(v))
+ if kind=='welcome' then f.body:SetText(welcome) else renderUpdate(f,v) end
  f.hint:SetText(kind=='welcome' and 'Press M to open the map. Use the cog button for Settings.' or 'Your settings, notes and saved destinations are kept.')
  A.Dialogs.Show(f)
  if not f:IsShown() then return false end

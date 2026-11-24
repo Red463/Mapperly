@@ -1,3 +1,3 @@
 -- Generated from docs/release-highlights.md; keep current with the TOC.
 local _,A=...
-A.ReleaseNotes={version="1.2.3",changes={"Fix the map-drag error when native display changes clear the frame's movable flag, including deferred combat opening.","Check movement readiness before starting and clean up safely if movement is rejected, without leaving the map stuck in dragging mode."}}
+A.ReleaseNotes={version="1.2.4",changes={"A clearer What's new window with a prominent version heading, inset highlights and a compact layout that fits its content.","Defer Mapperly marker mouse-routing changes until combat ends to avoid blocked input calls while refreshing the map.","Show minimum and recommended fishing skill beneath the zone heading, with source details and ranges for waters with different requirements.","Optional travel connections now use clean curves, draw return trips once and default off. Enable them in Navigation > Routing > Show travel connections."}}

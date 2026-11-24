@@ -2,7 +2,7 @@
 ## Title: Mapperly
 ## Notes: Native world map improvements. /mapperly
 ## Author: Tom
-## Version: 1.2.3
+## Version: 1.2.4
 ## IconTexture: Interface\AddOns\Mapperly\Media\Icon32
 ## SavedVariables: MapperlyDB
 ## OptionalDeps: Blizzard_WorldMap, Gatherly, RareScanner
@@ -18,6 +18,8 @@ Data/MapReveal.lua
 Data/Places.lua
 Data/FlightData.lua
 Data/ZoneLevels.lua
+Data/FishingLevels.lua
+FishingLevels.lua
 ZoneLevels.lua
 Places.lua
 Data/Services.lua

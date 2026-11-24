@@ -20,6 +20,29 @@ end
 -- Register through MapCanvas so the native manager owns layer, scale and position.
 -- Raw canvas children are not registered pins and can sit under the detail layers.
 MapperlyMapPinMixin={}
+local pendingMouseRouting=setmetatable({},{__mode='k'})
+function MapperlyMapPinMixin:CheckMouseButtonPassthrough(...)
+    -- AcquirePin invokes this native callback after every OnAcquired. Forever
+    -- blocks its SetPassThroughButtons calls from addon code during combat.
+    -- Defer only our pins; never replace Blizzard's shared mixin or setters.
+    if InCombatLockdown and InCombatLockdown() then
+        pendingMouseRouting[self]={n=select('#',...),...};return
+    end
+    pendingMouseRouting[self]=nil
+    return MapCanvasPinMixin.CheckMouseButtonPassthrough(self,...)
+end
+function A.FlushPinMouseRouting()
+    if InCombatLockdown and InCombatLockdown() then return end
+    for pin,args in pairs(pendingMouseRouting) do
+        pendingMouseRouting[pin]=nil
+        if pin:GetMap()==A.map and pin:IsShown() then
+            pin:CheckMouseButtonPassthrough(unpack(args,1,args.n))
+        end
+    end
+end
+local mouseRoutingEvents=CreateFrame('Frame')
+mouseRoutingEvents:RegisterEvent('PLAYER_REGEN_ENABLED')
+mouseRoutingEvents:SetScript('OnEvent',A.FlushPinMouseRouting)
 function MapperlyMapPinMixin:ShouldMouseButtonBePassthrough(button)
     -- Native AcquirePin recalculates this after OnAcquired, including reused pins.
     -- Notes and navigation destinations own right-click; other pins retain map navigation.
@@ -65,6 +88,7 @@ function MapperlyMapPinMixin:OnMouseLeave()
     GameTooltip:Hide()
 end
 function MapperlyMapPinMixin:OnReleased()
+    pendingMouseRouting[self]=nil
     if self.data and A.BoatLinks then A.BoatLinks.Clear(self.data) end
     if self.hoverBaseLevel then self:SetFrameLevel(self.hoverBaseLevel);self.hoverBaseLevel=nil end
     if GameTooltip:IsOwned(self) then GameTooltip:Hide() end

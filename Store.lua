@@ -39,7 +39,11 @@ function A.InitStore(raw)
     if db.navigationMode~='terrain' and db.navigationMode~='direct' then db.navigationMode='terrain' end
     if type(db.showJourneyRoute)~='boolean' then db.showJourneyRoute=true end
     if type(db.showMinimapRoute)~='boolean' then db.showMinimapRoute=true end
-    if type(db.showTransportLinks)~='boolean' then db.showTransportLinks=true end
+    -- The redesigned network is opt-in. The old layer defaulted on, so reset
+    -- it once on upgrade, then preserve subsequent deliberate choices.
+    if db.transportLinksDisplayVersion~=1 then
+        db.showTransportLinks=false;db.transportLinksDisplayVersion=1
+    elseif type(db.showTransportLinks)~='boolean' then db.showTransportLinks=false end
     if type(db.showRouteSteps)~='boolean' then db.showRouteSteps=true end
     -- Older close buttons persisted false, indistinguishable from an opt-out.
     -- Restore the requested default once; later explicit settings remain saved.

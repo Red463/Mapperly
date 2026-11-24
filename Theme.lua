@@ -140,6 +140,7 @@ local function apply(f,entry)
             f:SetShadowColor(unpack(entry.originalShadowColor or {0,0,0,1}));f:SetShadowOffset(unpack(entry.originalShadowOffset or {1,-1}))
         end
         T.PositionZoneHeading()
+        if A.UpdateFishingHeading then A.UpdateFishingHeading() end
     elseif role=='text' then
         local color
         if entry.kind=='coordinate' then color=new and {.94,.88,.75} or {1,.82,0}

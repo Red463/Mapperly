@@ -29,7 +29,7 @@ assert(not W.TryShow(),'another character shares the seen account state')
 A.version='1.2.0-test.2';A.ReleaseNotes={version=A.version,changes={'A shorter route to your destination.'}}
 assert(W.TryShow() and W.current=='update')
 assert(W.frame.themeTitleLabel:GetText()=="What's new in Mapperly")
-assert(W.frame.body:GetText():find('A shorter route',1,true),'show actual update highlights')
+assert(W.frame.rows and W.frame.rows[1].text:GetText():find('A shorter route',1,true),'show actual update highlights')
 W.frame:Hide();assert(not W.TryShow(),'closing by X/Escape/Hide must not repeat')
 A.version='1.2.0-test.1';assert(not W.TryShow(),'seen older versions should not repeat either')
 -- Another modal delays display without consuming state.
@@ -37,8 +37,8 @@ A.version='1.2.0-test.3';A.ReleaseNotes={version=A.version,changes={'Improved co
 A.settingsWindow:Show();assert(not W.TryShow()and not W.Seen(A.version));A.settingsWindow:Hide()
 for _,theme in ipairs({'gatherly','original'})do
  A.db.theme=theme;A.Theme.Apply()
- assert(W.TryShow());assert(W.frame:GetWidth()==520 and W.frame:GetHeight()==424)
- assert(W.frame.body:GetWidth()<=464)
+ assert(W.TryShow());assert(W.frame:GetWidth()==520 and W.frame:GetHeight()<424,'short update notes should use a compact window')
+ assert(W.frame.rows[1].text:GetWidth()<=464)
  W.frame:Hide();A.version=A.version..'x';A.ReleaseNotes.version=A.version
 end
 A.InitStore({announcementState={welcomeSeen='bad',versions={false,{},'good','good'}}})
@@ -61,6 +61,24 @@ local fresh=A.InitStore({});W.Initialize(false)
 A.InitStore(fresh);W.Initialize(true)
 assert(W.TryShow()and W.current=='welcome','a deferred first welcome survives reload')
 W.frame:Hide()
+-- One to four wrapped highlights must fit above the footer/action with no
+-- vertically centred content or large fixed-height gap.
+local previousHeight=0
+for count=1,4 do
+ A.version='1.2.0-layout-'..count
+ local lines={};for i=1,count do lines[i]=string.rep('A useful map improvement. ',6)end
+ A.ReleaseNotes={version=A.version,changes=lines}
+ assert(W.TryShow());local f=W.frame
+ assert(f:GetHeight()>previousHeight,'window should follow release-note content')
+ previousHeight=f:GetHeight()
+ for i=1,count do
+  local row=f.rows[i]
+  assert(row:IsShown()and row.text:GetText()==lines[i],'all notes must remain visible')
+  assert(-row.point[5]+row:GetHeight()<-f.hint.point[5],'rows must not overlap the footer')
+ end
+ assert(-f.done.point[5]+f.done:GetHeight()<=f:GetHeight()-12,'button must fit inside the frame')
+ f:Hide()
+end
 A.version='Unknown';assert(not W.TryShow(),'unavailable metadata must not create repeated unknown-version notices')
 """)
 print('PASS: welcome/update once per account/version, current notes, combat/world/modal deferral, corrupt state and both themes')

@@ -4,21 +4,68 @@ local function overview(map) return map==947 or A.IsOverviewMap and A.IsOverview
 local function resolve(pin)
     return A.TransportLinks and A.TransportLinks.ForPin(pin) or {}
 end
-local function line(parent,used,ax,ay,bx,by,color,width)
+local function line(parent,used,ax,ay,bx,by,color,width,layer)
     if used>=(B.limit or 1024) then return used end
     used=used+1;local item=B.lines[used]
     if not item then item=parent:CreateLine(nil,'OVERLAY');B.lines[used]=item end
-    item:SetDrawLayer('OVERLAY',width>2 and 1 or 0)
+    item:SetDrawLayer('OVERLAY',layer or (width>2 and 1 or 0))
     item:SetThickness(width);item:SetColorTexture(unpack(color))
     item:SetStartPoint('TOPLEFT',parent,ax,ay);item:SetEndPoint('TOPLEFT',parent,bx,by);item:Show()
     return used
 end
-local function draw(row,map,used,hover,completed,network)
+local function curve(used,ax,ay,bx,by,kind,seen)
+    -- Canonical endpoint order gives return trips the same arc and dedupe key.
+    if ax>bx or ax==bx and ay>by then ax,ay,bx,by=bx,by,ax,ay end
+    local key=kind..string.format(':%.1f:%.1f:%.1f:%.1f',ax,ay,bx,by)
+    if seen[key] then return used end
+    local dx,dy=bx-ax,by-ay;local length=math.sqrt(dx*dx+dy*dy)
+    if length<3 then return used end
+    local steps=math.max(6,math.min(12,math.ceil(length/50)))
+    -- Keep complete connections; never leave a half-drawn arc at the cap.
+    if used+steps*2>(B.limit or 768) then return used end
+    seen[key]=true
+    local bend=math.min(48,length*.14)
+    local cx,cy=(ax+bx)*.5-dy/length*bend,(ay+by)*.5+dx/length*bend
+    local x,y=ax,ay
+    for i=1,steps do
+        local t=i/steps;local u=1-t
+        local nx,ny=u*u*ax+2*u*t*cx+t*t*bx,u*u*ay+2*u*t*cy+t*t*by
+        used=line(B.overlay,used,x,y,nx,ny,{.055,.075,.09,.48},3.5,0)
+        used=line(B.overlay,used,x,y,nx,ny,{.42,.74,.90,.62},1.6,1)
+        x,y=nx,ny
+    end
+    return used
+end
+local function network(row,map,used,seen)
+    local V=A.JourneyView;local canvas=A.map:GetCanvas()
+    local width,height=canvas:GetWidth(),canvas:GetHeight()
+    local ax,ay=V.Project(row.board,map);local bx,by=V.Project(row.arrival,map)
+    if ax and ay and bx and by then
+        return curve(used,ax*width,-ay*height,bx*width,-by*height,row.kind,seen)
+    end
+    -- A cross-continent service may have only a native sailing piece on this
+    -- continent. Keep projected pieces separate instead of bridging load gaps.
+    local path=row.kind=='flight' and A.Flights and A.Flights.Path(row) or row.path
+    local first,last
+    local function finish()
+        if first and last then used=curve(used,first[1],first[2],last[1],last[2],row.kind,seen) end
+        first,last=nil,nil
+    end
+    for _,p in ipairs(path or {}) do
+        if p.breakBefore then finish() end
+        local x,y=V.Project(p,map)
+        if x and y then
+            last={x*width,-y*height};first=first or last
+        else finish() end
+    end
+    finish();return used
+end
+local function draw(row,map,used,hover,completed)
     local V=A.JourneyView;local canvas=A.map:GetCanvas();local width,height=canvas:GetWidth(),canvas:GetHeight()
-    local color=hover and {.55,.88,1,1} or network and {.3,.65,.9,.22} or completed and {.38,.48,.52,.35} or {.3,.75,1,.85}
+    local color=hover and {.55,.88,1,1} or completed and {.38,.48,.52,.35} or {.3,.75,1,.85}
     local path
     if map~=947 and not row.geometryUnknown then path=row.kind=='flight' and A.Flights and A.Flights.Path(row) or row.path end
-    if map==947 or (hover or network) and (row.geometryUnknown or not path or #path<2) then
+    if map==947 or hover and (row.geometryUnknown or not path or #path<2) then
         -- Schematic world connection, not a claim about an in-world teleport spline.
         local ax,ay=V.Project(row.board,map);local bx,by=V.Project(row.arrival,map)
         if not ax or not bx then return used end
@@ -28,18 +75,18 @@ local function draw(row,map,used,hover,completed,network)
         for at=0,length,14 do
             if used>=(B.limit or 1024) then break end
             local finish=math.min(length,at+9)
-            used=line(B.overlay,used,ax+dx*at/length,ay+dy*at/length,ax+dx*finish/length,ay+dy*finish/length,color,hover and 3 or network and 1 or 2)
+            used=line(B.overlay,used,ax+dx*at/length,ay+dy*at/length,ax+dx*finish/length,ay+dy*finish/length,color,hover and 3 or 2,hover and 3 or 2)
         end
-    elseif hover or network then
+    elseif hover then
         -- Continent previews retain the real same-piece sailing geometry.
-        local previous;local stride=network and math.max(1,math.ceil(#path/12)) or 1
+        local previous
         for i=2,#path do
             previous=previous or path[i-1]
             local a,b=previous,path[i]
             if b.breakBefore then previous=b
-            elseif i%stride==0 or i==#path or path[i+1].breakBefore then
+            else
                 local ax,ay=V.Project(a,map);local bx,by=V.Project(b,map)
-                if ax and bx then used=line(B.overlay,used,ax*width,-ay*height,bx*width,-by*height,color,hover and 3 or 1) end
+                if ax and bx then used=line(B.overlay,used,ax*width,-ay*height,bx*width,-by*height,color,hover and 3 or 1,hover and 3 or 2) end
                 previous=b
             end
         end
@@ -60,14 +107,17 @@ function B.Update(plan)
     B.overlay:SetFrameLevel(V.LayerLevel(A.map:GetCanvas()))
     plan=plan or V.DisplayPlan()
     local used=0
-    B.limit=384
+    B.limit=768
     if A.db and A.db.showTransportLinks then
-        for i,row in ipairs(A.TransportLinks.Visible(map)) do
-            if i>48 then break end
-            used=draw(row,map,used,false,false,true)
+        local seen,count={},0
+        for _,row in ipairs(A.TransportLinks.Visible(map)) do
+            local before=used
+            used=network(row,map,used,seen)
+            if used>before then count=count+1 end
+            if count>=32 then break end
         end
     end
-    B.limit=768
+    B.limit=1280
     if map==947 and A.db and A.db.showJourneyRoute and plan then
         for i,leg in ipairs(plan.legs or {}) do
             if leg.transport and A.TransportLinks.methods[leg.transport.kind] then
@@ -76,7 +126,7 @@ function B.Update(plan)
         end
     end
     local rows=resolve(B.focus and B.focus.pin or B.hover)
-    B.limit=1024
+    B.limit=1792
     for _,row in ipairs(rows) do if not B.focus or B.focus.id==row.id then used=draw(row,map,used,true,false) end end
 end
 function B.Hover(pin)

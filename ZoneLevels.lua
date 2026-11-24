@@ -28,7 +28,8 @@ function A.PositionHoverZoneLabel(label,force)
             end
         end
         if force or not label.mapperlyLabelOffsetApplied then
-            label:ClearAllPoints();label:SetPoint('TOP',A.map.ScrollContainer,'TOP',0,-40)
+            local offset=A.FishingLabel and A.FishingLabel(A.map:GetMapID()) and -60 or -40
+            label:ClearAllPoints();label:SetPoint('TOP',A.map.ScrollContainer,'TOP',0,offset)
             label.mapperlyLabelOffsetApplied=true
         end
     elseif label.mapperlyLabelOffsetApplied then
