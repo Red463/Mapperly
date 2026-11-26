@@ -37,6 +37,8 @@ def extract(reader,p,sampler,zones,owner,lua,part=None):
     dn,de=(b[0]-a[0])/length,(b[1]-a[1])/length
     def mapped(n,e,mid):
         z=zones[mid];return dict(mapID=mid,x=(z['west']-e)/(z['west']-z['east']),y=(z['north']-n)/(z['north']-z['south']))
+    if p['key']=='0:wmo:67711058' and p['fdid']==7543871:
+        return farholde_proof(reader,p,mesh,sampler,mapped,owner,slack,lua)
     def bank_contact(t,offset):
         north,east=a[0]+dn*t-de*offset,a[1]+de*t+dn*offset
         if not mesh.floor(north,east):return
@@ -119,7 +121,47 @@ def extract(reader,p,sampler,zones,owner,lua,part=None):
         return row
     raise ValueError(last_error)
 
-def proof_row(reader,p,mesh,points,samples,used,start,end,width,gap,slack,lua):
+def farholde_proof(reader,p,mesh,sampler,mapped,owner,slack,lua):
+    # The centre of this damaged deck is split. Sample the raised strip on
+    # the keep side of the break, then rejoin the middle of the intact span.
+    knots=[(-63,11.6),(-12,11.6),(4,0),(62,0)]
+    points=[]; samples=[]; used=set(); banks=[]; deltas=[]; kerbs=[]; gap=0
+    for j,(a,b) in enumerate(zip(knots,knots[1:])):
+        span=math.dist(a,b); count=math.ceil(span/.2)
+        ux,uy=(b[0]-a[0])/span,(b[1]-a[1])/span
+        for i in range(count+int(j==len(knots)-2)):
+            x,y=a[0]+i/count*(b[0]-a[0]),a[1]+i/count*(b[1]-a[1])
+            n,e,_=placed([x,y,0],p)
+            ground=reader.terrain(sampler,n,e)
+            near=points[-1][2] if points else ground['height']
+            hits=[h for h in mesh.floors(n,e) if h[2]>=2.2]
+            if not hits:raise ValueError('Farholde deck floor or headroom missing')
+            z,face,clearance=min(hits,key=lambda h:abs(h[0]-near))
+            point=[n,e,z]; used.add(face)
+            if points:
+                gap=max(gap,mesh.gap(points[-1],point))
+                if abs(z-near)>.3:kerbs.append(len(points))
+            if ground['liquid'] and (ground['liquidHigh'] is None or z<ground['liquidHigh']+.1):
+                raise ValueError('Farholde deck below water')
+            for offset in (-.5,-.25,0,.25,.5):
+                sn,se,_=placed([x-uy*offset,y+ux*offset,0],p)
+                hit=mesh.floor(sn,se,near=z)
+                if not hit or hit[2]<2.2 or abs(hit[0]-z)>.3:raise ValueError('Farholde deck width unsupported')
+                used.add(hit[1]); deltas.append(hit[0]-z)
+            if not points or (j==len(knots)-2 and i==count):
+                mid=owner(ground['area'])
+                if mid!=2548:raise ValueError('Farholde landing in unexpected zone')
+                q=mapped(n,e,mid)
+                if not ground['permitted'] or not dry_point(lua,q):raise ValueError('Farholde landing inaccessible')
+                banks.append((0,point,ground,q))
+            samples.append(dict(point=point,segment=len(points),headroom=clearance));points.append(point)
+    samples[-1]['segment']-=1
+    width=dict(radiusYards=.5,sampleCount=len(deltas),lateralStepYards=.25,longitudinalStepYards=.2,
+               minimumHeightDelta=min(deltas),maximumHeightDelta=max(deltas))
+    p={k:v for k,v in p.items() if k not in ('proof','sourceStatus','corridorIDs','liveStatus','validation')}
+    return proof_row(reader,p,mesh,points,samples,used,*banks,width,gap,slack,lua,kerbs)
+
+def proof_row(reader,p,mesh,points,samples,used,start,end,width,gap,slack,lua,kerbs=None):
     faces=[dict(v=mesh.faces[i]['v'],sourceGroup=mesh.faces[i]['group'],sourceTriangle=mesh.faces[i]['triangle'],sourceFlags=mesh.faces[i]['flags'])for i in sorted(used)]
     # No new corridor is needed for an already dry, permitted ground line.
     whole=dict(mapID=start[3]['mapID'],x=end[3]['x'],y=end[3]['y']) if start[3]['mapID']==end[3]['mapID']else None
@@ -131,6 +173,7 @@ def proof_row(reader,p,mesh,points,samples,used,start,end,width,gap,slack,lua):
         transformError=p['proofTransformError'],portalGap=gap,maximumStep=max(abs(x[2]-y[2])for x,y in zip(points,points[1:])),minimumHeadroom=min(s['headroom']for s in samples),widthProof=width,
         nativePlacement=p,nativeBoundsSlack=slack,provenance=dict(fdidSha256=dict(reader.used)),existingGroundLine=existing)
     row['isBridgeAsset']=bool(p.get('selectedPart'))or any(w in p.get('assetPath','').lower()for w in('bridge','viaduct','causeway'))
+    if kerbs is not None:row['kerbSteps']=kerbs
     validate_curved(row)
     return row
 

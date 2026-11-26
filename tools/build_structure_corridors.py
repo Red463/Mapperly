@@ -21,7 +21,15 @@ def validate(row):
     return a,b,length
 
 def validate_curved(row):
-    if row['transformError']>.01 or row['portalGap']>.031 or row['maximumStep']>.3 or row['minimumHeadroom']<2.2:raise ValueError('Unverified structure contact/clearance')
+    limit=.3
+    if 'kerbSteps' in row:
+        points=row['worldCenterline']
+        steps=[abs(a[2]-b[2]) for a,b in zip(points,points[1:])]
+        joints=[i for i,rise in enumerate(steps,1) if rise>.3]
+        if (row['placement']!=67711058 or row['wmo']!=7543871 or len(joints)!=2 or joints!=row['kerbSteps']
+                or max(steps)!=row['maximumStep']):raise ValueError('Unexpected bridge kerb profile')
+        limit=.45
+    if row['transformError']>.01 or row['portalGap']>.031 or row['maximumStep']>limit or row['minimumHeadroom']<2.2:raise ValueError('Unverified structure contact/clearance')
     if not all(x['permitted'] and not x['hole'] and not x['liquid'] for x in row['landings']):raise ValueError('Missing dry landing')
     if any(abs(x.get('terrainDelta',0))>.300001 for x in row['landings']):raise ValueError('Excessive deck-to-ground step')
     points=row['worldCenterline'];samples=row['samples'];faces=row['faces']
@@ -95,12 +103,15 @@ def main():
             if not math.isfinite(radius) or not .5<=radius<=2.5 or transverse['sampleCount']<across*len(row['samples']) or transverse['longitudinalStepYards']>.25 or transverse['lateralStepYards']>.25 or max(abs(transverse['minimumHeightDelta']),abs(transverse['maximumHeightDelta']))>.3:raise ValueError('Missing bridge width proof')
             result[key]['endpointAccess']=True
             result[key]['radius']=radius
+            if 'kerbSteps' in row:result[key]['kerbSteps']=len(row['kerbSteps'])
     # Append new placements after older corridors to preserve existing crossing IDs.
     algaz=ROOT/'tools/data/native-dun-algaz-70959.json'
     for row in json.loads(algaz.read_text()):
         if row['maximumFloorGap']>.02 or any(abs(p['exposedRiser'])>.55 for p in row['terrainLandings']):
             raise ValueError('Unsupported Dun Algaz tunnel entrance or floor')
         add_gate(row,'Dun Algaz tunnel')
+    # Preserve the ordinals of existing crossings, including Dun Algaz.
+    result=dict(sorted(result.items(),key=lambda item:bool(item[1].get('kerbSteps'))))
     def lua(v):
         if isinstance(v,dict):return '{'+','.join('['+lua(k)+']='+lua(x) for k,x in v.items())+'}'
         if isinstance(v,list):return '{'+','.join(lua(x) for x in v)+'}'

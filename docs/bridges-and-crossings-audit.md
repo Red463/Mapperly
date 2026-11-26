@@ -96,7 +96,7 @@ Full identities, coordinates, placement transforms, source hashes and individual
 
 | Native map | Candidates | Certified corridors |
 | --- | ---: | ---: |
-| 0 | 2192 | 43 |
+| 0 | 2192 | 44 |
 | 1 | 3060 | 39 |
 | 30 | 36 | 1 |
 | 33 | 90 | 0 |
@@ -157,7 +157,7 @@ Full identities, coordinates, placement transforms, source hashes and individual
 
 97 audited ownership pairs; 64 have bundled links. A link's presence is not proof that every passage on that border has been checked.
 
-Approaches: 325 verified-ground-approach, 47 verified-with-swimming-fallback, 15 short-verified-ground-approach, 4 interior-floor-approach-required, 1 verified-ground-approach-via-zone-crossing.
+Approaches: 327 verified-ground-approach, 47 verified-with-swimming-fallback, 15 short-verified-ground-approach, 4 interior-floor-approach-required, 1 verified-ground-approach-via-zone-crossing.
 18 exact ground handoffs were withheld after the approach audit. Nearby replacement candidates were re-evaluated before spacing/pair selection. Their evidence remains in `tools/data/crossing-handoff-review.json`; no whole zone pair is banned.
 See `crossing-approaches-audit.md` and `testing-crossing-acceptance.md` for approach and live-test details.
 

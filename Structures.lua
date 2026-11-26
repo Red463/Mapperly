@@ -5,7 +5,9 @@ function S.Get(edge)
     local d=A.StructureData
     if not d or d.version~=1 or not A.CrossingData or d.build~=A.CrossingData.build then return end
     local row=d.corridors and d.corridors[edge.structure]
-    if not row or (row.source~='native-wmo-floor' and row.source~='native-model-floor') or row.samples<3 or row.maximumStep>.3 or row.headroom<2 then return end
+    if not row or (row.source~='native-wmo-floor' and row.source~='native-model-floor') or row.samples<3 or row.headroom<2 then return end
+    local farholdeKerbs=row.placement==67711058 and row.wmo==7543871 and row.kerbSteps==2
+    if row.maximumStep>(farholdeKerbs and .45 or .3) then return end
     if not (same(edge.a,row.a) and same(edge.b,row.b) or same(edge.a,row.b) and same(edge.b,row.a)) then return end
     if not A.Terrain.Segment(row.a,row.a) or not A.Terrain.Segment(row.b,row.b) then return end
     return row

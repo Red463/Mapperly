@@ -134924,15 +134924,25 @@
       ],
       "worldNorth": -9021.534505208332,
       "worldEast": -4821.923177083332,
-      "sourceStatus": "unresolved",
-      "proof": null,
-      "corridorIDs": [],
+      "sourceStatus": "certified-corridor",
+      "proof": "native-bridge-expanded-70959.json",
+      "corridorIDs": [
+        361464678952332
+      ],
       "validation": {
         "key": "0:wmo:67711058",
-        "status": "unresolved",
+        "status": "floor-validated",
         "revision": 2,
-        "partFailures": {},
-        "reason": "No collidable faces"
+        "corridor": 361464678952332,
+        "corridors": [
+          361464678952332
+        ],
+        "maps": [
+          2548,
+          2548
+        ],
+        "radius": 0.5,
+        "existingGroundLine": false
       },
       "liveStatus": "not-tested"
     },
@@ -459036,10 +459046,26 @@
       "distance": 190.30000000000013,
       "source": "native-wmo-floor",
       "structure": 68443158
+    },
+    {
+      "id": 197,
+      "a": {
+        "mapID": 2548,
+        "x": 0.612045613299209,
+        "y": 0.8060776107528277
+      },
+      "b": {
+        "mapID": 2548,
+        "x": 0.5948274830157736,
+        "y": 0.7770878475843216
+      },
+      "distance": 128.76259092325688,
+      "source": "native-wmo-floor",
+      "structure": 361464678952332
     }
   ],
   "approachCounts": {
-    "verified-ground-approach": 325,
+    "verified-ground-approach": 327,
     "verified-with-swimming-fallback": 47,
     "short-verified-ground-approach": 15,
     "interior-floor-approach-required": 4,

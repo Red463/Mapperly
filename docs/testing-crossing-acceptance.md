@@ -171,6 +171,7 @@ If planning fails, click **Copy report** in the error window and press Ctrl+C (C
 | 152 | Riverglades 23.45, 71.47 | Riverglades 18.73, 67.25 | Riverglades 22.26, 67.18 → Riverglades 21.82, 67.25 | verified-with-swimming-fallback / verified-ground-approach |
 | 153 | Riverglades 40.35, 44.54 | Riverglades 43.88, 51.56 | Riverglades 43.21, 46.31 → Riverglades 43.88, 46.92 | verified-ground-approach / verified-ground-approach |
 | 154 | Riverglades 77.92, 33.16 | Riverglades 72.36, 28.89 | Riverglades 75.07, 31.39 → Riverglades 74.54, 32.17 | verified-ground-approach / verified-ground-approach |
+| 197 | Riverglades 60.02, 84.89 | Riverglades 58.30, 73.42 | Riverglades 61.20, 80.61 → Riverglades 59.48, 77.71 | verified-ground-approach / verified-ground-approach |
 | 73 | Searing Gorge 85.29, 4.68 | Loch Modan 19.03, 94.56 | Searing Gorge 91.50, 8.54 → Loch Modan 13.60, 94.56 | verified-ground-approach / verified-ground-approach |
 | 135 | Searing Gorge 35.08, 64.48 | Searing Gorge 44.96, 69.86 | Searing Gorge 37.65, 73.79 → Searing Gorge 38.75, 73.72 | verified-ground-approach / verified-ground-approach |
 | 25 | Silverpine Forest 65.28, 75.90 | Hillsbrad Foothills 18.85, 48.88 | Silverpine Forest 67.81, 79.69 → Hillsbrad Foothills 14.52, 46.19 | verified-ground-approach / verified-ground-approach |

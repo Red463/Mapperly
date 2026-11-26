@@ -2,6 +2,7 @@
 
 ## 1.2.8 - 2026-11-26
 
+- Walking routes to and from Farholde Keep in Riverglades now use the bridge over the river, including when swimming is disabled.
 - Hover a flight master on the continent or world map to preview direct paths before recording departures there. Click to choose from your eligible, recorded flights.
 - Fixed an Escape-key conflict that could show a Blizzard blocked-action warning while the map was closed. Escape still closes the map when opened during combat.
 

@@ -3,10 +3,10 @@
   "liveStatus": "not-tested",
   "normalApproachYards": 75,
   "shortApproachYards": 30,
-  "inventorySha256": "99f21bdfe6589976c1e0d4848803070ee69088b21c11251618bd6e3b50d87aca",
-  "crossingDataSha256": "2b6a7cb8b034f9e8144b39aaaea8dc48bad93b02deffa34f23e51dce585a9a2f",
+  "inventorySha256": "d84f9c48888945c7ab274a69cd32a58db09a4446ec63a822ab0769f1d5d57092",
+  "crossingDataSha256": "519cc4c13ca1e162629d5075c4efa0e97786eba5f4b9caab2c18a92ce8027bf6",
   "counts": {
-    "verified-ground-approach": 325,
+    "verified-ground-approach": 327,
     "verified-with-swimming-fallback": 47,
     "short-verified-ground-approach": 15,
     "interior-floor-approach-required": 4,
@@ -8808,6 +8808,51 @@
           "distance": 123.30149785464424
         }
       ]
+    },
+    {
+      "id": 197,
+      "source": "native-wmo-floor",
+      "structure": 361464678952332,
+      "sides": [
+        {
+          "side": "a",
+          "mapID": 2548,
+          "status": "verified-ground-approach",
+          "point": {
+            "mapID": 2548,
+            "x": 0.600210043226062,
+            "y": 0.8489379925991488
+          },
+          "world": [
+            -9211.566075362576,
+            -4802.684709646401,
+            60.32661437988281
+          ],
+          "policy": "dry-only",
+          "radius": 150.0,
+          "area": 16724,
+          "distance": 296.68061014941384
+        },
+        {
+          "side": "b",
+          "mapID": 2548,
+          "status": "verified-ground-approach",
+          "point": {
+            "mapID": 2548,
+            "x": 0.5829919129426265,
+            "y": 0.7342274657380006
+          },
+          "world": [
+            -8840.668628704512,
+            -4719.176777771739,
+            33.20519734746351
+          ],
+          "policy": "dry-only",
+          "radius": 150.0,
+          "area": 16591,
+          "distance": 151.9467523473096
+        }
+      ]
     }
   ],
   "sourceHashes": {
@@ -8926,8 +8971,11 @@
     "779382": "f839358bfc7a13888316cf63e0285cb2f7cceff5997f4738c536aef0d38ed5c7",
     "779387": "47c05be5c21753222f62c830eb2911e181c350fae21c6dd8bd69499531792fa0",
     "779557": "2ae7f774bd88c7e259225d9ac038d5ed6e2193599aad503e3e6cabb0623aa862",
+    "779577": "416c0d7aecca3a0731b064f97df6b38c167c559681c8aac4aad5925787d07479",
+    "779582": "72ff77eb01b8477c6703f59f490f5c90de0154fa5493516295b33c32aa8e65b0",
     "779737": "1660ac52b8e545af7fd24130c7cafea487e3b82585b4a03b835c391eff02a25c",
     "779742": "ceb7063ca125ab6591c82c2ecebd43e5e0fe238020cefe58e6635ac2fde2ac03",
+    "779757": "a976b33866dba60b6fbda2d714e9940d71cc196799a807d2be87df384c10d4b5",
     "779897": "3809dfd910180fa4a1e5a53e9ce082029ef704952ddd746cea9d482a8b53a87c",
     "779902": "36c7be07ead61baa04dfbd83544adc6eb711f7c6fdf9d03a5a1103a4eae94682",
     "782779": "1120509b2ac42a94310bf05f915b5e67ed233be854089a3545829e064b614b44",

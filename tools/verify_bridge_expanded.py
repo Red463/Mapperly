@@ -8,7 +8,8 @@ from build_bridge_expanded import atomic_json
 ROOT=Path(__file__).resolve().parents[1]
 
 def main():
-    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--file',default='native-bridge-expanded-70959.json');parser.add_argument('--check-only',action='store_true');args=parser.parse_args()
+    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--file',default='native-bridge-expanded-70959.json');parser.add_argument('--check-only',action='store_true')
+    parser.add_argument('--only',help='Re-probe one placement and preserve all other proofs');args=parser.parse_args()
     out=ROOT.parent/'output/bridges-and-crossings-70959';path=ROOT/'tools/data'/args.file
     proofs=json.loads(path.read_text());reader=Reader(ROOT.parent/'output/forever-datamine-70959')
     zones={z['id']:z for z in json.loads((ROOT/'tools/roads/zones.json').read_text())['zones']}
@@ -16,7 +17,10 @@ def main():
     lua=runtime()
     for f in ['Data/Water.lua','Water.lua']:lua.execute('assert(loadstring(...))("Mapperly",A)',(ROOT/f).read_text())
     accepted=[];results=[]
+    if args.only and not any(row.get('placementKey')==args.only for row in proofs):raise ValueError('Unknown placement')
     for row in proofs:
+        if args.only and row.get('placementKey')!=args.only:
+            accepted.append(row);continue
         p=dict(row['nativePlacement']);p.setdefault('kind','wmo');p.setdefault('map',zones[row['fromUiMap']]['terrainMap']);key=row.get('placementKey',f"{p['map']}:{p['kind']}:{p['uid']}")
         reader.used={};sampler=reader.sampler(p['map'],zones[row['fromUiMap']]['wdt']);result=dict(corridor=row['corridorID'],key=key)
         try:
@@ -69,8 +73,9 @@ def main():
         except (ValueError,KeyError)as error:result.update(status='rejected',reason=str(error))
         results.append(result);print(result,flush=True)
     if not args.check_only:atomic_json(path,accepted,compact=True)
-    atomic_json(out/(path.stem+'-reprobe.json'),results)
+    suffix='-'+args.only.replace(':','-') if args.only else ''
+    atomic_json(out/(path.stem+suffix+'-reprobe.json'),results)
     if args.check_only and len(accepted)!=len(proofs):raise SystemExit('Existing bridge proof failed native re-probe')
-    print('Verified',len(accepted),'of',len(proofs),'floor proofs;',sum(p['isBridgeAsset']for p in accepted),'classified bridge/crossing floors')
+    print('Verified',sum(r['status']=='verified' for r in results),'of',len(results),'probed corridors')
 
 if __name__=='__main__':main()
