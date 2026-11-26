@@ -1,7 +1,23 @@
 from pathlib import Path
 import sys,math
 root=Path(__file__).resolve().parents[1];sys.path.insert(0,str(root/'tools'))
-from bridge_geometry import rotate, Mesh, floor_path, quaternion, unplaced, placement_error, placed
+from bridge_geometry import rotate, Mesh, floor_path, quaternion, unplaced, placement_error, placed, collision_triangles, group_header
+import struct
+
+names = b'\0bridge32\0Temple\0'
+header = struct.pack('<ii', 1, 10) + bytes(60)
+assert group_header(struct.pack('<4sI', b'PGOM', 68) + header, names) == (76, 76, 'bridge32', 'Temple')
+indices = struct.pack('<3H', 2, 0, 1) * 3
+for tag, fmt, material in [('MOPY', '<2B', 255), ('MPY2', '<2H', 65535)]:
+    attributes = b''.join(struct.pack(fmt, flag, material) for flag in (8, 36, 32))
+    assert list(collision_triangles({'MOVI': indices, tag: attributes})) == [
+        (0, (2, 0, 1), 8), (2, (2, 0, 1), 32)]
+    try:
+        list(collision_triangles({'MOVI': indices[:6], tag: attributes}))
+    except ValueError:
+        pass
+    else:
+        raise AssertionError('Truncated triangle list was accepted')
 placement=dict(kind='m2',flags=0,scale=1536,pos=[12345.,-45.,16543.],rot=[21.,42.,17.])
 vertices=[[1.,2.,3.],[-10.,6.,-7.],[0.,0.,0.]]
 for v in vertices:assert math.dist(unplaced(placed(v,placement),placement),v)<1e-9

@@ -312,6 +312,9 @@ function V.WriteSummary()
         V.warning:SetText(plan.hasTransports and 'Transport estimate includes waiting. Manual boarding and disembarking are required. '..policy or 'Terrain estimate: check obstacles in game. '..policy..' Start replans from your current position.')
     end
     local text={}
+    if plan.approachDistance then
+        text[#text+1]=string.format('Route ends %.0f yd from your pin on mapped ground.',plan.approachDistance)
+    end
     for i,leg in ipairs(plan.legs or {}) do
         local row=leg.transport
         local cost=row and row.kind=='flight' and (' ('..A.Flights.Fare(row.fare,row.fareEstimated)..')') or ''

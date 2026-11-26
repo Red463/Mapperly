@@ -118,10 +118,10 @@ function T.Segment(a,b,options)
  local z=T.PolicyZone(a.mapID,options);return z and segment(z,a,b) or false
 end
 local function yards(z,a,b) return sqrt(((a.x-b.x)*z.widthYards)^2+((a.y-b.y)*z.heightYards)^2) end
-function T.Approach(p,maxYards,options)
+function T.Approach(p,maxYards,options,region)
  if not position(p) then return nil,'invalid point' end
  local z,reason=T.PolicyZone(p.mapID,options);if not z then return nil,reason end
- if segment(z,p,p) then return point(p) end
+ if segment(z,p,p) and (not region or A.WalkingRegions.Get(p)==region) then return point(p) end
  maxYards=maxYards==nil and 30 or maxYards
  if not number(maxYards) or maxYards<0 then return nil,'invalid distance' end
  local cx,cy=coordinates(z,p);local rx=min(z.w,math.ceil(maxYards*z.w/z.widthYards)+1);local ry=min(z.h,math.ceil(maxYards*z.h/z.heightYards)+1)
@@ -131,11 +131,12 @@ function T.Approach(p,maxYards,options)
    work=work+1;if work>16384 then return nil,'budget' end
    if cell(z,x,y) then
     local candidate={mapID=p.mapID,x=(x+.5)/z.w,y=(y+.5)/z.h};local d=yards(z,p,candidate)
-    if d<=maxYards+1e-8 and (not bestDistance or d<bestDistance) then best=candidate;bestDistance=d end
+    if d<=maxYards+1e-8 and (not bestDistance or d<bestDistance) and
+       (not region or A.WalkingRegions.Get(candidate)==region) then best=candidate;bestDistance=d end
    end
   end
  end
- if best then return best end
+ if best then return best,nil,bestDistance end
  return nil,'no approach'
 end
 local cachedZone,cachedRoads,cachedGround,cache,order,cachePoints=nil,nil,nil,{},{},0

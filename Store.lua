@@ -134,9 +134,13 @@ function A.Observe(category,name)
     local v=C_Map.GetPlayerMapPosition(map,'player');if not v then return end
     local x,y=v:GetXY()
     local p={map=map,x=x,y=y,name=name or category,category=category,description='Recorded at your interaction location.',access=UnitFactionGroup('player')=='Horde' and 'H' or 'A'}
+    if category=='flight' and A.Flights then p.flightNodeID=A.Flights.source end
     if not A.ValidPin(p) then return end
     for _,old in ipairs(A.db.observed) do
-        if A.ValidPin(old) and old.map==map and old.category==category and math.abs(old.x-x)<.003 and math.abs(old.y-y)<.003 then return end
+        if A.ValidPin(old) and old.map==map and old.category==category and math.abs(old.x-x)<.003 and math.abs(old.y-y)<.003 then
+            if p.flightNodeID then old.flightNodeID=p.flightNodeID end
+            return
+        end
     end
     table.insert(A.db.observed,p)
 end

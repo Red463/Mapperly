@@ -37,7 +37,39 @@ function F.Stats()
     end
     return known,routes
 end
+-- One lookup per visible pin batch. A zone and an overview can return
+-- different subsets of taxi nodes, so also try the node's home map.
+function F.MapDiscovery(map)
+    local queried,undiscovered={},{}
+    local character=F.Character()
+    local mapInfo=call(C_Map and C_Map.GetMapInfo,map)
+    local function read(mapID)
+        if not id(mapID) or queried[mapID] then return end
+        queried[mapID]=true
+        local rows=call(C_TaxiMap and C_TaxiMap.GetTaxiNodesForMap,mapID)
+        if secret(rows) or type(rows)~='table' then return end
+        for _,row in pairs(rows) do
+            if not secret(row) and type(row)=='table' and id(row.nodeID) and
+                not secret(row.isUndiscovered) and row.isUndiscovered==true then
+                -- Forever can return false even for unlearned stops.
+                undiscovered[row.nodeID]=true
+            end
+        end
+    end
+    return function(nodeID)
+        if not id(nodeID) then return end
+        read(map)
+        if not undiscovered[nodeID] then
+            local node=A.FlightData and A.FlightData.nodes[nodeID]
+            if node and node.a then read(node.a.mapID) end
+        end
+        if not undiscovered[nodeID] and mapInfo then read(mapInfo.parentMapID) end
+        if undiscovered[nodeID] then return 'locked' end
+        if character and character.nodes[nodeID]==true then return 'unlocked' end
+    end
+end
 local function notify(changed)
+    if A.RefreshFlightPinStates then A.RefreshFlightPinStates() end
     if A.NavigationSettings then A.NavigationSettings.Sync() end
     if changed and A.Navigation and A.Navigation.OnFlightsChanged then A.Navigation.OnFlightsChanged() end
 end

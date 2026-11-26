@@ -1,11 +1,25 @@
 local _,A=...
 local S={};A.PlanningStatus=S
 local function actionText(f,text) f.action:SetText(text);f.action:UpdateVisual() end
+local function setCountdown(f,seconds)
+    f.closeRemaining=seconds
+    local shownSeconds=seconds and math.ceil(seconds)
+    if shownSeconds~=f.countdownSeconds then
+        f.countdownSeconds=shownSeconds
+        if shownSeconds then f.countdown:SetText(string.format('Closes in %ds',shownSeconds)) end
+        f.countdown:SetShown(seconds~=nil)
+    end
+end
 local function safe(text) return tostring(text or ''):gsub('|','||') end
 local function setReport(f,report)
     f.failureReport=report
     f.copyReport:SetShown(report~=nil);f.reportHint:SetShown(report~=nil)
     f:SetHeight(report and 216 or 188)
+end
+local function showCancelled(f)
+    f.state='cancelled';f.title:SetText('Calculation cancelled')
+    f.phase:SetText('Previous navigation is unchanged.');f.detail:SetText('')
+    setReport(f,nil);actionText(f,'Dismiss');setCountdown(f,3)
 end
 local function build()
     if S.frame then return S.frame end
@@ -27,12 +41,12 @@ local function build()
             if p and p.id==f.jobID then
                 if A.Navigation.CancelPlanning then A.Navigation.CancelPlanning() else A.PlanningJob.Cancel() end
             end
-            f.state='cancelled';f.finishedAge=0;f.title:SetText('Calculation cancelled');f.phase:SetText('Previous navigation is unchanged.');f.detail:SetText('')
-            setReport(f,nil)
-            actionText(f,'Dismiss')
+            showCancelled(f)
         else f:Hide() end
     end)
     f.action:ClearAllPoints();f.action:SetPoint('BOTTOMRIGHT',f,'BOTTOMRIGHT',-18,12)
+    f.countdown=U.Label(f,'',0,0,'GameFontHighlightSmall')
+    f.countdown:ClearAllPoints();f.countdown:SetPoint('RIGHT',f.action,'LEFT',-12,0);f.countdown:Hide()
     f.copyReport=U.Action(f,'Copy report',0,0,116,function()
         if f.failureReport then A.RouteReport.Open(f.failureReport) end
     end)
@@ -52,7 +66,8 @@ local function position(f)
 end
 function S.Begin(candidate,preview)
     local progress=A.PlanningJob.Progress();if not progress then return end
-    local f=build();f.jobID=progress.id;f.age=0;f.finishedAge=0;f.notice=nil;f.state='running';f.preview=preview
+    local f=build();f.jobID=progress.id;f.age=0;f.notice=nil;f.state='running';f.preview=preview
+    setCountdown(f,nil)
     setReport(f,nil)
     f.flightRoutes=nil;f.flightSources=nil;f.flightNote=nil
     f.title:SetText('Planning route');f.destination:SetText(safe(candidate and candidate.name or 'Destination'))
@@ -62,12 +77,13 @@ end
 function S.Ready(id,candidate,plan)
     local f=S.frame;if not id or not f or f.jobID~=id then return end
     setReport(f,nil)
-    f.state='ready';f.finishedAge=0;f.title:SetText('Route ready');f.phase:SetText('Navigation updated')
+    f.state='ready';f.title:SetText('Route ready')
+    f.phase:SetText(plan.approachDistance and string.format('Route ends %.0f yd from your pin',plan.approachDistance) or 'Navigation updated')
     local walks,transports=0,0
     for _,leg in ipairs(plan.legs or {}) do if leg.kind=='transport' then transports=transports+1 else walks=walks+1 end end
     f.detail:SetText(string.format('%d yd  |  %d walking leg%s%s',math.floor((plan.distance or 0)+.5),walks,walks==1 and '' or 's',transports>0 and string.format('  |  %d transport',transports) or ''))
     actionText(f,'Dismiss')
-    if f.preview then f.phase:SetText('Preview ready');f:Hide() end
+    if f.preview then f.phase:SetText('Preview ready');f:Hide() else setCountdown(f,5) end
 end
 function S.Failed(id,candidate,reason)
     local f=S.frame
@@ -83,6 +99,7 @@ function S.Failed(id,candidate,reason)
         end
     end
     f=f or build();f.state='failed';f.jobID=id;f.age=f.age or 0;f.title:SetText('Unable to plan route')
+    setCountdown(f,nil)
     if not id then f.age=0;f.elapsed:SetText('0s') end
     f.destination:SetText(safe(candidate and candidate.name or 'Destination'))
     local detail=safe(reason)
@@ -97,15 +114,16 @@ function S.Update(elapsed)
     elapsed=type(elapsed)=='number' and math.max(0,elapsed) or 0
     position(f)
     if f.state~='running' then
-        f.finishedAge=(f.finishedAge or 0)+elapsed
-        if f.state=='ready' and f.finishedAge>=5 or f.state=='cancelled' and f.finishedAge>=3 then f:Hide() end
+        if f.closeRemaining then
+            local remaining=f.closeRemaining-elapsed
+            if remaining<=0 then f:Hide() else setCountdown(f,remaining) end
+        end
         return
     end
     f.age=f.age+elapsed;f.elapsed:SetText(string.format('%ds',math.floor(f.age+.5)))
     local p=A.PlanningJob.Progress()
     if not p or p.id~=f.jobID then
-        setReport(f,nil)
-        f.state='cancelled';f.finishedAge=0;f.title:SetText('Calculation cancelled');f.phase:SetText('Previous navigation is unchanged.');f.detail:SetText('');actionText(f,'Dismiss');return
+        showCancelled(f);return
     end
     f.title:SetText('Planning route'..string.rep('.',math.floor(f.age*2)%3+1))
     local stage=p.stage

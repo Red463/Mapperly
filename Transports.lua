@@ -205,6 +205,13 @@ function T.Guide(leg,p,state)
         return aim,row.arrivalAccess and 'Disembark; use '..row.arrivalAccess..' to reach the land marker.' or 'Disembark at '..(row.toName or 'the destination')
     end
     if state.departed then return nil,'Stay aboard to '..(row.toName or 'the destination') end
+    if row.boardingPlank and p and from and not state.reachedPlank then
+        local pier=A.TravelNetwork.Distance(p,row.boardingPlank)
+        if pier and pier>8 and from>25 then
+            return A.TravelNetwork.Transform(row.boardingPlank,p.mapID),'Walk to the boarding plank for '..row.toName
+        end
+        if pier then state.reachedPlank=true end
+    end
     local aim=p and T.Aim(row.board,p.mapID)
     return aim,row.boardingAccess and 'Use '..row.boardingAccess..'; board for '..(row.toName or 'the destination') or 'Board the '..label..' to '..(row.toName or 'the destination')
 end

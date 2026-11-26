@@ -57,6 +57,9 @@ def main():
     fromNodeID=row['fromStop']['sourceNodeID'],toNodeID=row['toStop']['sourceNodeID'],
     planningSeconds=math.ceil(ride+120),rideEstimateSeconds=ride,waitAssumptionSeconds=120,unknownSpeed=cruise is None,
     originDwellSeconds=row['fromStop']['delay'],path=path))
+   if row['id']=='transport:241:29:11':
+    # Player-observed dock end of the Booty Bay gangplank, rounded by the HUD.
+    edges[-1]['boardingPlank']=dict(mapID=1434,x=.260,y=.732)
   except (ValueError,KeyError) as error:excluded.append(dict(id=row['id'],reason=str(error)))
  def literal(v):
   if isinstance(v,dict):return '{'+','.join('['+literal(k)+']='+literal(x) for k,x in v.items())+'}'

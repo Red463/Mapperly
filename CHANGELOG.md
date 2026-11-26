@@ -1,5 +1,24 @@
 # Changelog
 
+## 1.2.7 - 2026-11-26
+
+### Navigation and ferries
+
+- Long cross-continent trips, including Stormwind to Desolace, prioritise walking connections that advance the whole journey, cutting down on unnecessary searches.
+- If a same-zone pin falls outside mapped walking terrain, smart routing automatically looks for connected ground within 80 yards. It shows how far the route ends from your pin.
+- At Booty Bay, follow the arrow to the Ratchet ferry plank at 26.0, 73.2. Arriving by a different boardwalk also switches guidance from walking to boarding.
+- The route-planning popup counts down before closing. Completed routes stay visible for five seconds and cancelled calculations for three. Errors stay open so you can copy a report.
+
+### Flight masters and map controls
+
+- Flight-master pins show a green check for confirmed stops, a padlock for stops the game marks undiscovered, and a plain boot when status is uncertain. Hover for details.
+- Opening a flight map confirms the current stop and reachable destinations for that character, avoiding false green checks on unlearned stops.
+- Escape now closes the world map during combat. Press Escape again to open the game menu.
+
+### City routing coverage
+
+- Audited roads, bridges and tunnels in six capitals and improved bridge-floor detection tools. The audit documents remaining gaps in Stormwind, Ironforge and other cities.
+
 ## 1.2.6 - 2026-11-26
 
 ### Nearby services and map tools

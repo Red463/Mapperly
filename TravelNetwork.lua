@@ -515,6 +515,15 @@ function P.Plan(a,b,options)
         return (phase==2 or options.candidatePoints or not e.deferBridge or startAccess and startAccess.structure==e.structure or goalAccess and goalAccess.structure==e.structure) and
             (phase==2 or mixed or e.structure or hops[e.to.mapID] and hops[p.mapID] and hops[e.to.mapID]<hops[p.mapID])
     end
+    -- Many routes share a flight master or crossing. Its remaining travel
+    -- estimate is independent of the path taken to reach it and of the fare.
+    local remaining={}
+    local function remainingCost(edge)
+        if not edge or ai==bi or not bound then return 0 end
+        local p=edge.to
+        if remaining[p]==nil then remaining[p]=bound(p) or 0 end
+        return remaining[p]
+    end
     local function optimisticItinerary(phase,includeDeferred)
         local open={initial};local costs={start=0};local done={};local labels={};local expanded=0
         if bestGoal then open[#open+1]=bestGoal;costs.goal=bestGoal.g end
@@ -537,13 +546,13 @@ function P.Plan(a,b,options)
                 rows[#rows+1]={g=g,fare=nextFare};labels[edge.key]=rows
             end
             costs[key]=g
-            open[#open+1]={key=key,p=edge and edge.to or b,g=g,f=g,previous=parent,bridge=edge,fare=nextFare,
+            open[#open+1]={key=key,p=edge and edge.to or b,g=g,f=g+remainingCost(edge),previous=parent,bridge=edge,fare=nextFare,
                 walk=known and known.path,length=length,joinFrom=parent.p,joinTo=to}
         end
         while #open>0 do
             if #open>8192 or expanded>512 then return end
             local at=1;for i=2,#open do
-                if open[i].g<open[at].g then at=i end
+                if open[i].f<open[at].f then at=i end
                 if i%1024==0 and A.Terrain.Checkpoint then A.Terrain.Checkpoint() end
             end
             local current=table.remove(open,at)

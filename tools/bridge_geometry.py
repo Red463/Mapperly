@@ -136,6 +136,31 @@ def floor_path(mesh,start,end,limit=20000):
                 heapq.heappush(queue,(candidate+math.dist(q[:2],end[:2]),candidate,target))
     return None
 
+def collision_triangles(group):
+    """Yield original triangle index, vertex indices and collision flags."""
+    if 'MPY2' in group:
+        attributes, fmt = group['MPY2'], '<2H'
+    elif 'MOPY' in group:
+        attributes, fmt = group['MOPY'], '<2B'
+    else:
+        return
+    indices = group.get('MOVI', b'')
+    if len(indices) % 6 or len(attributes) != len(indices) // 6 * struct.calcsize(fmt):
+        raise ValueError('Collision attribute count does not match triangle count')
+    for i, (ids, (flags, _)) in enumerate(zip(struct.iter_unpack('<3H', indices),
+                                               struct.iter_unpack(fmt, attributes))):
+        if flags & 8 or (flags & 32 and not flags & 4):
+            yield i, ids, flags
+
+
+def group_header(blob, names):
+    a, b = next((a, b) for tag, a, b in chunks(blob) if tag == 'MOGP')
+    offsets = struct.unpack_from('<ii', blob, a)
+    labels = [names[o:].split(b'\0', 1)[0].decode('utf-8', 'replace')
+              if 0 <= o < len(names) else '' for o in offsets]
+    return a + 68, b, labels[0], labels[1]
+
+
 class Reader:
     def __init__(self,snapshot):
         self.casc=LocalCasc(snapshot);self.blobs=OrderedDict();self.hashes={};self.used={};self.assets={};self.samplers={};self.wdts={};self.witnesses={}
@@ -201,18 +226,15 @@ class Reader:
             root={t:raw[a:b]for t,a,b in chunks(raw)};count=struct.unpack_from('<I',root['MOHD'],4)[0]
             groups=struct.unpack_from('<'+'I'*count,root['GFID'])
             names=root.get('MOGN',b'')
-            for index,at in enumerate(range(0,len(root.get('MOGI',b'')),32)):
-                offset=struct.unpack_from('<i',root['MOGI'],at+28)[0]
-                name=names[offset:].split(b'\0',1)[0].decode('utf8','replace')if offset>=0 else ''
-                if 'bridge'in name.lower()and index<len(groups):bridge_groups.append(groups[index])
-            if len(groups)>64:groups=tuple(bridge_groups)
             for group_id in groups:
-                group_raw=self.read(group_id);a,b=next((a,b)for t,a,b in chunks(group_raw)if t=='MOGP')
-                gc={t:group_raw[c:d]for t,c,d in chunks(group_raw,a+68,b)}
+                group_raw=self.read(group_id)
+                start,end,name,_=group_header(group_raw,names)
+                if 'bridge' in name.lower():bridge_groups.append(group_id)
+                elif len(groups)>64:continue
+                gc={t:group_raw[c:d]for t,c,d in chunks(group_raw,start,end)}
                 vs=list(struct.iter_unpack('<3f',gc.get('MOVT',b'')));vertices.extend(vs)
-                if not gc.get('MOPY'):continue
-                for i,(ids,(flags,material)) in enumerate(zip(struct.iter_unpack('<3H',gc['MOVI']),struct.iter_unpack('<2B',gc['MOPY']))):
-                    if flags&8 or flags&32 and not flags&4:faces.append(dict(v=[vs[k]for k in ids],group=group_id,triangle=i,flags=flags))
+                for i,ids,flags in collision_triangles(gc):
+                    faces.append(dict(v=[vs[k]for k in ids],group=group_id,triangle=i,flags=flags))
             models=list(struct.iter_unpack('<I',root.get('MODI',b'')))
             for at in range(0,len(root.get('MODS',b'')),32):sets.append(struct.unpack_from('<2I',root['MODS'],at+20))
             for i,at in enumerate(range(0,len(root.get('MODD',b'')),40)):

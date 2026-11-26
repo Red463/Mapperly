@@ -67,5 +67,21 @@ A.layoutReady=nil;A.nativeWindowed=nil
 ToggleWorldMap();assert(f:IsShown(),'allow first opening before an out-of-combat layout has been prepared')
 combat=false;A.testCombatCore:GetScript('OnEvent')(A.testCombatCore,'PLAYER_REGEN_ENABLED')
 assert(f:IsShown()and A.layoutReady,'finish initial layout after combat without closing the map')
+
+-- Forever opens the game menu if no registered Escape handler claims the key.
+assert(mapEscapeHandler,'combat-opened map needs an Escape handler')
+assert(not mapEscapeHandler() and f:IsShown(),'outside combat leave Escape to native panel handling')
+f:Hide();combat=true
+ToggleWorldMap()
+assert(mapEscapeHandler() and not f:IsShown() and A.panelClosePending,'first Escape closes the combat-opened map')
+assert(not mapEscapeHandler(),'a second Escape must be available to the game menu')
+combat=false;A.FinishMapClose()
+assert(not A.panelClosePending and not f:IsShown(),'finish native panel cleanup after combat')
+ToggleWorldMap();combat=true
+f.IsProtected=function()return true end
+assert(not mapEscapeHandler() and f:IsShown(),'skip a map protected by the client')
+f.IsProtected=function()return false end
+assert(mapEscapeHandler() and not f:IsShown(),'Escape also closes a map opened before combat')
+assert(blocked==0,'Escape must not call protected panel helpers during combat')
 ''')
 print('PASS: combat opening from closed via M/slash, repeated toggles, size/pane/theme retention and native game rules')

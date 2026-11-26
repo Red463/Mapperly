@@ -108,8 +108,8 @@ local function activate(candidate,plan)
     N.Tick();refresh()
     if A.RouteSteps then A.RouteSteps.Refresh() end
 end
-function N.RejectRequest(candidate,reason,options)
-    if A.RouteReport then A.RouteReport.RecordRequest(candidate,reason) end
+function N.RejectRequest(candidate,reason,options,start)
+    if A.RouteReport then A.RouteReport.RecordRequest(candidate,reason,start) end
     if candidate and A.PlanningStatus and not (options and options.automatic) then
         A.PlanningStatus.Failed(nil,candidate,reason)
     end
@@ -146,7 +146,7 @@ function N.Start(map,x,y,name,options)
     end
     if A.Journey and (options and options.mode or A.db.navigationMode)~='direct' then
         local statusID
-        local accepted,reason=A.Journey.Request(candidate,function(plan)
+        local accepted,reason,start=A.Journey.Request(candidate,function(plan)
             if A.Flights and A.Flights.OnTaxi()==true then
                 N.pending=nil;N.autoReplan=nil
                 if not (options and options.automatic) then N.deferredRoutingTarget=candidate end
@@ -163,7 +163,7 @@ function N.Start(map,x,y,name,options)
             if statusID and A.PlanningStatus then A.PlanningStatus.Failed(statusID,candidate,why) end
             refresh()
         end,options and options.continueJourney)
-        if not accepted then return N.RejectRequest(candidate,reason,options) end
+        if not accepted then return N.RejectRequest(candidate,reason,options,start) end
         intent(options)
         N.pending=candidate;N.autoReplan=options and options.automatic or nil;N.planningError=nil;N.deferredRoutingTarget=nil;N.Build()
         if not N.autoReplan and A.RouteRecovery then A.RouteRecovery.Clear() end
@@ -201,6 +201,7 @@ function N.CancelPlanning()
     N.Tick();refresh()
 end
 function N.Stop(arrived)
+    local approach=arrived and A.Journey and A.Journey.active and A.Journey.active.approachDistance
     local pending=arrived and not N.autoReplan and N.pending or nil
     if A.PlanningJob and not pending then A.PlanningJob.Cancel() end
     if A.Journey then A.Journey.Clear() end
@@ -210,7 +211,9 @@ function N.Stop(arrived)
     if N.frame then N.frame:Hide() end
     GameTooltip:Hide();refresh()
     if pending then N.Build();waiting('Planning walking route...') end
-    if arrived and A.Print then A.Print('Arrived at your navigation destination.') end
+    if arrived and A.Print then
+        A.Print(approach and string.format('Reached the mapped approach, about %.0f yd from your pin.',approach) or 'Arrived at your navigation destination.')
+    end
 end
 local function cancelAutomatic()
     if not N.autoReplan then return end
@@ -256,6 +259,8 @@ function N.Tick()
     local walking=A.Journey and A.Journey.active
     if walking then
         local player=A.Journey.PlayerPosition()
+        local boarded=A.Journey.TryBoardBoat(player)
+        if boarded then cancelAutomatic() end
         if not A.Journey.paused then player=A.Journey.RoutePosition(player) end
         if A.RouteRecovery then
             local recovery=A.RouteRecovery.Update(player,nil,not N.pending and not A.PlanningJob.IsRunning())
@@ -269,7 +274,7 @@ function N.Tick()
         local oldTransport=A.Journey.Leg() and A.Journey.Leg().transport
         local bend,reason=A.Journey.Update(player,true)
         local passengerExited=oldTransport and oldTransport.kind~='flight' and oldLeg~=A.Journey.legIndex
-        if oldLeg~=A.Journey.legIndex and A.JourneyView then A.JourneyView.Refresh() end
+        if (boarded or oldLeg~=A.Journey.legIndex) and A.JourneyView then A.JourneyView.Refresh() end
         local flightState=A.Journey.transportState
         if flightState and flightState.interrupted and not flightState.replanAttempted and not N.pending and not A.PlanningJob.IsRunning() and player and A.Terrain.Segment(player,player) then
             flightState.replanAttempted=true
@@ -328,7 +333,7 @@ function N.Tick()
     local following=not not walking
     journeyLayout(f,walking)
     if following then
-        local status=A.Journey.transportMessage or (N.autoReplan and 'Updating route' or A.RouteRecovery and A.RouteRecovery.IsOffRoute() and 'Rejoin route' or A.Journey.inStructure and 'Tunnel passage' or A.Journey.crossing and 'Zone crossing' or A.Journey.index<#walking.points and 'Next turn' or 'Destination')
+        local status=A.Journey.transportMessage or (N.autoReplan and 'Updating route' or A.RouteRecovery and A.RouteRecovery.IsOffRoute() and 'Rejoin route' or A.Journey.inStructure and 'Tunnel passage' or A.Journey.crossing and 'Zone crossing' or A.Journey.index<#walking.points and 'Next turn' or walking.approachDistance and 'Approach' or 'Destination')
         f.remaining:SetText(string.format('%s  |  %d yd remaining',status,math.floor(remaining+.5)))
         f.remaining:Show()
     else f.remaining:Hide() end

@@ -6,7 +6,8 @@ local function closeMap(frame)
         -- HideUIPanel rejects all insecure addon calls during combat, even for
         -- the unprotected world map. Its normal OnHide lifecycle still runs.
         A.panelClosePending=true
-        return frame:Hide()
+        frame:Hide()
+        return not frame:IsShown()
     end
     A.panelClosePending=nil
     if HideUIPanel then return HideUIPanel(frame) end
@@ -119,6 +120,12 @@ function A.AttachMap()
     if A.map or not WorldMapFrame or not WorldMapFrame.GetCanvas then return end
     A.map=WorldMapFrame
     local f=A.map
+    -- Direct combat opens bypass the panel manager that normally handles Escape.
+    if RegisterGameMenuEscHandler and GameMenuEscPriority and GameMenuEscPriority.AddOn then
+        RegisterGameMenuEscHandler(GameMenuEscPriority.AddOn,function()
+            if InCombatLockdown() and f:IsVisible() then return closeMap(f) end
+        end)
+    end
     -- Native M handling can request another open display state when character
     -- miniWorldMap/questLogOpen preferences disagree with our windowed shell.
     -- Keep native opening outside combat and global binding/rule checks.

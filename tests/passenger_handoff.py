@@ -64,5 +64,51 @@ UnitPosition=function()local x,y,i=P.World(p);return y,x,0,i end
 N.Tick()
 assert(J.Leg().kind=='walk' and J.active==protectedPlan and not N.pending and not N.handoffPending,'native pier arrival must keep the already joined protected walking floor')
 assert(P.Distance(J.Current(),pier.b)>150,'certified floor continuation cannot send the player back to the boat')
+
+-- Approach the Ratchet ferry by a different boardwalk, missing the inland waypoint.
+N.Stop()
+for _,r in ipairs(A.TransportData.edges) do if r.id=='transport:241:29:11' then row=r end end
+p=row.a
+local start=assert(A.Terrain.Approach({mapID=1434,x=.272,y=.769},100))
+p=start
+assert(N.Start(row.b.mapID,row.b.x*100,row.b.y*100,'Ratchet ferry'))
+while A.PlanningJob.IsRunning() do A.PlanningJob.Step() end
+assert(J.active,N.planningError)
+assert(J.Leg().kind=='walk' and J.active.legs[J.legIndex+1].transport.id==row.id)
+p={mapID=1434,x=.258,y=.734}
+print('Booty Bay replay: yards to shore waypoint and vessel',P.Distance(p,row.a),P.Distance(p,row.board))
+assert(P.Distance(p,row.a)>100 and P.Distance(p,row.board)<25)
+IsSwimming=function()return true end
+N.Tick();assert(J.Leg().kind=='walk','swimming past the ship must not skip walking')
+IsSwimming=function()return false end
+J.Pause();N.Tick();assert(J.Leg().kind=='walk')
+J.paused=false
+local flights=A.Flights
+A.Flights={OnTaxi=function()return true end}
+N.Tick();assert(J.Leg().kind=='walk','a flyover must not trigger boat boarding')
+A.Flights=flights
+N.autoReplan=true;N.pending=N.target
+A.PlanningJob.Start(function()error('obsolete walking detour ran')end)
+N.Tick()
+assert(J.Leg().transport==row and J.transportMessage=='Board the boat to Ratchet','the boarding plank must take priority over a missed inland waypoint')
+assert(not J.transportState.departed and not N.pending and not R.IsOffRoute() and not A.PlanningJob.IsRunning())
+N.Tick();assert(J.Leg().transport==row and not J.transportState.departed)
+
+-- Booty Bay dock screenshot, rounded to the tenth shown by the client.
+local plank={mapID=1434,x=.260,y=.732}
+local nearPier={mapID=1434,x=.263,y=.732}
+local plan=J.active
+J.Install(plan);p=nearPier
+assert(P.Distance(p,row.board)>25 and P.Distance(p,plank)<25)
+N.Tick()
+assert(J.Leg().transport==row,'approaching the observed plank should bypass the inland waypoint')
+local aim,message=A.Transports.Guide(J.Leg(),p,J.transportState)
+assert(aim and P.Distance(aim,plank)<.01,'the approach arrow must target the dock end of the plank')
+p=plank;N.Tick()
+assert(J.transportMessage=='Board the boat to Ratchet' and not J.transportState.departed)
+local aboard=A.Transports.Aim(row.board,1434)
+aim=A.Transports.Guide(J.Leg(),p,J.transportState)
+assert(aim and P.Distance(aim,aboard)<.01,'from the plank, guide forward onto the ferry')
+print('PASS: Booty Bay boarding plank at 26.0, 73.2;',P.Distance(p,row.board),'yards from the native vessel stop')
 """)
 print('PASS: native Auberdine-Menethil disembark rebase, protected recovery, old-route retention, history and job ownership')

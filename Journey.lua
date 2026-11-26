@@ -20,7 +20,12 @@ local function endpoints(start,goal,options)
     if live and not boarding and not cityStart and not A.Terrain.Segment(a,a) and A.Structures and A.Structures.Access(a,false) and not A.Structures.Access(a,true) then
         return nil,'Your bridge elevation cannot be confirmed here. Step onto a bank before planning a new route.'
     end
-    if (not boarding and not cityStart and not A.Terrain.Segment(a,a) and not (A.Structures and A.Structures.Access(a,live))) or (not cityGoal and not A.Terrain.Segment(b,b) and not (A.Structures and A.Structures.Access(b,false))) then return nil,'The start or destination is blocked or outside known terrain.' end
+    if not boarding and not cityStart and not A.Terrain.Segment(a,a) and not (A.Structures and A.Structures.Access(a,live)) then
+        return nil,'Your starting position is blocked or outside mapped walking terrain.'
+    end
+    if not cityGoal and not A.Terrain.Segment(b,b) and not (A.Structures and A.Structures.Access(b,false)) then
+        return nil,'The destination is blocked or outside mapped walking terrain.', 'blockedGoal'
+    end
     return a,b,zone
 end
 local function plan(start,goal,options)
@@ -155,6 +160,18 @@ function J.PlayerPosition()
     local result=readable and point({mapID=map,x=x,y=y})
     return result,result and nil or 'Player position is unavailable.'
 end
+local function nearbyDestination(start,candidate)
+    local goal=point(candidate)
+    if start.mapID~=goal.mapID or not A.WalkingRegions then return end
+    local region=A.WalkingRegions.Get(start)
+    if not region or region<=0 then return end
+    local near,_,distance=A.Terrain.Approach(goal,80,nil,region)
+    if near then
+        near.name=(candidate.name or 'Destination'):sub(1,109)..' (approach)'
+        near.walkingOnly=candidate.walkingOnly
+        return near,distance
+    end
+end
 function J.Request(candidate,done,failed,continueJourney)
     if A.Flights and A.Flights.OnTaxi()==true then return nil,'Wait until you land before planning a walking journey.' end
     local start,reason=J.PlayerPosition()
@@ -167,9 +184,18 @@ function J.Request(candidate,done,failed,continueJourney)
         if projected and A.Terrain.Segment(projected,projected) then start=projected end
     end
     local options={boardingContext=A.Flights and A.Flights.BoardingContext(start),walkingOnly=candidate.walkingOnly,liveStart=true}
-    local a,b=endpoints(start,candidate,options)
-    if not a then return nil,b end
-    A.PlanningJob.Start(function() return J.Plan(start,candidate,options) end,done,failed,candidate,start)
+    local routeGoal,approachDistance=candidate,nil
+    local a,b,detail=endpoints(start,candidate,options)
+    if not a then
+        if detail~='blockedGoal' then return nil,b,start end
+        routeGoal,approachDistance=nearbyDestination(start,candidate)
+        if not routeGoal then return nil,b,start end
+    end
+    A.PlanningJob.Start(function()
+        local plan,why=J.Plan(start,routeGoal,options)
+        if plan then plan.approachDistance=approachDistance end
+        return plan,why
+    end,done,failed,candidate,start)
     return true
 end
 function J.Install(plan)
@@ -187,6 +213,28 @@ function J.Current()
     if leg and leg.kind=='transport' then return leg.transport.board end
     if J.crossing and leg then return leg.exitPath and leg.exitPath[J.structureIndex or 2] or leg.exitAim end
     return J.active and J.active.points[J.index]
+end
+-- A dry-ground approach can end inland of a wooden pier. Players who reach
+-- the actual departure stop by another boardwalk can board directly.
+function J.TryBoardBoat(p)
+    local leg=J.Leg()
+    if J.paused or not p or not leg or leg.kind~='walk' then return end
+    local nextLeg=J.active.legs[J.legIndex+1]
+    local row=nextLeg and nextLeg.transport
+    if not row or row.kind~='boat' or p.mapID~=row.a.mapID then return end
+    local yards=A.TravelNetwork.Distance(p,row.board)
+    if not yards then return end
+    if yards>25 then
+        local pier=row.boardingPlank and A.TravelNetwork.Distance(p,row.boardingPlank)
+        if not pier or pier>25 then return end
+    end
+    if A.Flights and A.Flights.OnTaxi()==true then return end
+    local swimming=IsSwimming and IsSwimming()
+    if (issecretvalue and issecretvalue(swimming)) or swimming then return end
+    J.legIndex=J.legIndex+1;J.index=nextLeg.first
+    J.crossing=false;J.inStructure=nil;J.structureIndex=nil;J.transportState={}
+    if A.RouteRecovery then A.RouteRecovery.LegChanged() end
+    return true
 end
 function J.Prepare(position)
     local p=point(position);local plan=J.active

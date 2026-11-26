@@ -21,7 +21,8 @@ events:SetScript('OnEvent',function(_,event,name)
     elseif event=='MAIL_SHOW' then A.Observe('mail','Mailbox');A.Refresh()
     elseif event=='TAXIMAP_OPENED' then if A.Flights then A.Flights.Opened() end;A.Observe('flight',UnitName('npc') or 'Flight master');A.Refresh()
     elseif event=='TAXIMAP_CLOSED' then if A.Flights then A.Flights.Closed() end
-    elseif event=='TAXI_NODE_STATUS_CHANGED' then if A.Flights then A.Flights.Collect() end
+    elseif event=='TAXI_NODE_STATUS_CHANGED' then
+        if not (A.Flights and A.Flights.Collect()) and A.RefreshFlightPinStates then A.RefreshFlightPinStates() end
     elseif event=='PLAYER_ENTERING_WORLD' or event=='PLAYER_LEAVING_WORLD' then if A.Flights then A.Flights.WorldChanged(event=='PLAYER_ENTERING_WORLD') end
     elseif event=='CONFIRM_BINDER' then A.Observe('inn',UnitName('npc') or 'Inn');A.Refresh()
     elseif event=='GOSSIP_SHOW' and C_GossipInfo and C_GossipInfo.GetOptions then

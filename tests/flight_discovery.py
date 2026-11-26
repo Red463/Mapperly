@@ -34,6 +34,26 @@ local c=assert(F.Character());assert(c.nodes[2] and c.nodes[4])
 assert(not c.nodes[5] and not c.nodes[99] and not c.nodes[8],'unreachable, unknown and layer rows cannot unlock destinations')
 local offer=assert(c.offers[2][4]);assert(offer.fare==90 and #offer.hops==3 and offer.hops[2]==5,'whole fare and actual hop IDs must survive nonsequential slots')
 assert(not c.offers[4],'reverse offering cannot be invented')
+local reads={}
+C_TaxiMap.GetTaxiNodesForMap=function(map)
+ reads[map]=(reads[map] or 0)+1
+ if map==947 then return {} end
+ if map==100 then return {{nodeID=4,isUndiscovered=true},{nodeID=8,isUndiscovered=false},{nodeID=5}} end
+end
+A.FlightData.nodes[4].a={mapID=100}
+local discover=F.MapDiscovery(947)
+assert(discover(4)=='locked' and discover(8)==nil,'only an explicit undiscovered flag proves a lock')
+assert(discover(2)=='unlocked' and discover(5)==nil and discover(nil)==nil,'absence alone cannot prove a lock')
+assert(reads[947]==1 and reads[100]==1,'batch reads each map once')
+assert(not c.nodes[8] and not c.offers[2][8],'map lookup must not learn a bookable flight')
+-- Forever returned false for both learned Stormwind and unlearned Light's Hope Chapel.
+C_TaxiMap.GetTaxiNodesForMap=function()
+ return {{nodeID=2,isUndiscovered=false},{nodeID=67,isUndiscovered=false}}
+end
+discover=F.MapDiscovery(1453)
+assert(discover(2)=='unlocked' and discover(67)==nil,'the same map flag must not turn every stop green')
+C_TaxiMap.GetTaxiNodesForMap=function() error('unavailable') end
+assert(F.MapDiscovery(100)(2)=='unlocked' and F.MapDiscovery(100)(5)==nil)
 F.Closed();local previous=calls;assert(not F.Collect() and calls==previous,'closed taxi window cannot be read')
 guid='Player-B';assert(not F.Character().nodes[2],'another character cannot inherit flight discovery')
 assert(F.Opened());local b=F.Character();assert(b~=c and b.nodes[4])
@@ -64,3 +84,32 @@ assert(F.Collect() and not c.offers[2][4].hops,'cyclic hop metadata must omit ge
 F.Closed()
 ''')
 print('PASS: stable discovery IDs, directed offered fares, unknown/protected data and character isolation')
+
+lua.execute('assert(loadstring(...))("Mapperly",A)', (root/'Pins.lua').read_text(encoding='utf8'))
+lua.execute('''
+A.map=WorldMapFrame
+local pin=CreateFrame('Button',nil,A.map)
+for k,v in pairs(MapperlyMapPinMixin)do pin[k]=v end
+pin.icon=pin:CreateTexture()
+pin.icon.SetDesaturated=function(self,value) self.grey=value end
+pin.data={map=1,x=.2,y=.3,category='flight',flightNodeID=2,name='Flight master'}
+A.pinPool={pin}
+local locked=true
+C_TaxiMap.GetTaxiNodesForMap=function() return {{nodeID=2,isUndiscovered=locked}} end
+A.RefreshFlightPinStates()
+assert(pin.icon.grey and pin.flightBadge:IsShown() and pin.flightBadge.texture:match('Lock$'))
+local badge=pin.flightBadge
+locked=false
+A.Flights.Character().nodes[2]=nil
+A.RefreshFlightPinStates()
+assert(not pin.icon.grey and not badge:IsShown(),'inconclusive map flag must clear a stale padlock')
+A.Flights.Opened()
+A.RefreshFlightPinStates()
+assert(not pin.icon.grey and pin.flightBadge==badge and badge.texture:match('ReadyCheck%-Ready$'))
+pin:OnReleased()
+assert(not pin.flightStatus and not badge:IsShown() and not pin.icon.grey,'pooled pins must lose their former status')
+pin.data.flightNodeID=nil
+A.RefreshFlightPinStates()
+assert(not badge:IsShown(),'unidentified masters use a plain boot')
+''')
+print('PASS: map pin badges refresh on discovery and clear on release')

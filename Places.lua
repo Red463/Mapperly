@@ -27,9 +27,9 @@ function A.PlacesForMap(map)
         end
     end
     local faction=UnitFactionGroup('player')=='Alliance' and 1 or 2
-    for _,v in pairs(A.MapFlights.nodes) do if v[5]==faction then
-        local p=add(v[2],v[3],v[4],v[1],'flight','Flight master; availability depends on discovered routes.')
-        if p and A.TransportLinks then p.flightNodeID=A.TransportLinks.IdentifyFlight(v[2],v[3],v[4]) end
+    for nodeID,v in pairs(A.MapFlights.nodes) do if v[5]==faction then
+        local p=add(v[2],v[3],v[4],v[1],'flight')
+        if p then p.flightNodeID=nodeID end
     end end
     return result
 end

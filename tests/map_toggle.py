@@ -6,6 +6,11 @@ from pathlib import Path
 root=Path(__file__).resolve().parents[1]
 source=(root/'tests/run.py').read_text(encoding='utf8')
 setup=r"""
+GameMenuEscPriority={AddOn=8}
+function RegisterGameMenuEscHandler(priority,handler)
+ assert(priority==GameMenuEscPriority.AddOn and not mapEscapeHandler)
+ mapEscapeHandler=handler
+end
 mapTogglePrefs={maximized=true,questLog=false}
 mapNativeOpens=0;mapNativeCalls=0;mapPanelCloses=0
 ShowUIPanel=function(f) f:Show() end

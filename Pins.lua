@@ -64,10 +64,17 @@ function MapperlyMapPinMixin:OnAcquired(data)
     if A.map.AddMaskableTexture then A.map:AddMaskableTexture(self.icon) end
 end
 local function tooltip(self)
-    self.hoverBaseLevel=self:GetFrameLevel()
-    self:SetFrameLevel(self.hoverBaseLevel+20)
+    if not self.hoverBaseLevel then
+        self.hoverBaseLevel=self:GetFrameLevel()
+        self:SetFrameLevel(self.hoverBaseLevel+20)
+    end
     GameTooltip:SetOwner(self,'ANCHOR_RIGHT');GameTooltip:SetText(self.data.name)
     if self.data.category=='dungeon' then GameTooltip:Show();return end
+    if self.data.category=='flight' then
+        if self.flightStatus=='unlocked' then GameTooltip:AddLine('Unlocked on this character',.55,1,.55)
+        elseif self.flightStatus=='locked' then GameTooltip:AddLine('Locked — visit this flight master to unlock it.',1,.82,.40,true)
+        else GameTooltip:AddLine('Unconfirmed. Open a flight map to record the stops it offers.',.8,.8,.8,true) end
+    end
     if self.data.group and self.data.group~='' then GameTooltip:AddLine(self.data.group,1,.82,0) end
     if self.data.description and self.data.description~='' then GameTooltip:AddLine(self.data.description,1,1,1,true) end
     GameTooltip:AddLine(string.format('%.1f, %.1f',self.data.x*100,self.data.y*100),.8,.8,.8)
@@ -77,6 +84,36 @@ local function tooltip(self)
     if A.TransportLinks and #A.TransportLinks.ForPin(self.data)>0 then GameTooltip:AddLine('Click to choose a travel destination.',1,.82,0) end
     GameTooltip:AddLine('Alt-right-click to navigate here.',1,.82,0)
     GameTooltip:Show()
+end
+local flightBadges={
+    unlocked='Interface\\RaidFrame\\ReadyCheck-Ready',
+    locked='Interface\\AddOns\\Mapperly\\Media\\Toolbar\\Small\\Lock',
+}
+function MapperlyMapPinMixin:SetFlightStatus(status)
+    self.flightStatus=status
+    self.icon:SetDesaturated(status=='locked')
+    if status then
+        if not self.flightBadge then
+            self.flightBadge=self:CreateTexture(nil,'OVERLAY')
+            self.flightBadge:SetPoint('BOTTOMRIGHT',self,'BOTTOMRIGHT',1,-1)
+            if A.map.AddMaskableTexture then A.map:AddMaskableTexture(self.flightBadge) end
+        end
+        local size=math.max(9,math.floor(A.db.iconSize*.62+.5))
+        self.flightBadge:SetSize(size,size)
+        self.flightBadge:SetTexture(flightBadges[status])
+        self.flightBadge:Show()
+    elseif self.flightBadge then self.flightBadge:Hide() end
+    if self.hoverBaseLevel and GameTooltip:IsOwned(self) then tooltip(self) end
+end
+function A.RefreshFlightPinStates()
+    if not A.map or not A.map:IsShown() or not A.Flights then return end
+    local discovery
+    for _,pin in ipairs(A.pinPool) do
+        if pin.data.category=='flight' then
+            discovery=discovery or A.Flights.MapDiscovery(A.map:GetMapID())
+            pin:SetFlightStatus(discovery(pin.data.flightNodeID))
+        end
+    end
 end
 function MapperlyMapPinMixin:OnMouseEnter()
     tooltip(self)
@@ -92,6 +129,7 @@ function MapperlyMapPinMixin:OnReleased()
     if self.data and A.BoatLinks then A.BoatLinks.Clear(self.data) end
     if self.hoverBaseLevel then self:SetFrameLevel(self.hoverBaseLevel);self.hoverBaseLevel=nil end
     if GameTooltip:IsOwned(self) then GameTooltip:Hide() end
+    if self.flightStatus then self:SetFlightStatus(nil) end
 end
 function MapperlyMapPinMixin:OnClick(button)
     local p=self.data
@@ -129,6 +167,7 @@ function A.RefreshPins()
     end end
     local destination=A.Navigation and A.Navigation.PinForMap(map)
     if destination then A.pinPool[#A.pinPool+1]=A.map:AcquirePin('MapperlyMapPinTemplate',destination) end
+    A.RefreshFlightPinStates()
 end
 function A.Share(p)
     local text=string.format('%s (map %d, %.1f, %.1f)',p.name,p.map,p.x*100,p.y*100)
