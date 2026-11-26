@@ -2,6 +2,10 @@
 
 Use short bullets of up to 180 characters. A release can use its consolidated CHANGELOG.md section as the source for the in-game window.
 
+## 1.2.8
+
+Source: CHANGELOG.md
+
 ## 1.2.7
 
 Source: CHANGELOG.md

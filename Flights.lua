@@ -142,6 +142,23 @@ local function allowed(n,side,class)
     local mask=n.factionMask
     return number(mask) and (side=='Alliance' and mask%2==1 or side=='Horde' and math.floor(mask/2)%2==1)
 end
+function F.PreviewDepartures(source)
+    local rows={}
+    local d=A.FlightData
+    local _,side,class=identity()
+    local first=d and d.nodes[source]
+    if not allowed(first,side,class) then return rows end
+    for target,last in pairs(d.nodes) do
+        local key=source..':'..target
+        if d.segments[key] and allowed(last,side,class) then
+            rows[#rows+1]={id='flight:'..key,kind='flight',previewOnly=true,
+                fromNodeID=source,toNodeID=target,board=first.world,arrival=last.world,
+                flightPaths={key}}
+        end
+    end
+    table.sort(rows,function(a,b) return a.toNodeID<b.toNodeID end)
+    return rows
+end
 local function clock() local t=call(GetTime);return number(t) and t end
 F.contexts=setmetatable({},{__mode='k'})
 function F.BoardingContext(p)

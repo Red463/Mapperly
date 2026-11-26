@@ -18,10 +18,14 @@ function L.IdentifyFlight(instance,north,east)
     end
     return best
 end
+local function visiblePin(pin)
+    return pin and (pin.category=='transport' or pin.category=='flight')
+        and (not A.db or A.db.filters[pin.category] and
+        (not (pin.map==947 or A.IsOverviewMap(pin.map)) or A.db.continentFilters[pin.category]))
+end
 function L.ForPin(pin)
     local result={}
-    if not pin or (pin.category~='transport' and pin.category~='flight') then return result end
-    if A.db and (not A.db.filters[pin.category] or (pin.map==947 or A.IsOverviewMap(pin.map)) and not A.db.continentFilters[pin.category]) then return result end
+    if not visiblePin(pin) then return result end
     local rows=L.Available();local source
     if pin.transportID then for _,row in ipairs(rows) do if row.id==pin.transportID then source=row;break end end end
     for _,row in ipairs(rows) do
@@ -32,6 +36,14 @@ function L.ForPin(pin)
         if match then result[#result+1]=row end
     end
     return result
+end
+function L.ForHover(pin,offers)
+    offers=offers or L.ForPin(pin)
+    if #offers==0 and visiblePin(pin) and pin.category=='flight' and pin.flightNodeID
+        and A.db.useFlights~=false and (pin.map==947 or A.IsOverviewMap(pin.map)) then
+        return A.Flights.PreviewDepartures(pin.flightNodeID)
+    end
+    return offers
 end
 function L.Visible(map)
     local rows={}

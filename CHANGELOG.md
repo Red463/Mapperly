@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.2.8 - 2026-11-26
+
+- Hover a flight master on the continent or world map to preview direct paths before recording departures there. Click to choose from your eligible, recorded flights.
+- Fixed an Escape-key conflict that could show a Blizzard blocked-action warning while the map was closed. Escape still closes the map when opened during combat.
+
 ## 1.2.7 - 2026-11-26
 
 ### Navigation and ferries

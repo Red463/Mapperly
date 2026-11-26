@@ -68,20 +68,40 @@ ToggleWorldMap();assert(f:IsShown(),'allow first opening before an out-of-combat
 combat=false;A.testCombatCore:GetScript('OnEvent')(A.testCombatCore,'PLAYER_REGEN_ENABLED')
 assert(f:IsShown()and A.layoutReady,'finish initial layout after combat without closing the map')
 
--- Forever opens the game menu if no registered Escape handler claims the key.
-assert(mapEscapeHandler,'combat-opened map needs an Escape handler')
-assert(not mapEscapeHandler() and f:IsShown(),'outside combat leave Escape to native panel handling')
-f:Hide();combat=true
+-- Exercise the native named-window list, including Escape without a map.
+local function closeSpecialWindows()
+ local closed=false
+ for _,name in pairs(UISpecialFrames) do
+  local window=_G[name]
+  if window and window:IsShown() then window:Hide();closed=true end
+ end
+ return closed
+end
+f:Hide();closeSpecialWindows()
+for _,inCombat in ipairs({false,true}) do
+ combat=inCombat
+ assert(not closeSpecialWindows(),'closed map must allow the native game menu')
+end
 ToggleWorldMap()
-assert(mapEscapeHandler() and not f:IsShown() and A.panelClosePending,'first Escape closes the combat-opened map')
-assert(not mapEscapeHandler(),'a second Escape must be available to the game menu')
+assert(closeSpecialWindows() and not f:IsShown() and A.panelClosePending,'first Escape closes the combat-opened map')
+assert(not closeSpecialWindows(),'a second Escape must be available to the game menu')
 combat=false;A.FinishMapClose()
 assert(not A.panelClosePending and not f:IsShown(),'finish native panel cleanup after combat')
 ToggleWorldMap();combat=true
+assert(not closeSpecialWindows() and f:IsShown(),'native panel manager owns a map opened before combat')
+f:Hide();ToggleWorldMap()
 f.IsProtected=function()return true end
-assert(not mapEscapeHandler() and f:IsShown(),'skip a map protected by the client')
+closeSpecialWindows();assert(f:IsShown(),'skip a map protected by the client')
 f.IsProtected=function()return false end
-assert(mapEscapeHandler() and not f:IsShown(),'Escape also closes a map opened before combat')
+f:Hide();ToggleWorldMap()
+A.closeButton:GetScript('OnClick')()
+assert(not closeSpecialWindows(),'X must also clear the combat dismissal window')
+ToggleWorldMap();ToggleWorldMap()
+assert(not closeSpecialWindows(),'M must also clear the combat dismissal window')
+ToggleWorldMap();combat=false
+A.testCombatCore:GetScript('OnEvent')(A.testCombatCore,'PLAYER_REGEN_ENABLED')
+assert(closeSpecialWindows() and not f:IsShown(),'a directly opened map must still close after combat ends')
+assert(not closeSpecialWindows(),'post-combat Escape must return to normal')
 assert(blocked==0,'Escape must not call protected panel helpers during combat')
 ''')
 print('PASS: combat opening from closed via M/slash, repeated toggles, size/pane/theme retention and native game rules')

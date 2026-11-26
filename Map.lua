@@ -120,18 +120,23 @@ function A.AttachMap()
     if A.map or not WorldMapFrame or not WorldMapFrame.GetCanvas then return end
     A.map=WorldMapFrame
     local f=A.map
-    -- Direct combat opens bypass the panel manager that normally handles Escape.
-    if RegisterGameMenuEscHandler and GameMenuEscPriority and GameMenuEscPriority.AddOn then
-        RegisterGameMenuEscHandler(GameMenuEscPriority.AddOn,function()
-            if InCombatLockdown() and f:IsVisible() then return closeMap(f) end
-        end)
-    end
     -- Native M handling can request another open display state when character
     -- miniWorldMap/questLogOpen preferences disagree with our windowed shell.
     -- Keep native opening outside combat and global binding/rule checks.
     -- Combat opening uses the unprotected frame and defers mode changes.
     local nativeToggle=f.HandleUserActionToggleSelf
     if type(nativeToggle)=='function' then
+        -- Direct opens have no native panel slot. Let CloseSpecialWindows
+        -- dismiss them without registering code in the global Escape dispatcher.
+        local dismiss=CreateFrame('Frame','MapperlyCombatMapDismiss',UIParent)
+        dismiss:Hide()
+        table.insert(UISpecialFrames,'MapperlyCombatMapDismiss')
+        dismiss:SetScript('OnHide',function(self)
+            if not self:IsShown() and f:IsVisible() then closeMap(f) end
+        end)
+        f:HookScript('OnHide',function(self)
+            if not self:IsShown() then dismiss:Hide() end
+        end)
         f.HandleUserActionToggleSelf=function(self,...)
             if self==f and self:IsShown() then return closeMap(self) end
             if self==f and InCombatLockdown() then
@@ -144,7 +149,9 @@ function A.AttachMap()
                 -- through the protected panel delegate. Our deferred layout
                 -- applies the remembered mode after combat instead.
                 self.needUpdateDisplayState=nil
-                return self:Show()
+                self:Show()
+                if self:IsShown() then dismiss:Show() end
+                return
             end
             return nativeToggle(self,...)
         end

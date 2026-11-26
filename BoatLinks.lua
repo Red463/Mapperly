@@ -2,7 +2,7 @@ local _,A=...
 local B={lines={}};A.BoatLinks=B
 local function overview(map) return map==947 or A.IsOverviewMap and A.IsOverviewMap(map) end
 local function resolve(pin)
-    return A.TransportLinks and A.TransportLinks.ForPin(pin) or {}
+    return A.TransportLinks and A.TransportLinks.ForHover(pin) or {}
 end
 local function line(parent,used,ax,ay,bx,by,color,width,layer)
     if used>=(B.limit or 1024) then return used end
@@ -62,7 +62,7 @@ local function network(row,map,used,seen)
 end
 local function highlight(row,map,used)
     local V=A.JourneyView;local canvas=A.map:GetCanvas();local width,height=canvas:GetWidth(),canvas:GetHeight()
-    local color={.55,.88,1,1}
+    local color=row.previewOnly and {.65,.81,.88,.78} or {.55,.88,1,1}
     local path
     if map~=947 and not row.geometryUnknown then path=row.kind=='flight' and A.Flights and A.Flights.Path(row) or row.path end
     if map==947 or not path or #path<2 then
@@ -118,7 +118,7 @@ function B.Update()
             if count>=32 then break end
         end
     end
-    local rows=resolve(B.focus and B.focus.pin or B.hover)
+    local rows=B.focus and A.TransportLinks.ForPin(B.focus.pin) or resolve(B.hover)
     B.limit=1792
     for _,row in ipairs(rows) do if not B.focus or B.focus.id==row.id then used=highlight(row,map,used) end end
 end
@@ -128,7 +128,7 @@ function B.Hover(pin)
 end
 function B.Focus(pin,id)
     if not A.map or not overview(A.map:GetMapID()) then return false end
-    for _,row in ipairs(resolve(pin)) do if row.id==id then B.focus={pin=pin,id=id,map=A.map:GetMapID()};B.Update();return true end end
+    for _,row in ipairs(A.TransportLinks.ForPin(pin)) do if row.id==id then B.focus={pin=pin,id=id,map=A.map:GetMapID()};B.Update();return true end end
     return false
 end
 function B.Clear(pin)

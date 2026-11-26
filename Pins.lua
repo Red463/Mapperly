@@ -81,7 +81,14 @@ local function tooltip(self)
     if self.data.target then GameTooltip:AddLine('Click to open destination map.') end
     if self.data.category=='notes' then GameTooltip:AddLine('Click to edit; Shift-click to share; right-click to remove.') end
     if self.data.category=='navigation' then GameTooltip:AddLine('Left-click to edit; right-click to stop navigation.') end
-    if A.TransportLinks and #A.TransportLinks.ForPin(self.data)>0 then GameTooltip:AddLine('Click to choose a travel destination.',1,.82,0) end
+    if A.TransportLinks then
+        local offers=A.TransportLinks.ForPin(self.data)
+        if #offers>0 then
+            GameTooltip:AddLine('Click to choose a travel destination.',1,.82,0)
+        elseif #A.TransportLinks.ForHover(self.data,offers)>0 then
+            GameTooltip:AddLine('Showing direct flight paths. Check available flights with this master.',.65,.81,.88,true)
+        end
+    end
     GameTooltip:AddLine('Alt-right-click to navigate here.',1,.82,0)
     GameTooltip:Show()
 end

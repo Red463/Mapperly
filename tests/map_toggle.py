@@ -7,9 +7,15 @@ root=Path(__file__).resolve().parents[1]
 source=(root/'tests/run.py').read_text(encoding='utf8')
 setup=r"""
 GameMenuEscPriority={AddOn=8}
-function RegisterGameMenuEscHandler(priority,handler)
- assert(priority==GameMenuEscPriority.AddOn and not mapEscapeHandler)
- mapEscapeHandler=handler
+function RegisterGameMenuEscHandler()
+ error('Mapperly must leave the global game-menu Escape dispatcher untouched')
+end
+-- Native CreateFrame publishes named frames for CloseSpecialWindows to resolve.
+local createFrame=CreateFrame
+CreateFrame=function(kind,name,...)
+ local frame=createFrame(kind,name,...)
+ if name then _G[name]=frame end
+ return frame
 end
 mapTogglePrefs={maximized=true,questLog=false}
 mapNativeOpens=0;mapNativeCalls=0;mapPanelCloses=0
