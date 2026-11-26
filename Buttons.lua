@@ -1,4 +1,8 @@
 local _,A=...
+function A.ToolbarTexture(asset,size)
+    if asset=='Navigate' then return 'Interface\\AddOns\\Mapperly\\Media\\GuideArrow' end
+    return 'Interface\\AddOns\\Mapperly\\Media\\Toolbar\\'..size..'\\'..asset
+end
 -- Solid charcoal controls with a thin bronze rim and no bevel or gradient.
 function A.CreateMapButton(parent,text,width,x,callback)
     local b=CreateFrame('Button',nil,parent)
@@ -74,7 +78,7 @@ function A.CreateIconButton(parent,asset,callback)
     for _,edge in ipairs(b.borders) do edge:Hide() end
     b.face:ClearAllPoints();b.face:SetAllPoints(b)
     b.icon=b:CreateTexture(nil,'ARTWORK');b.icon:SetSize(24,24)
-    b.icon:SetTexture(asset=='Navigate' and 'Interface\\AddOns\\Mapperly\\Media\\GuideArrow' or 'Interface\\AddOns\\Mapperly\\Media\\Toolbar\\Small\\'..asset)
+    b.icon:SetTexture(A.ToolbarTexture(asset,'Small'))
     b.icon:SetSnapToPixelGrid(true);b.icon:SetTexelSnappingBias(0)
     b:UpdateVisual()
     return b
@@ -104,7 +108,7 @@ end
 function A.UpdateButtonStates()
     if not A.db then return end
     local navigate=A.controls and A.controls.navigate
-    if navigate then navigate.active=A.Navigation and A.Navigation.target~=nil or false;navigate:UpdateVisual() end
+    if navigate then navigate.active=A.drawerKey=='navigate' or A.Navigation and A.Navigation.target~=nil or false;navigate:UpdateVisual() end
     if A.sizeButton then
         local asset=A.db.compact and 'Resize' or 'Compact'
         if A.sizeButton.iconAsset~=asset then
@@ -112,10 +116,11 @@ function A.UpdateButtonStates()
             A.sizeButton.iconAsset=asset
         end
     end
-    for key,setting in pairs({quests='questPane',reveal='reveal',lock='locked'}) do
+    for key,selected in pairs({quests=A.QuestPaneSelected(),services=A.drawerKey=='services',notes=A.drawerKey=='notes',
+        filters=A.drawerKey=='filters',settings=A.drawerKey=='settings',reveal=A.db.reveal,lock=A.db.locked}) do
         local b=A.controls and A.controls[key]
         if b then
-            b.active=not not A.db[setting]
+            b.active=selected
             if key=='quests' and b.arrow then b.arrow:SetText(b.active and '<' or '>') end
             b:UpdateVisual()
         end

@@ -55,15 +55,33 @@ local displayError
 A.PlanningJob.Start(function() return plan end,function() error('native preview widget failed') end,function(reason) displayError=reason end)
 assert(pcall(A.PlanningJob.Step),'display errors must be reported rather than leave the UI looking stuck')
 assert(displayError and displayError:find('native preview widget failed',1,true) and not A.PlanningJob.IsRunning())
+local history=A.PlanningJob.Recent()
+local displayFailure=history[#history]
+assert(displayFailure.state=='failed' and displayFailure.reason==displayError,'job history must report the display failure shown to the player')
 local profiling=debugprofilestop
 local timerCompleted=false
 debugprofilestop=function() error('profiling unavailable') end
 A.PlanningJob.Start(function() return plan end,function() timerCompleted=true end)
 assert(pcall(A.PlanningJob.Step) and timerCompleted,'unavailable profiling APIs must not strand a job before coroutine resume')
 debugprofilestop=profiling
-
-
-
+''')
+lua.execute('''
+-- Preview a genuinely disconnected point while the player follows a different route.
+A.TerrainData.zones[2]={status='complete',w=5,h=5,widthYards=100,heightYards=100,rows={'2','2','2','2','2'}}
+A.Navigation={target={map=1,x=.3,y=.7}}
+C_Map={GetBestMapForUnit=function() return 2 end,GetPlayerMapPosition=function() return {GetXY=function() return .1,.1 end} end}
+local preview={map=2,x=.9,y=.1,name='Preview'}
+local captured
+assert(A.Journey.Request(preview,nil,function(reason)
+    local rows=A.PlanningJob.Recent()
+    captured=rows[#rows]
+    assert(captured.reason==reason)
+end))
+while A.PlanningJob.IsRunning() do A.PlanningJob.Step() end
+assert(captured and captured.state=='failed','the disconnected preview must fail')
+assert(captured.destination.map==2 and captured.destination.x==.9,'job history must identify the failed preview destination')
+assert(captured.start.mapID==2 and captured.start.x==.1 and captured.start.y==.1,'record the player position used to plan that preview')
+assert(A.Navigation.target.map==1,'preview failure must preserve the active destination')
 ''')
 lua.execute('''
 local plan=assert(A.Journey.Plan({mapID=1,x=.1,y=.1},{mapID=1,x=.9,y=.1,name='Goal'},{}))

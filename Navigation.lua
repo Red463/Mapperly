@@ -108,8 +108,11 @@ local function activate(candidate,plan)
     N.Tick();refresh()
     if A.RouteSteps then A.RouteSteps.Refresh() end
 end
-local function rejected(reason,candidate)
+function N.RejectRequest(candidate,reason,options)
     if A.RouteReport then A.RouteReport.RecordRequest(candidate,reason) end
+    if candidate and A.PlanningStatus and not (options and options.automatic) then
+        A.PlanningStatus.Failed(nil,candidate,reason)
+    end
     return nil,reason
 end
 local function intent(options)
@@ -117,18 +120,19 @@ local function intent(options)
 end
 function N.Start(map,x,y,name,options)
     local nx,ny=N.Parse(x,y)
-    if nx==nil then return rejected(ny) end
+    if nx==nil then return N.RejectRequest(nil,ny,options) end
     map=tonumber(map)
-    if not number(map) or map<1 or map%1~=0 then return rejected('Choose a map before entering coordinates.') end
+    if not number(map) or map<1 or map%1~=0 then return N.RejectRequest(nil,'Choose a map before entering coordinates.',options) end
+    local candidate={map=map,x=nx,y=ny,name=type(name)=='string' and name:sub(1,120) or nil}
     local hbd=library()
-    if not hbd or type(hbd.GetWorldCoordinatesFromZone)~='function' then return rejected('Map coordinates are not available yet. Try again shortly.') end
+    if not hbd or type(hbd.GetWorldCoordinatesFromZone)~='function' then return N.RejectRequest(candidate,'Map coordinates are not available yet. Try again shortly.',options) end
     local ok,wx,wy,instance=pcall(hbd.GetWorldCoordinatesFromZone,hbd,nx,ny,map)
-    if not ok or not number(wx) or not number(wy) or not number(instance) then return rejected('This map cannot be used for navigation. Open a zone or continent map.') end
+    if not ok or not number(wx) or not number(wy) or not number(instance) then return N.RejectRequest(candidate,'This map cannot be used for navigation. Open a zone or continent map.',options) end
     local info=C_Map.GetMapInfo and C_Map.GetMapInfo(map)
     local zone=info and info.name or 'Map '..map
-    name=type(name)=='string' and name:sub(1,120) or zone
-    if name:match('^%s*$') then name=zone end
-    local candidate={map=map,x=nx,y=ny,worldX=wx,worldY=wy,instance=instance,category='navigation',name=name,zone=zone}
+    if not candidate.name or candidate.name:match('^%s*$') then candidate.name=zone end
+    candidate.worldX,candidate.worldY,candidate.instance=wx,wy,instance
+    candidate.category='navigation';candidate.zone=zone
     candidate.walkingOnly=options and options.walkingOnly or nil
     candidate.sessionResume=options and options.sessionResume or nil
     local currentLeg=A.Journey and A.Journey.Leg()
@@ -159,7 +163,7 @@ function N.Start(map,x,y,name,options)
             if statusID and A.PlanningStatus then A.PlanningStatus.Failed(statusID,candidate,why) end
             refresh()
         end,options and options.continueJourney)
-        if not accepted then return rejected(reason,candidate) end
+        if not accepted then return N.RejectRequest(candidate,reason,options) end
         intent(options)
         N.pending=candidate;N.autoReplan=options and options.automatic or nil;N.planningError=nil;N.deferredRoutingTarget=nil;N.Build()
         if not N.autoReplan and A.RouteRecovery then A.RouteRecovery.Clear() end
@@ -181,10 +185,7 @@ function N.ToPin(pin)
     end
     if not A.ValidPin(pin) then return nil,'This marker has no usable map coordinates.' end
     local ok,reason=N.Start(pin.map,pin.x*100,pin.y*100,pin.name,{walkingOnly=pin.walkingOnly})
-    if not ok then
-        if A.Print then A.Print(reason) end
-        if A.PlanningStatus then A.PlanningStatus.Failed(nil,pin,reason) end
-    end
+    if not ok and A.Print then A.Print(reason) end
     return ok,reason
 end
 local function restart(target,options)

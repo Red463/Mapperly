@@ -4,49 +4,67 @@
   "inputs": {
     "Data/Terrain.lua": "b52c3275f761a1f0c38f25f06ec2372a9a4c432a690ecaea9fca873f748a5acb",
     "Data/Water.lua": "99caf6d1a019b9a9457af04fbb881cb823df47c86e7c16f4eb8cd623d424c87c",
-    "Data/GroundCorrections.lua": "d368dc1531d8f912953111a057f0f32a1f96462aad6a9be086a3580ff854a748",
-    "Data/WalkingRegions.lua": "4d31ebedb702dd8342e5c7acd81111e01514ba9e151db6cc50a81cce8f0ecdf6",
+    "Data/GroundCorrections.lua": "c56eb304e5d8e436206485670d81611a5e3c626a9237743633ef4be017c5c9fc",
+    "Data/WalkingRegions.lua": "847b4d8fa4c3eb99ddaec6fe43721af99a044bdc931706002d8e45712f6383d7",
     "Data/Roads.lua": "bbe71ea01361c9599e56894bfa0b1c1119b5a043cac36e577c42a24fddf57c3f",
     "Data/RoadsSupplement.lua": "08cdc53bbb74fbd2c1a27d51cb2ec7e786f633048e12bfd62a5cc970eaff9749",
-    "Data/Crossings.lua": "079cea1d7bb46a01ce2ccd63821da2e2ea3d4212251d556bc5b409c26666e0e0",
+    "Data/Crossings.lua": "2b6a7cb8b034f9e8144b39aaaea8dc48bad93b02deffa34f23e51dce585a9a2f",
     "Data/HarbourAccess.lua": "e9f30810364de89165b5ad9507c3fc3e788134a10f85091de89679a78460dfd5",
     "Data/Flights.lua": "e1bb75df87ed4095c79ef140a38d1c6f207454ab8d14cef53935559371ba5b3f",
     "Data/Transports.lua": "f33a11e4ae5c05ff094a0482a0561ec1f4031ffa55327b7748c544ca7fa147a6",
-    "Data/LocalTransports.lua": "537a10e2f8b449c8c55191690726d3b36b5d2d6ee1ed33d4bae7e8fc4e7df144",
+    "Data/LocalTransports.lua": "9e17b236a8a3adc42ffefe45e2935776943a187f9dc42fc626039711dee4fbf0",
     "Roads.lua": "fffbcfe45dbcb9d0993c543a566b7929417b224098bbb97e8949dba2b9eacba2",
     "Water.lua": "39d8b7f1442375229753e6f5b06a0753a7ee7cde3fb777e144cd6da21fc6793f",
-    "Terrain.lua": "56dfe59732832ebe62bd9659ffe8bdd448fee709a537f94df4be2c395711fb49",
+    "Terrain.lua": "166dc22fde01bad0dcdcaff3707a72b11703b89102a6e84a5e7805578c6615f3",
     "WalkingRegions.lua": "052e6c91bcaac4ae76d5c37dd8e72e58bd5a7eef6e051bac35e8fa076360b951",
-    "PathReuse.lua": "197159eff958d60b9df78e975c99436881b8ffb31322cd51851d5b644a272f46"
+    "PathReuse.lua": "cd1555696ca480602a13a6bc8a1951374f0a44701f47494ea3d3aaf9cf333419"
   },
   "maxPairs": 32,
   "budget": 262144,
   "zones": 48,
-  "pairs": 887,
-  "paths": 3367,
-  "points": 51926,
-  "failed": 1730,
-  "outputSha256": "76fcc39528e098f9a49b15f289bc965963972dfc905a60a61e73062f7540bd7d",
-  "revalidation": {
-    "method": "Retained original allowed-mode search geometry: every resolved revision-1 signature unchanged and every segment validated with explicit allowSwimming=true. No new optimality/search claim.",
+  "paths": 3433,
+  "points": 52075,
+  "outputSha256": "d82246e3d8434b383e4b76112d9229ba63cbffe06be4c5c4f5db0fd3f4546519",
+  "previousFullBuild": {
+    "outputSha256": "76fcc39528e098f9a49b15f289bc965963972dfc905a60a61e73062f7540bd7d",
     "paths": 3367,
+    "points": 51926,
+    "pairs": 887,
+    "failed": 1730
+  },
+  "refresh": {
+    "previousOutputSha256": "d82246e3d8434b383e4b76112d9229ba63cbffe06be4c5c4f5db0fd3f4546519",
     "previousInputs": {
       "Data/Terrain.lua": "b52c3275f761a1f0c38f25f06ec2372a9a4c432a690ecaea9fca873f748a5acb",
       "Data/Water.lua": "99caf6d1a019b9a9457af04fbb881cb823df47c86e7c16f4eb8cd623d424c87c",
-      "Data/GroundCorrections.lua": "d368dc1531d8f912953111a057f0f32a1f96462aad6a9be086a3580ff854a748",
-      "Data/WalkingRegions.lua": "4d31ebedb702dd8342e5c7acd81111e01514ba9e151db6cc50a81cce8f0ecdf6",
+      "Data/GroundCorrections.lua": "c56eb304e5d8e436206485670d81611a5e3c626a9237743633ef4be017c5c9fc",
+      "Data/WalkingRegions.lua": "847b4d8fa4c3eb99ddaec6fe43721af99a044bdc931706002d8e45712f6383d7",
       "Data/Roads.lua": "bbe71ea01361c9599e56894bfa0b1c1119b5a043cac36e577c42a24fddf57c3f",
       "Data/RoadsSupplement.lua": "08cdc53bbb74fbd2c1a27d51cb2ec7e786f633048e12bfd62a5cc970eaff9749",
-      "Data/Crossings.lua": "079cea1d7bb46a01ce2ccd63821da2e2ea3d4212251d556bc5b409c26666e0e0",
+      "Data/Crossings.lua": "2b6a7cb8b034f9e8144b39aaaea8dc48bad93b02deffa34f23e51dce585a9a2f",
       "Data/HarbourAccess.lua": "e9f30810364de89165b5ad9507c3fc3e788134a10f85091de89679a78460dfd5",
       "Data/Flights.lua": "e1bb75df87ed4095c79ef140a38d1c6f207454ab8d14cef53935559371ba5b3f",
       "Data/Transports.lua": "f33a11e4ae5c05ff094a0482a0561ec1f4031ffa55327b7748c544ca7fa147a6",
-      "Data/LocalTransports.lua": "537a10e2f8b449c8c55191690726d3b36b5d2d6ee1ed33d4bae7e8fc4e7df144",
+      "Data/LocalTransports.lua": "b07285c4a9086ee9a5c7cbb4150baade38e1e7c7c280e5f6315d4735ec7cfd15",
       "Roads.lua": "fffbcfe45dbcb9d0993c543a566b7929417b224098bbb97e8949dba2b9eacba2",
-      "Water.lua": "ef4cf007ce317dab1db35e2de6d4b6de0c11b4f1f5ae2626fd0bf8600a482a38",
-      "Terrain.lua": "56dfe59732832ebe62bd9659ffe8bdd448fee709a537f94df4be2c395711fb49",
+      "Water.lua": "39d8b7f1442375229753e6f5b06a0753a7ee7cde3fb777e144cd6da21fc6793f",
+      "Terrain.lua": "166dc22fde01bad0dcdcaff3707a72b11703b89102a6e84a5e7805578c6615f3",
       "WalkingRegions.lua": "052e6c91bcaac4ae76d5c37dd8e72e58bd5a7eef6e051bac35e8fa076360b951",
-      "PathReuse.lua": "197159eff958d60b9df78e975c99436881b8ffb31322cd51851d5b644a272f46"
-    }
+      "PathReuse.lua": "cd1555696ca480602a13a6bc8a1951374f0a44701f47494ea3d3aaf9cf333419"
+    },
+    "rebuiltZones": {
+      "1432": {
+        "pairs": 32,
+        "paths": 78,
+        "failed": 114
+      },
+      "1437": {
+        "pairs": 32,
+        "paths": 114,
+        "failed": 78
+      }
+    },
+    "retainedPaths": 3241,
+    "method": "Fresh searches for the listed zones. Every retained signature and segment revalidated in allowed-swimming mode."
   }
 }

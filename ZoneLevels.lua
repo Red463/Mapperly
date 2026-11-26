@@ -1,5 +1,6 @@
 local _,A=...
 local cities={[1453]=true,[1454]=true,[1455]=true,[1456]=true,[1457]=true,[1458]=true}
+local function clearHoverFishing(label)if A.UpdateHoverFishing then A.UpdateHoverFishing(label) end end
 function A.ZoneLevelRange(map)
     if cities[map] then return end
     local info=C_Map.GetMapInfo and C_Map.GetMapInfo(map)
@@ -45,16 +46,25 @@ function A.UpdateHoverZoneLabel(label)
     local map=A.map
     local info=C_Map.GetMapInfo and C_Map.GetMapInfo(map:GetMapID())
     local continentType=Enum and Enum.UIMapType and Enum.UIMapType.Continent or 2
-    if not info or info.mapType~=continentType or not C_Map.GetMapInfoAtPosition then return end
+    if not info or info.mapType~=continentType or not C_Map.GetMapInfoAtPosition then clearHoverFishing(label);return end
     local areaType=MAP_AREA_LABEL_TYPE and MAP_AREA_LABEL_TYPE.AREA_NAME or 3
     local area=label.labelInfoByType and label.labelInfoByType[areaType]
-    if not area or not area.name or label:GetHighestPriorityLabelInfo()~=area then return end
-    local x,y=map:GetNormalizedCursorPosition()
-    if not x or not y or x<0 or x>1 or y<0 or y>1 then return end
+    if not area or not area.name or label:GetHighestPriorityLabelInfo()~=area then clearHoverFishing(label);return end
+    -- Match AreaLabelFrameMixin's input choice so our extra rows describe
+    -- the same zone as the native controller or mouse hover caption.
+    local gamepad=InputUtil and InputUtil.IsGamepadUIEnabled and InputUtil.IsGamepadUIEnabled()
+        and (map.HasGamepadCursorInput and map:HasGamepadCursorInput()
+            or map.IsCanvasMouseFocusOrPinFocus and not map:IsCanvasMouseFocusOrPinFocus())
+    local x,y
+    if gamepad then
+        if map.GetNormalizedGamepadCursorPosition then x,y=map:GetNormalizedGamepadCursorPosition() end
+    else x,y=map:GetNormalizedCursorPosition() end
+    if not x or not y or x<0 or x>1 or y<0 or y>1 then clearHoverFishing(label);return end
     local hovered=C_Map.GetMapInfoAtPosition(map:GetMapID(),x,y)
-    if hovered and hovered.mapID~=map:GetMapID() and A.ZoneLevelRange(hovered.mapID) then
+    if hovered and hovered.mapID and hovered.mapID~=map:GetMapID() and hovered.name then
         label.Name:SetText(A.ZoneTitle(hovered.mapID,hovered.name))
-    end
+        if A.UpdateHoverFishing then A.UpdateHoverFishing(label,hovered.mapID) end
+    else clearHoverFishing(label) end
 end
 function A.AttachZoneLevels()
     for provider in pairs(A.map.dataProviders or {}) do
@@ -63,6 +73,7 @@ function A.AttachZoneLevels()
             if not label.mapperlyLevelsHooked then
                 label.mapperlyLevelsHooked=true
                 label:HookScript('OnUpdate',function(self) A.UpdateHoverZoneLabel(self) end)
+                label:HookScript('OnHide',clearHoverFishing)
             end
             A.PositionHoverZoneLabel(label,true)
         end

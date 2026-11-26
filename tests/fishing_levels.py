@@ -33,9 +33,10 @@ local lines={};GameTooltip.SetOwner=function(self,owner)self.owner=owner end
 GameTooltip.IsOwned=function(self,owner)return self.owner==owner end
 GameTooltip.AddLine=function(_,line)lines[#lines+1]=line end
 f:GetScript('OnEnter')(f)
-assert(GameTooltip:GetText():find('reference',1,true))
+assert(GameTooltip:GetText()=='Fishing skill')
 local tip=table.concat(lines,' ')
-assert(tip:find('51',1,true) and tip:find('150',1,true) and tip:find('lure',1,true) and tip:find('server',1,true))
+assert(tip:find('51',1,true) and tip:find('150',1,true) and tip:find('lure',1,true))
+for _,word in ipairs({'WCLBox','checked','published','Published','server','2026-'})do assert(not tip:find(word,1,true),'Tooltip should omit source/date and server-reference wording')end
 A.Theme.Set('original');assert(f.point[1]=='TOPLEFT' and f.point[2]==A.map.ScrollContainer,'Charcoal fishing row must sit below header')
 A.Theme.Set('gatherly');assert(f.point[1]=='TOP' and f:IsShown())
 A.map.GetMapID=function()return 999999 end;A.UpdateNavigation();assert(not f:IsShown(),'Clear stale zone fishing data')

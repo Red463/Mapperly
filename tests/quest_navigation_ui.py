@@ -16,12 +16,20 @@ f.tabs.quests:GetScript('OnClick')(f.tabs.quests)
 local u=f.questUI
 assert(f.questPage:IsShown() and not f.entryPage:IsShown() and not f.libraryPage:IsShown())
 assert(#u.questList.rows>=1 and u.questList.rows[1].record.id==71)
+local result=u.questList.rows[1]
+assert(result.title.point[4]+result.title:GetWidth()<result.locations.point[4],'quest names must end before Locations')
+assert(result.locations.point[4]+result.locations:GetWidth()<=result:GetWidth())
+local questHeight,locationHeight=u.questList.frame:GetHeight(),u.locationList.frame:GetHeight()
+f:FitToolHeight(f:GetHeight()+100)
+assert(u.questList.frame:GetHeight()==questHeight+100 and u.locationList.frame:GetHeight()==locationHeight+100)
+f:FitToolHeight(f:GetHeight())
 u.search:SetText('does not exist');u.search:GetScript('OnTextChanged')(u.search)
 assert(not u.questList.rows[1]:IsShown() and u.empty:GetText():find('No active quests',1,true))
 u.search:SetText('RAVEN');u.search:GetScript('OnTextChanged')(u.search)
 u.questList.rows[1].locations:GetScript('OnClick')(u.questList.rows[1].locations)
 assert(u.selectedID==71 and u.locationList.rows[1].record.questID==71)
 local row=u.locationList.rows[1];local went,previewed=0,0
+assert(row.go.point[4]+row.go:GetWidth()<=row:GetWidth() and -row.go.point[5]+row.go:GetHeight()<=row:GetHeight())
 local oldGo,oldPreview=A.Navigation.ToPin,A.JourneyView.Preview
 A.Navigation.ToPin=function(p) went=went+1;assert(p.questID==71 and p.map==1431 and p.x==.4);return true end
 A.JourneyView.Preview=function(p) previewed=previewed+1;assert(p.questID==71);return true end
@@ -39,7 +47,7 @@ A.QuestNavigationUI.Refresh(f)
 assert(not u.selectedID and u.empty:GetText():find('No active quests',1,true))
 f.SelectPage('entry');assert(f.entryPage:IsShown() and not f.questPage:IsShown())
 f.SelectPage('saved');assert(f.libraryPage:IsShown() and not f.questPage:IsShown())
-for _,tab in pairs(f.tabs) do local x=tab.point[4];assert(x+tab:GetWidth()<=f:GetWidth()-24,'tabs must fit the window') end
+for _,tab in pairs(f.tabs) do local x=tab.point[4];assert(x>=8 and x+tab:GetWidth()<=f:GetWidth()-8,'tabs must fit the drawer insets') end
 A.Navigation.ToPin=oldGo;A.JourneyView.Preview=oldPreview
 -- Reproduce the actual reported quest through both UI actions, not only
 -- through the model: the list stays exact while the routed endpoint moves.

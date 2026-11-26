@@ -79,6 +79,16 @@ for count=1,4 do
  assert(-f.done.point[5]+f.done:GetHeight()<=f:GetHeight()-12,'button must fit inside the frame')
  f:Hide()
 end
+A.version='1.2.0-paged'
+local lines={};for i=1,9 do lines[i]='Entry '..i end
+A.ReleaseNotes={version=A.version,changes=lines}
+assert(W.TryShow())
+local f=W.frame
+assert(f.rows[1].text:GetText()=='Entry 1' and f.pageLabel:GetText()=='Page 1 of 3')
+f.next:GetScript('OnClick')();assert(f.rows[4].text:GetText()=='Entry 8')
+f.next:GetScript('OnClick')();assert(f.rows[1].text:GetText()=='Entry 9' and not f.rows[2]:IsShown())
+f.previous:GetScript('OnClick')();assert(f.rows[1].text:GetText()=='Entry 5')
+f:Hide();assert(not W.TryShow())
 A.version='Unknown';assert(not W.TryShow(),'unavailable metadata must not create repeated unknown-version notices')
 """)
 print('PASS: welcome/update once per account/version, current notes, combat/world/modal deferral, corrupt state and both themes')

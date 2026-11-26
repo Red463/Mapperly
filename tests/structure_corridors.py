@@ -74,6 +74,32 @@ for _,id in ipairs({300408,373730}) do
   assert(why=='arrived','floor follower must tolerate ordinary movement past dense samples in either direction')
  end
 end
+-- In Dun Algaz the zone assignment can change while the player is still
+-- walking the tunnel. The arrow should keep guiding them to its far mouth.
+for _,id in ipairs({73025,126354,68441769,68443158}) do
+ local row=A.StructureData.corridors[id]
+ for _,reverse in ipairs({false,true}) do
+  local start,goal=reverse and row.b or row.a,reverse and row.a or row.b
+  local plan,reason=A.Journey.Plan(start,goal,{walkingOnly=true});assert(plan,reason)
+  assert(plan.legs[1].exitStructure==id)
+  A.Journey.Install(plan)
+  local ends=A.Structures.Path(id,start)
+  local first,last=ends[1],ends[#ends]
+  local count=math.ceil(A.TravelNetwork.Distance(first,last)/5)
+  for step=0,count do
+   local t=step/count
+   local p=A.Structures.Aim({worldX=first.worldX+(last.worldX-first.worldX)*t,
+      worldY=first.worldY+(last.worldY-first.worldY)*t,instance=first.instance},
+      t<.5 and start.mapID or goal.mapID)
+   local aim,status=A.Journey.Update(p,true)
+   if step<count-2 then
+    assert(aim and A.Journey.crossing and A.Journey.Leg().exitStructure==id,
+     'Left tunnel guidance before reaching the far mouth: '..id..' step '..step)
+   end
+  end
+  local _,status=A.Journey.Update(goal,true);assert(status=='arrived')
+ end
+end
 local row=A.StructureData.corridors[300408]
 local plan=assert(A.Journey.Plan(row.a,row.b,{}));A.Journey.Install(plan);A.Journey.Update(row.a,true)
 local z=A.Terrain.Zone(row.a.mapID)

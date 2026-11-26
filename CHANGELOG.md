@@ -1,5 +1,28 @@
 # Changelog
 
+## 1.2.6 - 2026-11-26
+
+### Nearby services and map tools
+
+- Open the coin purse on the map to find nearby repairers, vendors, trainers, innkeepers, flight masters and mailboxes. Check the distance and click a result to navigate.
+- Expand a category to browse goods by icon, see who sells an item or find another provider. Search by item, service or NPC name. Vendor and trainer locations come with Mapperly.
+- Destinations, Notes, Filters and Settings now open beside the map at the same width as Nearby Services and the quest log. Switch tools without resizing the map canvas.
+- Preview a route beside the map and go back to its destination. Notes shows all twelve symbols together, Settings uses shorter pages, and long lists expand with the map.
+
+### Faster, more reliable journeys
+
+- Long routes use precomputed walking connections and check walking and transport options earlier. The planner skips disconnected ground and avoids repeating failed searches.
+- Cross more bridges within and between zones, including the Southfury bridge, the Westfall to Duskwood bridge and the northern Stranglethorn road to Duskwood.
+- Verified bridge decks now guide you through narrow or tilted crossings. Mapperly checks both approaches, avoids unproven shortcuts and handles journeys starting on a deck.
+- Walk through all four Dun Algaz tunnels between Loch Modan and the Wetlands. The arrow follows the tunnel to its far exit even when the zone changes underground.
+- If planning fails, choose Copy report and press Ctrl+C (Cmd+C on Mac) to share the attempt in Mapperly's CurseForge comments. Reports include the destination, settings and timings.
+
+### Route appearance and fishing
+
+- Follow a continuous world-map line with rounded bends and a consistent width as you zoom. Completed sections fade, transport legs use blue dots and the minimap shows one cue ahead.
+- In Settings > Navigation > Display > Route style, change the colours ahead and behind you, line width and direction markers on both maps. A live preview shows your choices.
+- Hover a zone or city on the continent map to see its minimum and recommended fishing skill where known. Larger text and a shorter tooltip make the guidance easier to read.
+
 ## 1.2.4 - 2026-11-24
 
 - Redraw optional world/continent background travel connections as clean schematic curves with a fine blue stroke and dark underlay. Deduplicate return trips, keep native projection gaps separate and cap complete curves in a reused pool. Active journey geometry and marker-hover previews remain independent.

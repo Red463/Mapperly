@@ -308,7 +308,7 @@
       "collisionTriangles": 1027
     },
     "proofFile": "output\\lift-audit\\exit-mask-native-cell-proof.json",
-    "proofSha256": "7b904801b8118d532f25dfa6de33877e0a947a9555f78875de676cc87c1a20f0",
+    "proofSha256": "680e19d2865eff49bca2512b0ba76b990496db16a8dcbd2f669929aa30a77e59",
     "scriptSha256": "f1d9059c17393745e812a7612a1924c1da3cc845fae82f77456e2684461287ff",
     "stats": [
       {
@@ -343,10 +343,19 @@
     "elapsedSeconds": 5.973877399999765,
     "runtimeMaskInputSha256": {
       "Data\\Terrain.lua": "b52c3275f761a1f0c38f25f06ec2372a9a4c432a690ecaea9fca873f748a5acb",
-      "Data\\GroundCorrections.lua": "d368dc1531d8f912953111a057f0f32a1f96462aad6a9be086a3580ff854a748",
-      "Data\\WalkingRegions.lua": "4d31ebedb702dd8342e5c7acd81111e01514ba9e151db6cc50a81cce8f0ecdf6",
-      "Terrain.lua": "56dfe59732832ebe62bd9659ffe8bdd448fee709a537f94df4be2c395711fb49",
+      "Data\\GroundCorrections.lua": "c56eb304e5d8e436206485670d81611a5e3c626a9237743633ef4be017c5c9fc",
+      "Data\\WalkingRegions.lua": "847b4d8fa4c3eb99ddaec6fe43721af99a044bdc931706002d8e45712f6383d7",
+      "Terrain.lua": "166dc22fde01bad0dcdcaff3707a72b11703b89102a6e84a5e7805578c6615f3",
       "WalkingRegions.lua": "052e6c91bcaac4ae76d5c37dd8e72e58bd5a7eef6e051bac35e8fa076360b951"
+    },
+    "routePlanningRevalidation": {
+      "method": "Repeated original native exit_masks.py audit; every accepted native sample and all retained lift anchor/disk/trace paths revalidated. Intrinsic masks, links, coordinates and native observations unchanged. Canonical proof omits elapsed timings.",
+      "acceptedNativeSamples": 55575,
+      "additionalGroundSamples": 591,
+      "retainedPaths": 6,
+      "terrainSha256": "166dc22fde01bad0dcdcaff3707a72b11703b89102a6e84a5e7805578c6615f3",
+      "proofSha256": "680e19d2865eff49bca2512b0ba76b990496db16a8dcbd2f669929aa30a77e59",
+      "revalidatorSha256": "69b036ed9d3c6dc0c2891f900c7432e03ce41fde89c1d9973952d6c3b47363ca"
     }
   },
   "limitations": [

@@ -105,7 +105,7 @@ function MapperlyMapPinMixin:OnClick(button)
         if A.MarkWaypointHandled then A.MarkWaypointHandled() end
         A.Navigation.ToPin(p.category=='navigation' and A.Navigation.target or p)
     elseif p.category=='navigation' then
-        if button=='RightButton' then A.Navigation.Stop() else A.ShowNavigationInput(A.Navigation.target and A.Navigation.target.map) end
+        if button=='RightButton' then A.Navigation.Stop() else A.ShowNavigationInput(A.Navigation.target and A.Navigation.target.map,'navigate') end
     elseif button=='LeftButton' and A.TransportLinks and A.TransportLinks.Show(p) then return
     elseif p.target then A.map:SetMapID(p.target)
     elseif p.category=='notes' then
@@ -114,7 +114,7 @@ function MapperlyMapPinMixin:OnClick(button)
             GameTooltip:Hide()
             A.RefreshPins()
         elseif IsShiftKeyDown() then A.Share(p)
-        else A.ShowNote(p.map,p.x,p.y,p) end
+        else A.ShowNote(p.map,p.x,p.y,p,'notes') end
     end
 end
 function A.RefreshPins()

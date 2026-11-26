@@ -49,7 +49,9 @@ plan=assert(A.Journey.Plan({mapID=1455,x=.187,y=.515},goal,{maxWalkingCells=6000
 assert(not plan.hasCityGuidance)
 -- The conservative service-search contract and outdoor permissions are separate.
 assert(not A.Journey.Plan(starts[1],goal,{walkingOnly=true,maxWalkingCells=60000}))
-assert(not A.Journey.Plan({mapID=1431,x=0,y=0},goal,{maxWalkingCells=60000}),'unknown outdoor starts remain rejected')
+local blockedOutdoor={mapID=1431,x=.5,y=.5}
+assert(not A.Terrain.Segment(blockedOutdoor,blockedOutdoor),'outdoor fixture must be blocked')
+assert(not A.Journey.Plan(blockedOutdoor,goal,{maxWalkingCells=60000}),'blocked outdoor starts remain rejected')
 """)
 print('PASS: native Ironforge blocked starts/destinations use city guidance; normal paths, terrain permissions and walking-only searches remain intact')
 

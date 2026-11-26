@@ -14,9 +14,13 @@ with tempfile.TemporaryDirectory(prefix='release-notes-test-',dir=root/'output')
  highlights.write_text('## 2.0.0\n\n- A clearer map.\n- Better routes.\n')
  assert m.build(p)==('2.0.0',['A clearer map.','Better routes.'])
  assert 'Better routes.'in(p/'Data/ReleaseNotes.lua').read_text()
- for body in ['## 1.0.0\n- Old release.\n','## 2.0.0\n','## 2.0.0\n'+''.join('- Feature.\n'for _ in range(5)),'## 2.0.0\n- '+('x'*181)+'\n']:
+ highlights.write_text('## 2.0.0\n\nSource: CHANGELOG.md\n')
+ bullets=['Change '+str(i) for i in range(9)]
+ (p/'CHANGELOG.md').write_text('## 2.0.0 - 2026-11-26\n'+''.join('- '+b+'\n' for b in bullets)+'## 1.0.0\n- Old release.\n')
+ assert m.build(p)==('2.0.0',bullets)
+ for body in ['## 1.0.0\n- Old release.\n','## 2.0.0\n','## 2.0.0\n- '+('x'*181)+'\n']:
   highlights.write_text(body)
   try:m.build(p)
   except ValueError:pass
   else:raise AssertionError('missing/overlong update highlights must block packaging')
-print('PASS: current release notes match TOC; future missing, empty, excessive or overlong highlights are rejected')
+print('PASS: consolidated release notes match TOC and changelog; missing, empty or overlong highlights are rejected')

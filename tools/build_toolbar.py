@@ -5,7 +5,7 @@ root = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(root.parent / 'Gatherly/.test-deps'))
 from PIL import Image
 
-names = ['Locate', 'AddNote', 'Filters', 'Reveal', 'Lock', 'Settings', 'Resize', 'Compact', 'Close', 'ParentMap', 'Quest']
+names = ['Locate', 'AddNote', 'Filters', 'Reveal', 'Lock', 'Settings', 'Resize', 'Compact', 'Close', 'ParentMap', 'Quest', 'Services']
 for name in names:
     source = root / 'assets/toolbar' / (name + '.png')
     if name == 'Quest':

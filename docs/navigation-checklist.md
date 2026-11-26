@@ -24,6 +24,10 @@ Status: release 1.2.0, 23 November 2026. Automated checks pass; coverage limits 
 - [x] 18. Export bounded copyable route reports and retain validated character/build-scoped resumable destination state.
 - [x] 19. Integrate and package a local release candidate with automated regressions and independent component reviews. See [release test guide](testing-1.2.0.md) for remaining native-client checks.
 
+## Additional navigation work
+
+- [ ] **Audit all bridges and every zone crossing**, including bridges wholly within a zone. See the [implementation plan](superpowers/plans/2026-11-25-bridges-and-zone-crossings.md) and [progress ledger](bridges-and-crossings-progress.md). **Active, requested 25 November 2026.**
+
 ## Milestones
 
 1. Walking foundation: 1-5 and the walking portion of 12. First playable preview.

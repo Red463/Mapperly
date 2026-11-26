@@ -96,18 +96,26 @@ function A.QueueViewportFit()
         end)
     else A.FitViewport() end
 end
+function A.SelectQuestPane(shown)
+    A.db.questPane=not not shown
+    if shown and A.drawerKey then A.SelectMapDrawer(nil);return end
+    if A.map then A.ApplyLayout() end
+    if A.SyncSettings then A.SyncSettings() end
+end
 function A.LayoutShell()
     local f=A.map
     A.headerHeight=A.db.theme=='gatherly' and 26 or 42
     for _,key in ipairs({'BorderFrame','BlackoutFrame','NavBar','SidePanelToggle','WorldMapTrackingOptionsButton'}) do A.HideChrome(f[key]) end
-    if f.SetQuestLogPanelShown then f:SetQuestLogPanelShown(A.db.questPane) end
+    local showQuests=A.QuestPaneSelected()
+    if f.SetQuestLogPanelShown then f:SetQuestLogPanelShown(showQuests) end
     local sw,sh=UIParent:GetWidth(),UIParent:GetHeight()
     local width=sw*(A.db.compact and math.min(.86,.76*A.db.scale) or .92)
     local height=sh*(A.db.compact and math.min(.84,.78*A.db.scale) or .90)
     -- Native quest rows, details and search/count controls have fixed-width art.
     -- Reserve their native width instead of compressing them with map size.
     local questWidth=type(f.questLogWidth)=='number' and math.max(333,f.questLogWidth) or 333
-    local pane=A.db.questPane and questWidth+12 or 0
+    local services=A.drawerKey=='services'
+    local pane=(showQuests or A.drawerKey) and questWidth+12 or 0
     A.questPaneExtent=pane
     local inset=A.db.theme=='gatherly' and 6 or 0;A.mapInset=inset
     -- Keep native edge gutters outside the 3:2 artwork, not underneath opaque
@@ -118,7 +126,7 @@ function A.LayoutShell()
         -- The slider changes the window, not text/icon scale. Retain enough
         -- canvas height for the full toolbar and enough width beside the log.
         local maximum=math.max(1,math.min(sw*.92-pane-A.railWidth-2*inset,(sh*.90-strips)*1.5))
-        local minimum=math.min(maximum,math.max(360,((A.minimumRailHeight or 374)-strips)*1.5))
+        local minimum=math.min(maximum,math.max(360,((A.minimumRailHeight or 374)-strips)*1.5,pane>0 and 345*1.5 or 0))
         mapWidth=math.min(maximum,math.max(minimum,mapWidth))
     end
     f:SetScale(1);f:SetSize(mapWidth+pane+A.railWidth+2*inset,mapWidth/1.5+strips)
@@ -135,10 +143,15 @@ function A.LayoutShell()
         scroll:ClearAllPoints();scroll:SetPoint('TOPLEFT',f,'TOPLEFT',inset,-A.headerHeight)
         scroll:SetPoint('BOTTOMRIGHT',f,'BOTTOMRIGHT',-pane-A.railWidth-inset,A.footerHeight+inset)
     end
-    if frame(f.QuestLog) and A.db.questPane then
-        f.QuestLog:ClearAllPoints();f.QuestLog:SetPoint('TOPRIGHT',f,'TOPRIGHT',-6-A.railWidth-inset,-A.headerHeight)
-        f.QuestLog:SetPoint('BOTTOMRIGHT',f,'BOTTOMRIGHT',-6-A.railWidth-inset,A.footerHeight+inset);f.QuestLog:SetWidth(questWidth)
+    if services and not A.servicesPanel then A.servicesPanel=A.CreateNearbyServicesPanel(f) end
+    local drawer=A.LayoutToolDrawer(questWidth,math.max(1,f:GetHeight()-strips)) or services and A.servicesPanel or showQuests and f.QuestLog
+    if frame(drawer) then
+        drawer:ClearAllPoints()
+        drawer:SetPoint('TOPRIGHT',f,'TOPRIGHT',-6-A.railWidth-inset,-A.headerHeight)
+        drawer:SetPoint('BOTTOMRIGHT',f,'BOTTOMRIGHT',-6-A.railWidth-inset,A.footerHeight+inset)
+        drawer:SetWidth(questWidth)
     end
+    if A.servicesPanel then A.servicesPanel:SetShown(services) end
     A.PositionMapPinButton()
     A.FitQuestBackground()
     local surfaceWidth=f:GetWidth()-A.railWidth-2*inset

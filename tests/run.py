@@ -12,6 +12,9 @@ lua.execute('''
 local db=A.InitStore({scale=99, movingAlpha=-1, filters={mail=false}, notes=false})
 assert(A.InitStore({}).iconSize==18)
 assert(A.InitStore({iconSize=24}).iconSize==24,'saved marker sizes must remain intact')
+local sections = A.InitStore({collapsedServiceSections={vendor=true,trainer='true',invalid=true}}).collapsedServiceSections
+assert(sections.vendor and not sections.trainer and not sections.invalid)
+assert(not next(A.InitStore({collapsedServiceSections=false}).collapsedServiceSections))
 A.InitStore(db)
 assert(db.scale==1 and db.layoutVersion==2 and db.movingAlpha==.2 and db.filters.mail==false)
 assert(A.InitStore({layoutVersion=2,scale=99}).scale==1.1)
@@ -190,11 +193,9 @@ end} end
 A.PlacesForMap(1431)
 assert(calls[1][1]==1571.6 and calls[1][2]==-231,'game north/east coordinates must be swapped for HBD horizontal/vertical projection')
 LibStub=function() return nil end
-local records={}
-UIDropDownMenu_AddButton=function(info) records[#records+1]=info end
-A.BuildMenu(nil,1)
-assert(#records==10,'filters should contain only eight pin categories and show/hide all')
-for _,info in ipairs(records) do assert(not info.text:find('opacity') and not info.text:find('Quest pane')) end
+A.controls.filters:GetScript('OnClick')()
+for _,k in ipairs(A.categories) do assert(A.filterWindow.rows[k]:GetChecked()==A.db.filters[k]) end
+A.controls.filters:GetScript('OnClick')()
 assert(A.controls.quests and A.controls.notes and A.controls.reveal and A.controls.settings)
 local savedPosition=C_Map.GetPlayerMapPosition
 C_Map.GetPlayerMapPosition=function(id) if id==1416 then return {GetXY=function() return .3,.6 end} end end
@@ -238,7 +239,7 @@ assert(A.closeButton.template=='UIPanelCloseButton' and A.closeButton:GetParent(
 assert(A.sizeButton.point[2]==A.actionRail,'resize must now be the first toolbar control')
 local skinButton=A.controls.filters
 assert(not skinButton.face.gradient and not skinButton.topBevel,'buttons must have a solid flat face without bevels')
-for _,key in ipairs({'locate','navigate','notes','filters','reveal','lock','settings','quests','parent','size'}) do
+for _,key in ipairs({'locate','navigate','notes','filters','reveal','lock','settings','quests','services','parent','size'}) do
  local b=A.controls[key]
  assert(b:GetParent()==A.actionRail and b.iconOnly and b:GetWidth()==28 and b:GetHeight()==28,'every action must be a compact icon on the right rail: '..key)
  assert(b.icon and b.icon:GetWidth()==24 and b:GetText()=='','toolbar artwork must be larger with less padding')
@@ -299,16 +300,15 @@ assert(A.coordinateText:GetText()=='')
 A.db.coordinates=true
 A.map.GetNormalizedCursorPosition=savedCursor;C_Map.GetPlayerMapPosition=savedPlayerPosition
 local railHeight=4
-for _,key in ipairs({'size','parent','locate','navigate','notes','filters','quests','reveal','lock','settings'}) do
+for _,key in ipairs({'size','parent','locate','navigate','notes','filters','quests','services','reveal','lock','settings'}) do
  local b=A.controls[key]
  railHeight=railHeight+b:GetHeight()+(key=='size' and 0 or (key=='parent' or key=='filters' or key=='lock') and 10 or 4)
 end
 assert(railHeight<400,'compact icon rail must remain short enough for the supported compact map')
-local dropdownAnchor
-ToggleDropDownMenu=function(_,__,menu,anchor) dropdownAnchor=anchor end
 A.controls.filters:GetScript('OnClick')(A.controls.filters)
-assert(dropdownAnchor==A.controls.filters,'filters popup must anchor to its new icon button')
+assert(A.drawerKey=='filters' and A.filterWindow:IsVisible(),'filters must occupy the map drawer')
 A.controls.navigate:GetScript('OnClick')()
+assert(A.drawerKey=='navigate' and not A.filterWindow:IsShown())
 assert(A.navigationWindow and A.navigationWindow:IsShown() and A.navigationWindow.targetMap==A.map:GetMapID(),'navigation rail action must open coordinate entry for the viewed map')
 A.navigationWindow:Hide()
 local savedFilters={}
@@ -679,7 +679,7 @@ for folder,size in [('Small',32),('Medium',64)]:
         assert path.read_bytes()[2]==2
     assert len(list((root/'Media/Markers'/folder).glob('*.tga')))==len(marker_names)
 print('PASS: 72 WoW marker textures, size variants, transparent corners and valid TGA encoding')
-toolbar_names=['Locate','AddNote','Filters','Reveal','Lock','Settings','Resize','Compact','Close','ParentMap','Quest']
+toolbar_names=['Locate','AddNote','Filters','Reveal','Lock','Settings','Resize','Compact','Close','ParentMap','Quest','Services']
 for folder,size in [('',128),('Medium',64),('Small',32)]:
     for name in toolbar_names:
         path=root/'Media/Toolbar'/folder/(name+'.tga')
@@ -688,4 +688,4 @@ for folder,size in [('',128),('Medium',64),('Small',32)]:
             assert icon.getchannel('A').getextrema()==(0,255)
             for point in [(0,0),(size-1,0),(0,size-1),(size-1,size-1)]: assert icon.getpixel(point)[3]==0
         assert path.read_bytes()[2]==2
-print('PASS: 33 toolbar textures, native size variants and transparent backgrounds')
+print(f'PASS: {len(toolbar_names)*3} toolbar textures, native size variants and transparent backgrounds')

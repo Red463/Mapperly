@@ -44,15 +44,9 @@ local function arrowGap(x1,y1,x2,y2)
     if hi<1 then pieces[#pieces+1]={x1+dx*hi,y1+dy*hi,x2,y2} end
     return pieces
 end
-local function world(p,hbd)
-    if number(p.worldX) and number(p.worldY) and number(p.instance) then return p.worldX,p.worldY,p.instance end
-    local ok,x,y,instance=pcall(hbd.GetWorldCoordinatesFromZone,hbd,p.x,p.y,p.mapID or p.map)
-    if ok and number(x) and number(y) and number(instance) then return x,y,instance end
-end
 function R.Update()
-    for _,line in ipairs(R.lines) do line:Hide() end
-    for _,line in ipairs(R.fragments) do line:Hide() end
-    if A.RouteStyle then A.RouteStyle.Hide(R.directions) end
+    local style=A.RouteStyle
+    style.HideLines(R.lines);style.HideLines(R.fragments);style.Hide(R.directions)
     if not A.db or not A.JourneyView then return end
     -- Direct-bearing map lines follow the player even with the map reopened.
     if A.Navigation and A.Navigation.target and not (A.Journey and A.Journey.active) and A.map and A.map:IsShown() then A.JourneyView.Refresh() end
@@ -88,33 +82,46 @@ function R.Update()
     end
     if R.overlay:GetParent()~=Minimap then R.overlay:SetParent(Minimap);R.overlay:SetAllPoints(Minimap) end
     R.overlay:SetFrameLevel(Minimap:GetFrameLevel()+2)
-    local used=0;local segments={};local split=true
-    local marks={spacing=60,limit=3,size=5,thickness=2,strokeWidth=1.5,anchor='CENTER',inside=function(x,y)
+    local segments={};local split=true
+    local marks={minimap=true,spacing=35,limit=1,size=4.5,thickness=1.6,strokeWidth=2.5,anchor='CENTER',inside=function(x,y)
         return x*x+y*y>=144 and R.Clip(x,y,x,y,width,height,shape)~=nil
     end}
-    for i=1,#plan.points-1 do
-        local ax,ay,ai=world(plan.points[i],hbd);local bx,by,bi=world(plan.points[i+1],hbd)
-        if ai==instance and bi==instance and not plan.points[i+1].breakBefore then
-            local x1,y1=R.Project(ax,ay,px,py,radius,width,height,facing)
-            local x2,y2=R.Project(bx,by,px,py,radius,width,height,facing)
-            x1,y1,x2,y2=R.Clip(x1,y1,x2,y2,width,height,shape)
-            if x1 then
-                for _,piece in ipairs(arrowGap(x1,y1,x2,y2)) do
-                    used=used+1
-                    local line=R.lines[used]
-                    if not line then line=R.overlay:CreateLine(nil,'OVERLAY');R.lines[used]=line;line:SetThickness(1.5) end
-                    if A.RouteStyle then line:SetColorTexture(A.RouteStyle.Color(plan,i,.85))
-                    elseif plan.points[i].transport or plan.points[i+1].transport then line:SetColorTexture(.3,.75,1,.85) else line:SetColorTexture(1,.77,.18,.85) end
-                    line:SetStartPoint('CENTER',R.overlay,piece[1],piece[2]);line:SetEndPoint('CENTER',R.overlay,piece[3],piece[4]);line:Show()
-                    if A.RouteStyle then
-                        segments[#segments+1]={piece[1],piece[2],piece[3],piece[4],base=line,color={A.RouteStyle.Color(plan,i,.85)},markable=not A.RouteStyle.Completed(plan,i),split=split}
-                    end
-                    split=false
-                end
-            else split=true end
-        else split=true end
+    local function append(x1,y1,x2,y2,kind,fromPlayer)
+        x1,y1,x2,y2=R.Clip(x1,y1,x2,y2,width,height,shape)
+        if not x1 then split=true;return end
+        local pieces=arrowGap(x1,y1,x2,y2)
+        if #pieces==0 then split=true end
+        for j,piece in ipairs(pieces) do
+            local slot=#segments+1
+            if not R.lines[slot] then R.lines[slot]=R.overlay:CreateLine(nil,'OVERLAY') end
+            piece.base=R.lines[slot];piece.kind=kind;piece.split=split or j>1
+            piece.fromPlayer=fromPlayer and j==1
+            segments[slot]=piece;split=false
+        end
     end
-    if A.RouteStyle then A.RouteStyle.Render(segments,R.directions,R.fragments,R.overlay,marks) end
+    local progress=A.RouteProgress
+    local active,fraction=progress.Split(plan,hbd,px,py,instance)
+    local current=active or progress.Segment(plan)
+    local x1,y1
+    for j,point in ipairs(plan.points) do
+        local wx,wy,wi=progress.World(point,hbd)
+        local x2,y2
+        if wi==instance then x2,y2=R.Project(wx,wy,px,py,radius,width,height,facing) end
+        if x1 and x2 and not point.breakBefore then
+            local i=j-1
+            if i==active and fraction>0 then
+                local x=x1+(x2-x1)*fraction;local y=y1+(y2-y1)*fraction
+                append(x1,y1,x,y,'completed')
+                if fraction<1 then append(x,y,x2,y2,'ahead',true) end
+            else
+                local kind=style.Kind(plan,i)
+                local fromPlayer=i==current and kind=='ahead' and x1*x1+y1*y1<=64
+                append(x1,y1,x2,y2,kind,fromPlayer)
+            end
+        else split=true end
+        x1,y1=x2,y2
+    end
+    style.Render(segments,R.directions,R.fragments,R.overlay,marks)
 end
 local driver=CreateFrame('Frame',nil,UIParent)
 driver:SetSize(1,1);driver:SetPoint('TOPLEFT',UIParent,'TOPLEFT',0,0);driver:EnableMouse(false)

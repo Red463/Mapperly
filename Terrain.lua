@@ -215,8 +215,7 @@ function T.Path(a,b,options)
  local key,reverse=cacheKey(a,b);local hit=cache[key]
  if hit then
   if not hit.points then return nil,hit.reason end
-  if maxDistance and hit.length>maxDistance+.000001 then return nil,'too long' end
-  return pathCopy(hit.points,reverse),hit.length
+  if not maxDistance or hit.length<=maxDistance+.000001 then return pathCopy(hit.points,reverse),hit.length end
  end
  -- A failed local search says nothing about longer paths across this zone.
  -- Keep range-scoped failures separate from unrestricted cached results.
@@ -254,47 +253,27 @@ function T.Path(a,b,options)
  end
  -- Exact unobstructed eight-neighbor distance is admissible on rectangular
  -- cells and avoids exploring the extra area admitted by Euclidean distance.
- local function heuristic(x,y)
-  local dx,dy=abs(ex-x),abs(ey-y);local common=min(dx,dy)
+ local function heuristic(x,y,tx,ty)
+  local dx,dy=abs(tx-x),abs(ty-y);local common=min(dx,dy)
   return common*diagonal+(dx-common)*wx+(dy-common)*wy
  end
- local heap,scores,previous,closed={},{[start]=0},{},{};push(heap,start,heuristic(sx,sy),0)
- local work=0;local found=false
- while #heap>0 do
-  local entry=pop(heap);local id=entry.id
-  if not closed[id] and entry.g==scores[id] then
-   if id==goal then found=true;break end
-   if work>=budget then return nil,'budget' end
-   work=work+1;closed[id]=true
-   if work%256==0 then
-    if A.PlanningJob then A.PlanningJob.PathProgress(work) end
-    -- A planning job installs a fresh frame clock on every resume.
-    local checkpoint=yield or T.Checkpoint
-    if type(checkpoint)=='function' then checkpoint(work) end
-   end
-   local x,y=id%z.w,floor(id/z.w);local currentFactor=factor(x,y)
-   for _,offset in ipairs(neighbors) do
-    local dx,dy=offset[1],offset[2];local nx,ny=x+dx,y+dy;local nid=ny*z.w+nx
-    if not closed[nid] and cell(z,nx,ny) and (not maxDistance or inRange(nx,ny)) and (dx==0 or dy==0 or (cell(z,x+dx,y) and cell(z,x,y+dy))) then
-     local g=entry.g+(dx==0 and wy or dy==0 and wx or diagonal)*(currentFactor+factor(nx,ny))/2
-     if not scores[nid] or g<scores[nid] then scores[nid]=g;previous[nid]=id;push(heap,nid,g+heuristic(nx,ny),g) end
-    end
-   end
-  end
+ local work,reported=0,0
+ local function reportWork()
+  if work<=reported then return end
+  reported=work
+  if A.PlanningJob then A.PlanningJob.PathProgress(work) end
+  local checkpoint=yield or T.Checkpoint
+  if checkpoint then checkpoint(work) end
  end
- if not found then
-  local why=maxDistance and 'too long' or 'unreachable'
-  remember(rangeKey or key,reverse,nil,nil,why);return nil,why
+ local function finish(path,reason)
+  reportWork();return path,reason
  end
- local backwards={point(b)};local id=goal
- while true do
-  backwards[#backwards+1]={mapID=a.mapID,x=(id%z.w+.5)/z.w,y=(floor(id/z.w)+.5)/z.h}
-  if #backwards%256==0 and T.Checkpoint then T.Checkpoint() end
-  if id==start then break end;id=previous[id]
+ local function charge()
+  if work>=budget then return false end
+  work=work+1
+  if work%256==0 then reportWork() end
+  return true
  end
- backwards[#backwards+1]=point(a)
- local raw=pathCopy(backwards,true);local result={raw[1]};local at=1;local length=0;local shortcuts=0
- if A.PlanningJob then A.PlanningJob.Report('Smoothing the walking route') end
  -- Integrate cost over cell-boundary crossings so smoothing cannot erase
  -- road bends or accumulate sampling errors along long straight segments.
  -- The supercover predicate remains the authority for terrain safety.
@@ -315,6 +294,79 @@ function T.Path(a,b,options)
   end
   return yards(z,a,b)*sum
  end
+ local function search(tile,tileWidth,limit,from,to)
+  local initial,target=from or start,to or goal
+  local tx,ty=target%z.w,floor(target/z.w)
+  local heap,scores,previous,closed={},{[initial]=0},{},{};push(heap,initial,0,0)
+  while #heap>0 do
+   local entry=pop(heap);local id=entry.id
+   if not closed[id] and entry.g==scores[id] then
+    if id==target then return previous end
+    if work>=limit or not charge() then return end
+    closed[id]=true
+    local x,y=id%z.w,floor(id/z.w);local currentFactor=factor(x,y)
+    for _,offset in ipairs(neighbors) do
+     local dx,dy=offset[1],offset[2];local nx,ny=x+dx,y+dy;local nid=ny*z.w+nx
+     if not closed[nid] and (not tile or floor(ny/12)*tileWidth+floor(nx/12)==tile) and cell(z,nx,ny) and (not maxDistance or inRange(nx,ny)) and (dx==0 or dy==0 or (cell(z,x+dx,y) and cell(z,x,y+dy))) then
+      local g=entry.g+(dx==0 and wy or dy==0 and wx or diagonal)*(currentFactor+factor(nx,ny))/2
+      if not scores[nid] or g<scores[nid] then scores[nid]=g;previous[nid]=id;push(heap,nid,g+heuristic(nx,ny,tx,ty),g) end
+     end
+    end
+   end
+  end
+ end
+ local previous,raw
+ local function center(x,y) return {mapID=a.mapID,x=(x+.5)/z.w,y=(y+.5)/z.h} end
+ local function refineSpans(spans,width,limit)
+  local result={point(a)}
+  for i=#spans,1,-1 do
+   local span=spans[i]
+   local first,last=center(span.x,span.y),center(span.tx,span.ty)
+   if not segment(z,result[#result],first) then return end
+   result[#result+1]=first
+   if span.x~=span.tx or span.y~=span.ty then
+    if not roads and segment(z,first,last) then
+     result[#result+1]=last
+    else
+     local entry=span.y*z.w+span.x;local exit=span.ty*z.w+span.tx
+     local back=search(span.tile,width,limit,entry,exit)
+     if not back then return end
+     local chain={};local id=exit
+     while id~=entry do chain[#chain+1]=id;id=back[id] end
+     for j=#chain,1,-1 do id=chain[j];result[#result+1]=center(id%z.w,floor(id/z.w)) end
+    end
+   end
+   if i%12==0 and T.Checkpoint then T.Checkpoint() end
+  end
+  if not segment(z,result[#result],b) then return end
+  result[#result+1]=point(b)
+  return result
+ end
+ if not maxDistance and budget>=16384 and max(abs(ex-sx),abs(ey-sy))>=96 then
+  if A.TerrainPortals then
+   local function chargeGuide() return work<min(42000,budget*.85) and charge() end
+   local spans,width=A.TerrainPortals.Trace(z,a.mapID,sx,sy,ex,ey,roadFactor,cell,push,pop,chargeGuide)
+   if width=='disconnected' then return finish(nil,'unreachable') end
+   if spans then raw=refineSpans(spans,width,budget) end
+  end
+ end
+ if not raw and not previous then previous=search(nil,nil,budget) end
+ if not raw and not previous then
+  if work>=budget then return finish(nil,'budget') end
+  local why=maxDistance and 'too long' or 'unreachable'
+  remember(rangeKey or key,reverse,nil,nil,why);return finish(nil,why)
+ end
+ if not raw then
+  local backwards={point(b)};local id=goal
+  while true do
+   backwards[#backwards+1]={mapID=a.mapID,x=(id%z.w+.5)/z.w,y=(floor(id/z.w)+.5)/z.h}
+   if #backwards%256==0 and T.Checkpoint then T.Checkpoint() end
+   if id==start then break end;id=previous[id]
+  end
+  backwards[#backwards+1]=point(a);raw=pathCopy(backwards,true)
+ end
+ local result={raw[1]};local at=1;local length=0;local shortcuts=0
+ if A.PlanningJob then A.PlanningJob.Report('Smoothing the walking route') end
  local costs={0}
  if roads then for i=2,#raw do
   costs[i]=costs[i-1]+weighted(raw[i-1],raw[i])
@@ -328,13 +380,13 @@ function T.Path(a,b,options)
    shortcuts=shortcuts+1;if shortcuts%16==0 and T.Checkpoint then T.Checkpoint() end
    if segment(z,raw[at],raw[i]) and (not roads or weighted(raw[at],raw[i])<=costs[i]-costs[at]+.000001) then nextIndex=i;break end
   end
-  if not segment(z,raw[at],raw[nextIndex]) then return nil,'unreachable' end
+  if not segment(z,raw[at],raw[nextIndex]) then return finish(nil,'unreachable') end
   length=length+yards(z,raw[at],raw[nextIndex]);result[#result+1]=raw[nextIndex];at=nextIndex
  end
  -- Bound retained geometry as well as cache entry count.
  if #result<=1024 then remember(key,reverse,result,length) end
- if maxDistance and length>maxDistance+.000001 then return nil,'too long' end
- return result,length
+ if maxDistance and length>maxDistance+.000001 then return finish(nil,'too long') end
+ return finish(result,length)
 end
 function T.Distance(a,b,options)
  local path,length=T.Path(a,b,options);if not path then return nil,length end;return length

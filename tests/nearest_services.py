@@ -54,5 +54,16 @@ assert(S.Request('mail',function(r)completed=true end,function(e)error(e)end))
 assert(not S.Request('inn',function()end,function()end),'service search cannot cancel an existing planning job')
 while A.PlanningJob.IsRunning() do A.PlanningJob.Step() end
 assert(completed)
+A.Navigation={target={map=2,x=.7,y=.5}}
+local searchFailure
+assert(S.Request('dungeon',nil,function(reason)
+    local history=A.PlanningJob.Recent()
+    searchFailure=history[#history]
+    assert(searchFailure.reason==reason)
+end))
+while A.PlanningJob.IsRunning() do A.PlanningJob.Step() end
+assert(searchFailure and searchFailure.state=='failed')
+assert(not searchFailure.destination,'a search with no matching service has no destination')
+assert(searchFailure.start.mapID==1 and searchFailure.start.x==0 and searchFailure.start.y==.5)
 """)
 print('PASS: nearest verified walking distance, faction/source guards, border coverage, partial results and transactional cancellation')

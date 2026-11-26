@@ -129,7 +129,7 @@ function S.Find(kind,start,options)
         local target=approach(pin)
         if target then
             checked=checked+1
-            local plan,why=A.Journey.Plan(start,target,{walkingOnly=true,preferRoads=A.db.preferRoads,roadPreferenceStrength=A.db.roadPreferenceStrength,maxWalkingCells=math.min(100000,maxCells-spent)})
+            local plan,why=A.Journey.Plan(start,target,{walkingOnly=true,preferRoads=A.db.preferRoads,roadPreferenceStrength=A.db.roadPreferenceStrength,maxWalkingCells=math.min(100000,maxCells-spent),liveStart=true})
             if plan and number(plan.distance) and (not best or plan.distance<best.plan.distance) then best={pin=target,plan=plan}
             elseif not plan and limited(why) then uncertain=math.min(uncertain,pin.lowerBound) end
         end
@@ -147,6 +147,6 @@ function S.Request(kind,done,failed)
     local start,why=A.Journey.PlayerPosition();if not start then return nil,why end
     if not faction() then return nil,'Your faction is unavailable. Try again after loading.' end
     if not A.Terrain.Zone(start.mapID or start.map) or not A.Terrain.Segment(point(start),point(start)) then return nil,'Move onto known walkable terrain before finding nearby services.' end
-    A.PlanningJob.Start(function() return S.Find(kind,start) end,done,failed)
+    A.PlanningJob.Start(function() return S.Find(kind,start) end,done,failed,nil,start)
     return true
 end

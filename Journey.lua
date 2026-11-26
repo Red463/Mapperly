@@ -16,7 +16,11 @@ local function endpoints(start,goal,options)
     local boarding=A.Flights and A.Flights.ContextValid(options and options.boardingContext,a)
     local cityStart=A.CityNavigation and A.CityNavigation.Supports(a,options)
     local cityGoal=A.CityNavigation and A.CityNavigation.Supports(b,options)
-    if (not boarding and not cityStart and not A.Terrain.Segment(a,a)) or (not cityGoal and not A.Terrain.Segment(b,b)) then return nil,'The start or destination is blocked or outside known terrain.' end
+    local live=options and options.liveStart
+    if live and not boarding and not cityStart and not A.Terrain.Segment(a,a) and A.Structures and A.Structures.Access(a,false) and not A.Structures.Access(a,true) then
+        return nil,'Your bridge elevation cannot be confirmed here. Step onto a bank before planning a new route.'
+    end
+    if (not boarding and not cityStart and not A.Terrain.Segment(a,a) and not (A.Structures and A.Structures.Access(a,live))) or (not cityGoal and not A.Terrain.Segment(b,b) and not (A.Structures and A.Structures.Access(b,false))) then return nil,'The start or destination is blocked or outside known terrain.' end
     return a,b,zone
 end
 local function plan(start,goal,options)
@@ -29,20 +33,39 @@ local function plan(start,goal,options)
     local speed=options and options.speed or 7
     if type(speed)~='number' or speed~=speed or speed<=0 or speed==math.huge then speed=7 end
     local networkOptions={preferRoads=preferRoads,roadPreferenceStrength=strength,name=goal.name or 'Destination',speed=speed,faction=options and options.faction,boardingContext=options and options.boardingContext,start=a,
-        walkingOnly=options and options.walkingOnly,maxWalkingCells=options and options.maxWalkingCells}
-    if a.mapID~=b.mapID or A.Flights and A.Flights.ContextValid(networkOptions.boardingContext,a) then
+        walkingOnly=options and options.walkingOnly,maxWalkingCells=options and options.maxWalkingCells,liveStart=options and options.liveStart}
+    if a.mapID~=b.mapID or A.Flights and A.Flights.ContextValid(networkOptions.boardingContext,a) or
+        A.Structures and (A.Structures.Access(a,networkOptions.liveStart) or A.Structures.Access(b,false)) then
         return A.TravelNetwork.Plan(a,b,networkOptions)
     end
     local progress=A.PlanningJob and A.PlanningJob.Progress();local before=progress and progress.cells or 0
-    local points,distance=A.Terrain.Path(a,b,{maxExpansions=math.min(262144,networkOptions.maxWalkingCells or 262144),preferRoads=preferRoads,roadPreferenceStrength=strength})
-    if not points and A.CityNavigation then points,distance=A.CityNavigation.Path(a,b,options) end
-    if not points and A.TravelNetwork and A.StructureData then
+    local directCells=0
+    local points,distance
+    if not (A.TravelNetwork and A.TravelNetwork.SeparateGround and A.TravelNetwork.SeparateGround(a,b)) then
+        points,distance=A.Terrain.Path(a,b,{maxExpansions=math.min(262144,networkOptions.maxWalkingCells or 262144),preferRoads=preferRoads,roadPreferenceStrength=strength,yield=function(count)
+            directCells=count
+            if A.Terrain.Checkpoint then A.Terrain.Checkpoint() end
+        end})
+    end
+    if not points and A.CityNavigation then
+        local cityPoints,cityDistance=A.CityNavigation.Path(a,b,options)
+        if cityPoints then points,distance=cityPoints,cityDistance end
+    end
+    -- Structure and transport comparisons share the allowance left by the
+    -- direct attempt, including when its valid geometry becomes a candidate.
+    if networkOptions.maxWalkingCells then
         local after=A.PlanningJob and A.PlanningJob.Progress()
-        if networkOptions.maxWalkingCells and after then networkOptions.maxWalkingCells=math.max(0,networkOptions.maxWalkingCells-(after.cells-before)) end
+        networkOptions.maxWalkingCells=math.max(0,networkOptions.maxWalkingCells-(after and after.cells-before or directCells))
+    end
+    if not points and A.TravelNetwork and A.StructureData then
         return A.TravelNetwork.Plan(a,b,networkOptions)
     end
     if not points then
         return nil,distance=='budget' and 'Route search reached its limit. Try a closer waypoint.' or 'No walking connection was found through the available terrain.'
+    end
+    if A.TravelNetwork and A.TravelNetwork.CanImproveWithStructure and A.TravelNetwork.CanImproveWithStructure(a,b,distance,points) then
+        networkOptions.candidatePoints=points;networkOptions.candidateDistance=distance
+        return A.TravelNetwork.Plan(a,b,networkOptions)
     end
     local transports=not networkOptions.walkingOnly and A.Transports and A.Transports.Edges(networkOptions) or {}
     if #transports>0 and distance>A.Transports.MinimumSeconds(transports)*speed and
@@ -54,7 +77,26 @@ local function plan(start,goal,options)
         mapID=a.mapID,name=goal.name or 'Destination',coverage=points.cityGuidance and 'city guidance' or zone.status,hasCityGuidance=points.cityGuidance,
         legs={{kind='walk',name='Walk to '..(goal.name or 'destination'),mapID=a.mapID,first=1,last=#points,cityGuidance=points.cityGuidance,points=points,distance=distance,estimatedSeconds=distance/speed}}}
 end
--- Prefer a complete dry itinerary; never treat the preference as a prohibition.
+-- A wet/unknown root cell is not proof against a separately supported floor,
+-- an issued flight boarding context, or the city/tram wayfinding exceptions.
+local function dryEndpointBlocked(start,goal,options)
+    for index,p in ipairs({point(start),point(goal)}) do
+        if not A.Terrain.Segment(p,p) and A.Terrain.Segment(p,p,{allowSwimming=true}) then
+            local city=A.CityNavigation and A.CityNavigation.Supports(p,options)
+            local boarding=index==1 and A.Flights and A.Flights.ContextValid(options.boardingContext,p)
+            local floor=A.Structures and A.Structures.Access(p,index==1 and options.liveStart or false)
+            local tram=A.Trams and not options.walkingOnly and (p.mapID==1453 or p.mapID==1455)
+            if not city and not boarding and not floor and not tram then return true end
+        end
+    end
+    return false
+end
+local function budgetFailure(reason)
+    return type(reason)=='string' and (reason=='budget' or reason:find('search reached its limit',1,true) or reason:find('search budget',1,true))
+end
+-- The setting is a best-effort preference. Reserve a modest dry attempt and
+-- retain the caller's original allowance for the permitted-swimming retry.
+-- Explicit allowSwimming=false remains a required policy with its full budget.
 function J.Plan(start,goal,options)
     local water=A.Water
     if not water or not water.WithPlanningPolicy then return plan(start,goal,options) end
@@ -63,11 +105,24 @@ function J.Plan(start,goal,options)
         return water.WithPlanningPolicy(options.allowSwimming,work)
     end
     if A.db and A.db.avoidSwimming then
-        local dry=water.WithPlanningPolicy(false,work)
-        if dry then return dry end
-        if A.PlanningJob then A.PlanningJob.Report('Trying route with swimming permitted') end
+        local dryOptions={};for key,value in pairs(options or {}) do dryOptions[key]=value end
+        dryOptions.maxWalkingCells=math.min(131072,dryOptions.maxWalkingCells or 131072)
+        local fallbackReason
+        if water.WithPlanningPolicy(false,function() return dryEndpointBlocked(start,goal,dryOptions) end) then
+            fallbackReason='endpoint'
+        else
+            local dry,why=water.WithPlanningPolicy(false,function() return plan(start,goal,dryOptions) end)
+            if dry then return dry end
+            fallbackReason=budgetFailure(why) and 'budget' or 'unconfirmed'
+        end
+        if A.PlanningJob then
+            A.PlanningJob.Report(fallbackReason=='budget' and 'Dry search reached its limit; trying swimming' or 'Trying route with swimming permitted')
+        end
         local result,reason=water.WithPlanningPolicy(true,work)
-        if result then result.swimmingFallback=true end
+        if result then
+            result.swimmingFallback=true;result.swimmingFallbackReason=fallbackReason
+            result.drySearchBudget=dryOptions.maxWalkingCells
+        end
         return result,reason
     end
     return work()
@@ -111,14 +166,17 @@ function J.Request(candidate,done,failed,continueJourney)
         local projected=A.TravelNetwork.Transform(start,J.MapID())
         if projected and A.Terrain.Segment(projected,projected) then start=projected end
     end
-    local options={boardingContext=A.Flights and A.Flights.BoardingContext(start),walkingOnly=candidate.walkingOnly}
+    local options={boardingContext=A.Flights and A.Flights.BoardingContext(start),walkingOnly=candidate.walkingOnly,liveStart=true}
     local a,b=endpoints(start,candidate,options)
     if not a then return nil,b end
-    A.PlanningJob.Start(function() return J.Plan(start,candidate,options) end,done,failed)
+    A.PlanningJob.Start(function() return J.Plan(start,candidate,options) end,done,failed,candidate,start)
     return true
 end
 function J.Install(plan)
     J.active=plan;J.index=math.min(2,#plan.points);J.paused=false;J.legIndex=plan.multiZone and 1 or nil;J.crossing=false;J.inStructure=nil;J.structureIndex=nil;J.transportState=nil;J.transportMessage=nil
+    -- A journey may begin exactly at a structure entry. Keep its one-point
+    -- approach leg active so Update enters the certified floor follower.
+    if plan.multiZone and plan.legs[1] and plan.legs[1].last then J.index=math.min(J.index,plan.legs[1].last) end
 end
 function J.Clear() J.active=nil;J.index=nil;J.paused=false;J.legIndex=nil;J.crossing=false;J.inStructure=nil;J.structureIndex=nil;J.transportState=nil;J.transportMessage=nil end
 function J.Leg() return J.active and J.active.multiZone and J.active.legs[J.legIndex] end
@@ -137,7 +195,10 @@ function J.Prepare(position)
     if J.Leg() and J.Leg().kind=='transport' then return true end
     local sameMap=p.mapID==J.MapID()
     local leg=J.Leg();local floorFinished=not J.inStructure or not leg.exitPath or (J.structureIndex or 2)>=#leg.exitPath
-    if nextLeg and floorFinished and p.mapID==nextLeg.mapID and (not sameMap and (J.crossing or A.TravelNetwork.Distance(p,nextLeg.points[1])<=8) or sameMap and J.crossing and A.TravelNetwork.Distance(p,nextLeg.points[1])<=8) then
+    -- A zone change can happen halfway through a tunnel. Keep following its
+    -- floor until the player reaches the landing on the next walking leg.
+    if nextLeg and floorFinished and p.mapID==nextLeg.mapID and (J.crossing or not sameMap) and
+       (J.crossing and not sameMap and not leg.exitPath or A.TravelNetwork.Distance(p,nextLeg.points[1])<=8) then
         J.inStructure=J.Leg().exitStructure
         J.legIndex=J.legIndex+1;J.index=nextLeg.first;J.crossing=false
         if A.RouteRecovery then A.RouteRecovery.LegChanged() end

@@ -60,24 +60,26 @@ local function network(row,map,used,seen)
     end
     finish();return used
 end
-local function draw(row,map,used,hover,completed)
+local function highlight(row,map,used)
     local V=A.JourneyView;local canvas=A.map:GetCanvas();local width,height=canvas:GetWidth(),canvas:GetHeight()
-    local color=hover and {.55,.88,1,1} or completed and {.38,.48,.52,.35} or {.3,.75,1,.85}
+    local color={.55,.88,1,1}
     local path
     if map~=947 and not row.geometryUnknown then path=row.kind=='flight' and A.Flights and A.Flights.Path(row) or row.path end
-    if map==947 or hover and (row.geometryUnknown or not path or #path<2) then
+    if map==947 or not path or #path<2 then
         -- Schematic world connection, not a claim about an in-world teleport spline.
         local ax,ay=V.Project(row.board,map);local bx,by=V.Project(row.arrival,map)
         if not ax or not bx then return used end
+        ax,ay,bx,by=V.Clip(ax,ay,bx,by)
+        if not ax then return used end
         ax,ay,bx,by=ax*width,-ay*height,bx*width,-by*height
         local dx,dy=bx-ax,by-ay;local length=math.sqrt(dx*dx+dy*dy)
         if length<1 then return used end
         for at=0,length,14 do
             if used>=(B.limit or 1024) then break end
             local finish=math.min(length,at+9)
-            used=line(B.overlay,used,ax+dx*at/length,ay+dy*at/length,ax+dx*finish/length,ay+dy*finish/length,color,hover and 3 or 2,hover and 3 or 2)
+            used=line(B.overlay,used,ax+dx*at/length,ay+dy*at/length,ax+dx*finish/length,ay+dy*finish/length,color,3,3)
         end
-    elseif hover then
+    else
         -- Continent previews retain the real same-piece sailing geometry.
         local previous
         for i=2,#path do
@@ -86,14 +88,14 @@ local function draw(row,map,used,hover,completed)
             if b.breakBefore then previous=b
             else
                 local ax,ay=V.Project(a,map);local bx,by=V.Project(b,map)
-                if ax and bx then used=line(B.overlay,used,ax*width,-ay*height,bx*width,-by*height,color,hover and 3 or 1,hover and 3 or 2) end
+                if ax and bx then used=line(B.overlay,used,ax*width,-ay*height,bx*width,-by*height,color,3,3) end
                 previous=b
             end
         end
     end
     return used
 end
-function B.Update(plan)
+function B.Update()
     for _,item in ipairs(B.lines) do item:Hide() end
     local map=A.map and A.map:GetMapID()
     if not A.map or not A.map:IsShown() or not overview(map) then B.hover=nil;B.focus=nil;return end
@@ -105,7 +107,6 @@ function B.Update(plan)
         B.overlay:EnableMouse(false);B.overlay:SetClipsChildren(true)
     end
     B.overlay:SetFrameLevel(V.LayerLevel(A.map:GetCanvas()))
-    plan=plan or V.DisplayPlan()
     local used=0
     B.limit=768
     if A.db and A.db.showTransportLinks then
@@ -117,17 +118,9 @@ function B.Update(plan)
             if count>=32 then break end
         end
     end
-    B.limit=1280
-    if map==947 and A.db and A.db.showJourneyRoute and plan then
-        for i,leg in ipairs(plan.legs or {}) do
-            if leg.transport and A.TransportLinks.methods[leg.transport.kind] then
-                used=draw(leg.transport,map,used,false,A.Journey and A.Journey.active==plan and i<(A.Journey.legIndex or 1))
-            end
-        end
-    end
     local rows=resolve(B.focus and B.focus.pin or B.hover)
     B.limit=1792
-    for _,row in ipairs(rows) do if not B.focus or B.focus.id==row.id then used=draw(row,map,used,true,false) end end
+    for _,row in ipairs(rows) do if not B.focus or B.focus.id==row.id then used=highlight(row,map,used) end end
 end
 function B.Hover(pin)
     if not A.map or not overview(A.map:GetMapID()) or #resolve(pin)==0 then return false end
@@ -145,7 +138,6 @@ end
 local driver=CreateFrame('Frame',nil,UIParent);driver:SetSize(1,1);driver:EnableMouse(false)
 local elapsed=0
 driver:SetScript('OnUpdate',function(_,dt)
-    local active=A.Journey and A.Journey.active and A.Journey.active.hasTransports
-    elapsed=elapsed+dt;if elapsed<((B.hover or B.focus or active) and .2 or 1) then return end;elapsed=0
-    if B.hover or B.focus or active or A.db and A.db.showTransportLinks and A.map and A.map:IsShown() then B.Update() end
+    elapsed=elapsed+dt;if elapsed<((B.hover or B.focus) and .2 or 1) then return end;elapsed=0
+    if B.hover or B.focus or A.db and A.db.showTransportLinks and A.map and A.map:IsShown() then B.Update() end
 end)

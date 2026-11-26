@@ -19,6 +19,14 @@ local report=R.Build()
 assert(report:find('Native position: north=500 east=600 z=0 instance=1',1,true) and report:find('swimming=false taxi=false vehicle=false',1,true),'report explains native position and land status')
 assert(report:find('Path reuse cache:',1,true) and report:find('Water coverage:',1,true),'source and cache coverage included without raw dumps')
 assert(report:find('Missing crossing',1,true) and report:find('42',1,true) and report:find('flightRoutes=3',1,true))
+local originalClock,now=debugprofilestop,100
+debugprofilestop=function() return now end
+J.Start(function() now=105;coroutine.yield();now=2108;return {} end)
+J.Step();now=2105;J.Step()
+local recent=J.Recent();local timing=recent[#recent]
+assert(timing.elapsedMS==2008 and timing.progress.slices==2 and timing.progress.workMS==8 and timing.progress.peakSliceMS==5)
+assert(R.Build():find('workMS=8',1,true))
+debugprofilestop=originalClock
 assert(not report:find('PrivateName',1,true) and not report:find('Player%-private') and not report:find('9000',1,true),'report excludes names GUID and wallet')
 J.Start(function() coroutine.yield();return {} end);J.Step();J.Cancel()
 report=R.Build();assert(report:find('cancelled',1,true),'cancelled calculations retained')

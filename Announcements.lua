@@ -52,17 +52,22 @@ local function changes(v)
  local data=A.ReleaseNotes;local list={}
  if data and data.version==v and type(data.changes)=='table' then
   for _,line in ipairs(data.changes) do
-   if type(line)=='string' and #list<4 then list[#list+1]=line:sub(1,180):gsub('|','||') end
+   if type(line)=='string' then list[#list+1]=line:gsub('|','||') end
   end
  end
  if #list==0 then return {'Mapperly has been updated. Your settings, notes and saved destinations are kept.'} end
  return list
 end
-local function renderUpdate(f,v)
+local function renderUpdate(f,v,page)
  local U=A.Dialogs;local y=146
+ local notes=changes(v)
+ local pages=math.ceil(#notes/4)
+ page=math.min(pages,math.max(1,page or 1))
+ f.page=page
  f.release:SetText('Version '..v)
  for _,row in ipairs(f.rows) do row:Hide() end
- for i,line in ipairs(changes(v)) do
+ for i=1,math.min(4,#notes-(page-1)*4) do
+  local line=notes[(page-1)*4+i]
   local row=f.rows[i]
   if not row then
    row=U.Card(f,28,y,464,54);f.rows[i]=row
@@ -81,6 +86,21 @@ local function renderUpdate(f,v)
  f.divider:ClearAllPoints();f.divider:SetPoint('TOPLEFT',f,'TOPLEFT',28,-y-6)
  f.hint:ClearAllPoints();f.hint:SetPoint('TOPLEFT',f,'TOPLEFT',28,-y-18)
  f.done:ClearAllPoints();f.done:SetPoint('TOPLEFT',f,'TOPLEFT',380,-y-50)
+ if pages>1 then
+  if not f.previous then
+   f.previous=U.Action(f,'Previous',28,0,96,function() renderUpdate(f,A.version,f.page-1) end)
+   f.pageLabel=U.Label(f,'',136,0,'GameFontHighlightSmall')
+   f.next=U.Action(f,'Next',200,0,76,function() renderUpdate(f,A.version,f.page+1) end)
+  end
+  f.previous:ClearAllPoints();f.previous:SetPoint('TOPLEFT',f,'TOPLEFT',28,-y-50)
+  f.pageLabel:ClearAllPoints();f.pageLabel:SetPoint('LEFT',f.previous,'RIGHT',12,0)
+  f.pageLabel:SetText(('Page %d of %d'):format(page,pages))
+  f.next:ClearAllPoints();f.next:SetPoint('LEFT',f.pageLabel,'RIGHT',12,0)
+  f.previous:SetEnabled(page>1);f.next:SetEnabled(page<pages)
+ end
+ if f.previous then
+  f.previous:SetShown(pages>1);f.next:SetShown(pages>1);f.pageLabel:SetShown(pages>1)
+ end
  f:SetHeight(y+98)
 end
 local function busy()

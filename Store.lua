@@ -14,6 +14,9 @@ local function noteFields(fields)
     return {name=name,description=type(fields.description)=='string' and fields.description:sub(1,1000) or '',group=type(fields.group)=='string' and fields.group:sub(1,40) or '',icon=icon}
 end
 function A.NoteIconName(key) return A.noteIconNames[key] or legacyIcons[key] or 'Note' end
+function A.QuestPaneSelected()
+    return A.db.questPane and not A.drawerKey
+end
 function A.Number(v, lo, hi, fallback)
     if type(v) ~= 'number' or v ~= v then return fallback end
     return math.max(lo, math.min(hi, v))
@@ -65,6 +68,11 @@ function A.InitStore(raw)
     if db.layoutVersion~=2 then db.scale=1;db.position=nil;db.layoutVersion=2 end
     db.scale=A.Number(db.scale,.5,1.1,1)
     db.iconSize=A.Number(db.iconSize,12,36,18)
+    local collapsed = type(db.collapsedServiceSections)=='table' and db.collapsedServiceSections or {}
+    db.collapsedServiceSections = {}
+    for _,section in ipairs({'vendor','repair','trainer','inn','flight','mail'}) do
+        if collapsed[section] == true then db.collapsedServiceSections[section] = true end
+    end
     db.alpha=A.Number(db.alpha,.2,1,1)
     db.movingAlpha=A.Number(db.movingAlpha,.2,1,.65)
     db.filters=type(db.filters)=='table' and db.filters or {}

@@ -2,6 +2,11 @@ local _,A=...
 local S={};A.PlanningStatus=S
 local function actionText(f,text) f.action:SetText(text);f.action:UpdateVisual() end
 local function safe(text) return tostring(text or ''):gsub('|','||') end
+local function setReport(f,report)
+    f.failureReport=report
+    f.copyReport:SetShown(report~=nil);f.reportHint:SetShown(report~=nil)
+    f:SetHeight(report and 216 or 188)
+end
 local function build()
     if S.frame then return S.frame end
     local U=A.Dialogs
@@ -14,6 +19,8 @@ local function build()
     f.elapsed=U.Label(f,'',350,64,'GameFontDisableSmall');f.elapsed:SetWidth(53);f.elapsed:SetJustifyH('RIGHT')
     f.detail=U.Label(f,'',16,88,'GameFontHighlightSmall');f.detail:SetSize(388,52);f.detail:SetWordWrap(true)
     for _,text in ipairs({f.destination,f.phase,f.detail}) do text:SetJustifyH('LEFT') end
+    f.reportHint=U.Label(f,"Help us fix this route. Share the report in Mapperly’s CurseForge comments.",16,140,'GameFontHighlightSmall')
+    f.reportHint:SetSize(388,32);f.reportHint:SetJustifyH('LEFT');f.reportHint:SetWordWrap(true)
     f.action=U.Action(f,'Cancel',306,148,96,function()
         if f.state=='running' then
             local p=A.PlanningJob.Progress()
@@ -21,9 +28,16 @@ local function build()
                 if A.Navigation.CancelPlanning then A.Navigation.CancelPlanning() else A.PlanningJob.Cancel() end
             end
             f.state='cancelled';f.finishedAge=0;f.title:SetText('Calculation cancelled');f.phase:SetText('Previous navigation is unchanged.');f.detail:SetText('')
+            setReport(f,nil)
             actionText(f,'Dismiss')
         else f:Hide() end
     end)
+    f.action:ClearAllPoints();f.action:SetPoint('BOTTOMRIGHT',f,'BOTTOMRIGHT',-18,12)
+    f.copyReport=U.Action(f,'Copy report',0,0,116,function()
+        if f.failureReport then A.RouteReport.Open(f.failureReport) end
+    end)
+    f.copyReport:ClearAllPoints();f.copyReport:SetPoint('RIGHT',f.action,'LEFT',-8,0)
+    setReport(f,nil)
     if A.Theme then A.Theme.ButtonRole(f.action,'primary') end
     f:SetScript('OnUpdate',function(_,elapsed) S.Update(elapsed) end)
     f:Hide();return f
@@ -39,6 +53,7 @@ end
 function S.Begin(candidate,preview)
     local progress=A.PlanningJob.Progress();if not progress then return end
     local f=build();f.jobID=progress.id;f.age=0;f.finishedAge=0;f.notice=nil;f.state='running';f.preview=preview
+    setReport(f,nil)
     f.flightRoutes=nil;f.flightSources=nil;f.flightNote=nil
     f.title:SetText('Planning route');f.destination:SetText(safe(candidate and candidate.name or 'Destination'))
     f.phase:SetText('Preparing route');f.detail:SetText('');f.elapsed:SetText('0s');actionText(f,'Cancel')
@@ -46,6 +61,7 @@ function S.Begin(candidate,preview)
 end
 function S.Ready(id,candidate,plan)
     local f=S.frame;if not id or not f or f.jobID~=id then return end
+    setReport(f,nil)
     f.state='ready';f.finishedAge=0;f.title:SetText('Route ready');f.phase:SetText('Navigation updated')
     local walks,transports=0,0
     for _,leg in ipairs(plan.legs or {}) do if leg.kind=='transport' then transports=transports+1 else walks=walks+1 end end
@@ -56,22 +72,26 @@ end
 function S.Failed(id,candidate,reason)
     local f=S.frame
     if id and (not f or f.jobID~=id) then return end
+    reason=reason or 'No walking route was found.'
+    local report=A.RouteReport.Build(candidate,reason,id)
     local progress=A.PlanningJob.Progress()
     if not id and progress then
         -- An invalid new click must not conceal the calculation still running.
         if f and f:IsShown() and f.state=='running' and f.jobID==progress.id then
-            f.notice='New destination rejected: '..safe(reason);return
+            f.notice='New destination rejected: '..safe(reason);f.detail:SetText(f.notice)
+            setReport(f,report);return
         end
     end
     f=f or build();f.state='failed';f.jobID=id;f.age=f.age or 0;f.title:SetText('Unable to plan route')
     if not id then f.age=0;f.elapsed:SetText('0s') end
     f.destination:SetText(safe(candidate and candidate.name or 'Destination'))
-    local detail=safe(reason or 'No walking route was found.')
+    local detail=safe(reason)
     if id and f.flightRoutes~=nil then detail=detail..'\n'..safe(f.flightNote or string.format('Recorded flight routes considered: %d.',f.flightRoutes)) end
     f.phase:SetText('Previous navigation is unchanged.');f.detail:SetText(detail)
+    setReport(f,report)
     actionText(f,'Dismiss');position(f);f:Show();f:Raise()
 end
-function S.Clear() if S.frame then S.frame:Hide();S.frame.jobID=nil;S.frame.state=nil end end
+function S.Clear() if S.frame then S.frame:Hide();setReport(S.frame,nil);S.frame.jobID=nil;S.frame.state=nil end end
 function S.Update(elapsed)
     local f=S.frame;if not f or not f:IsShown() then return end
     elapsed=type(elapsed)=='number' and math.max(0,elapsed) or 0
@@ -84,6 +104,7 @@ function S.Update(elapsed)
     f.age=f.age+elapsed;f.elapsed:SetText(string.format('%ds',math.floor(f.age+.5)))
     local p=A.PlanningJob.Progress()
     if not p or p.id~=f.jobID then
+        setReport(f,nil)
         f.state='cancelled';f.finishedAge=0;f.title:SetText('Calculation cancelled');f.phase:SetText('Previous navigation is unchanged.');f.detail:SetText('');actionText(f,'Dismiss');return
     end
     f.title:SetText('Planning route'..string.rep('.',math.floor(f.age*2)%3+1))

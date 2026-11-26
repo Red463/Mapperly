@@ -70,7 +70,11 @@ function fakeUI()
  function methods:GetFrameLevel() return self.frameLevel or 1 end
  function methods:SetFrameLevel(value) self.frameLevel=value end
  function methods:GetFrameStrata() return self.frameStrata or self.parent and self.parent:GetFrameStrata() or 'MEDIUM' end
- function methods:SetFrameStrata(value) self.frameStrata=value end
+ local strata={BACKGROUND=true,LOW=true,MEDIUM=true,HIGH=true,DIALOG=true,FULLSCREEN=true,FULLSCREEN_DIALOG=true,TOOLTIP=true}
+ function methods:SetFrameStrata(value)
+  assert(strata[value],"bad argument #1 to 'SetFrameStrata': "..tostring(value))
+  self.frameStrata=value
+ end
  function methods:CreateFontString() return CreateFrame('FontString',nil,self) end
  function methods:CreateTexture() return CreateFrame('Texture',nil,self) end
  function methods:CreateMaskTexture() return CreateFrame('MaskTexture',nil,self) end

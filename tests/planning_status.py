@@ -81,3 +81,44 @@ assert(N.target==target and A.Journey.active==plan)
 N.Stop()
 ''')
 print('PASS: actual Alt-right-click immediately reports progress, completion and unsupported far-route failure')
+lua.execute('''
+local S,R,J=A.PlanningStatus,A.RouteReport,A.PlanningJob
+local attempted={map=1434,x=.42,y=.086,name='Private note title'}
+local player={mapID=1434,x=.1,y=.2}
+A.Journey.PlayerPosition=function() return player end
+S.Failed(nil,attempted,'No crossing from this bank.')
+local status=S.frame
+assert(status.copyReport:IsShown() and status.reportHint:GetText():find('CurseForge',1,true))
+R.Open()
+local window=R.frame
+local focused,selected=false,false
+window.edit.SetFocus=function() focused=true end
+window.edit.HighlightText=function(_,first,last) selected=focused and first==nil and last==nil end
+window:Hide()
+player.x=.9
+status.copyReport:GetScript('OnClick')()
+local snapshot=window.edit:GetText()
+assert(window:IsShown() and window:GetFrameStrata()=='FULLSCREEN_DIALOG' and selected)
+assert(snapshot:find('Reported error: No crossing from this bank.',1,true))
+assert(snapshot:find('Requested destination: map=1434 x=0.42 y=0.086',1,true))
+assert(snapshot:find('Actual position: map=1434 x=0.1 y=0.2',1,true))
+assert(not snapshot:find('Private note title',1,true) and not window.refresh:IsShown())
+assert(window.copyHint:GetText():find('Ctrl+C',1,true))
+IsMacClient=function() return true end
+status.copyReport:GetScript('OnClick')()
+assert(window.copyHint:GetText():find('Cmd+C',1,true))
+J.Start(function() coroutine.yield() end)
+local id=S.Begin(attempted)
+assert(not status.copyReport:IsShown() and not status.reportHint:IsShown())
+S.Failed(nil,attempted,'Second click rejected')
+assert(status.state=='running' and status.jobID==id and status.copyReport:IsShown())
+assert(status.action:GetText()=='Cancel' and window.edit:GetText()==snapshot)
+status.copyReport:GetScript('OnClick')()
+assert(window.edit:GetText():find('Reported error: Second click rejected',1,true))
+assert(J.IsRunning())
+status.action:GetScript('OnClick')()
+assert(not J.IsRunning() and not status.copyReport:IsShown())
+R.Open()
+assert(window.refresh:IsShown() and not window.edit:GetText():find('Reported error:',1,true))
+''')
+print('PASS: failure action selects the frozen route report on Windows and Mac and preserves concurrent planning')

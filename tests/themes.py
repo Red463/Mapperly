@@ -123,7 +123,12 @@ assert(not footer.mapperlyBrownBase:IsShown() and not rail.mapperlyBrownBase:IsS
 assert(zone.fontPath=='OriginalFont.ttf' and zone.fontSize==12 and zone.fontFlags=='','Original must restore the heading font')
 A.mapThemeTrim=previousTrim
 UIParent:SetSize(800,600);A.ShowSettings()
-assert(settings:GetHeight()*settings.scale<=560.01)
-assert(A.themeChoices.original.point[4]+A.themeChoices.original:GetWidth()<=592)
+assert(settings:GetWidth()==333 and settings:GetHeight()==320 and settings.scale==1,'standalone settings must use the compact drawer layout at normal scale')
+for _,button in pairs(A.themeChoices) do
+ assert(button.point[4]+button:GetWidth()<=button:GetParent():GetWidth(),'theme choices must fit their card')
+end
+for _,tab in pairs(A.settingsTabs) do
+ assert(tab.point[4]+tab:GetWidth()<=settings:GetWidth(),'all settings tabs must fit the panel')
+end
 ''')
 print('PASS: persisted themes, live selector, native chrome/actions, Original restoration and editor state')

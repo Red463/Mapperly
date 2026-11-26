@@ -1,0 +1,1097 @@
+{
+  "build": 70959,
+  "reason": "No owned dry playable ground approach found within the bounded 450-yard / 6000-cell audit, including swimming fallback. This is insufficient evidence for a useful walking shortcut, not proof the location is impassable in game.",
+  "liveStatus": "not-tested",
+  "sourceHashes": {
+    "775971": "160452dec4c2b0ae4cbe7468ce52fee91ac7ec521d2cb0f28e955def0d087137",
+    "777152": "d766e6a76d4633b02e5820e8241d019241d552d7be515893b83bcd0e822d1199",
+    "777337": "9fc7e729b4a3f28f8ece8b6cbfa919468693cd87fb3cf8340975c05eecd88f2e",
+    "777347": "2370e6821554776fc02446451e16016af7fa93a5ce75354121eba56e628258e1",
+    "777352": "84e71bffdac99d6c0fa76a1727629235d5a7879bca07daf723693759949de41b",
+    "777452": "45853f78b59196cb2fe19789706096b73df29cf749015a14a0e0738f7a1d823c",
+    "777457": "bf826d130722a858f640195fdca11423fd775fd4a8f212fdd1184197b80f418a",
+    "777522": "c40e3ed33f125b1591e549b07440b7ce277334409d15d1b6f537c506cbbfeef4",
+    "777527": "25f9f1594d20b5a8295e235373e8df2c317e83cb9502a59a77dee18c37b33b33",
+    "777532": "0a187554aec270bc5a43be8482ea3a0eac29609cec98d4ca101587ebe17a361a",
+    "777542": "ae607d6c83e7d6821fedd5fecb8fcf2c24e27c059b4189640bce996b703866d5",
+    "777547": "cbf571eef175bdc2240aff09a584482b2d23eb7b2d549928ce79afe04ad42c68",
+    "777552": "304ed78f05311a3896c59fe570e0d89c2b3e030e9e7534d590f3faf5fda3567d",
+    "777627": "868ca7f5c96d97969ba45642dac089d504eec4121ed9b0080d7f9a23dbc4570e",
+    "777632": "072a9a850437dc1d265eacefbc084de0b6e46f1295046a0e68e50cec197f2abb",
+    "777637": "d8903b75712fa209bdbf4477b7c96d0f89c543bb881e7dce9d10e57b239d4802",
+    "777647": "522895c30f3030ae01eb8b800284f51c8abece36833b5bfd839fd8f99e264b40",
+    "777652": "d75161ba9d2dc46395ec81133f121baa3ffffb8819ad6e9a7456546fd2eea544",
+    "777672": "b7c277c8e59619e30e9e01af6f90276c3b52cf6fca397c69961310103baeb2ca",
+    "777727": "0e7b493ca5e509d61c454793c22bd83241f01862a06ccc3400b4f026d310aca0",
+    "777732": "bdb2d85f5f60552dc58f34655b4644e156bdd3cc50365e6a384bb7e23c08402e",
+    "777742": "3c7ff1f49a99c05d37b2dc653d38c16a3f71d023d52a7e53cf622c24aee4fb31",
+    "777747": "d59ebbb3b4a374bb4791cdc166656460a5421d164ee6218002477a504e2c6216",
+    "777752": "3e81f4348e4f3753f4ba78e5f1e44d7bdcbc32896082c8b79b92817878c6f361",
+    "777827": "a1b5aff94cdd8c4be82baf9b9a88d036ad0801f8daaa670a1d425df30668a566",
+    "777832": "245624f7f30ad9f9bda676149731dacf8584280a8130ffd6718469978d2f1a89",
+    "777837": "3eef737d6eeb7d539b8268cb02fd1239dae2298b16fac2e3dc7220ccd1b246a0",
+    "777847": "40ae2e976e2388f2df885b5af79ee98d7e71d6f636069243ff83170c0ece6922",
+    "777852": "37f4261218b6e66aa198539f4e16d725734ace79b7cc84b6b237144937ec3eff",
+    "777872": "626592102e53baacbd84956684bf4f20bc2de59ed87ba9226ea12453a8232fe2",
+    "777932": "41a85d6ec85d109b62e54c854c49d901df94583902ebf6cd4bec5b7f8318be8a",
+    "777992": "7d715051d91dcfa9ff6f4b1706a6387a3e6867648e93d74833713fa48281b7af",
+    "777997": "dddd2c48191b3cc4db68647063c9e484640651a2facb74910c581d300ed8b1d9",
+    "778027": "9372a05dd77ca2a4c3ceb7f448ec605a5023295515290ed6423361d54314d67f",
+    "778032": "0124621b021e9461250fac793a0f3049b56077bf6c9ace2d46c81726880abc58",
+    "778047": "310c38bdc7f5fedaf22a5c00fed376a45c13a5f96f0618e09234bdb0e30b4f37",
+    "778052": "d682069e6153f3460e459e07f1f1f70e07eaf4778c5b8cfe0de0c76612638dc5",
+    "778127": "51b0ffa795ddd19de16fda0d1d9d5c30c15ffef3bd9bf4d6cf5516d08dd847c1",
+    "778132": "050f84d6a74513b63955584009be4f22331312661caf55ddbd0710fd3484ddea",
+    "778142": "e38d71de08e68e84b85cd1eb799947fa223296cfe6ae66762b3c02d903fb5b0d",
+    "778147": "79e97945f86f65200bd1ce0d60b2356bd33064192dfb4cd2bb506c1c265f6f03",
+    "778152": "d72c37575ef4fa08d357849068817205e236c1ef914b68958edf87d94e030fb0",
+    "778177": "23811b273542b77cb5eb0e2da398b52b2698105dd17a2268e163135911c18acd",
+    "778182": "baa5b6b0be91d97ab9045bcb81303cd579a7d3b5d1ae2555a55b9d591a85f362",
+    "778192": "8ba851d7d98a8d22b57a6ccd94edf85f101857f4d42de6f8b04552e159ce628e",
+    "778217": "ecef40ea9f1990e0e13c38b0ba070b636ef56acfb0361453f07d97420d219b42",
+    "778232": "6c310011b2132c86a8ed8ed7882508375bd4b295b384a202f9e5326d22340b34",
+    "778237": "4b8d5277eea2591a3483b9c0a3741173291be50cff696a17911bb729716fbc94",
+    "778332": "26292ca4f949b2756520e7307368cd64f36f7a92137a4911697ec98369471095",
+    "778337": "949974ee7ee236158babee4548d8ec908ee70c74337d8fc2ebd0975f081d996d",
+    "778342": "98239bf31319971fd32e94a631a535a1681aa7f0afd43b5a5c4680a84a20de03",
+    "778352": "6ebedc2ac5e53157d54f8dca31b056b4eb18e0f30b0a04065fa14ab382edc1f9",
+    "778382": "8eb3ddf83e22da3031ad0c07659ee1f325e2d95ddf543198e917cb30f93d12c7",
+    "778387": "fdb0a0a2c48b72b4f0739126bee41c892789445da370ee77bf9591a8df6835cc",
+    "778412": "eee894fd90e6756216691e100eaac0370ab86120d3d6b421dd4e88d0814b2cae",
+    "778417": "98e6d72bb72be532c7af09aef5a248ad14bd44c8a47a242cd8752f90a6e4fec5",
+    "778432": "7e2d97eac2fd14200060c69573013b4ed8756d0d3fa692bbdf0c7a7ad4c8a008",
+    "778437": "adfe9252dc0e6338ed0f3ba7ba7871ca65efe1642fb44a7fe0be752c65133bfd",
+    "778442": "0ee591a0d7d654cec57036aca35ccb5dffa5e903c2270518ce473161fc3e8580",
+    "778447": "fa08abd938734063619f3d6cf5b261341357cbab101141b8cb6b8b315074cc0a",
+    "778452": "2f4dc09cf2af7b1492ae97461f343b761f05130ba81d75ba69bb56405dca7c3d",
+    "778542": "52a435f86e254578b081e69cecf3bf2b69320d2039181f9ecfff9a412aa553cf",
+    "778547": "1cd28df1ef86c9506ec2f1db4d0e69432138635205cd28982ef5e5ce0eca6e35",
+    "778552": "08344c9ec0cea6a4d66d52da1ce1cee11c03e7545a32d5769ef3aebc7742d628",
+    "778557": "81ca9d41c5def2472798245c35deece238ec58de788c903821746065fec6256a",
+    "778562": "67d45c52921fe621351c0ceb9b676129501e7c9c198b0badbbae93c2463f67d7",
+    "778592": "4b94f9c1b95995f048bb92eff02026008d85b5811a2430126c971ef2e6b40dca",
+    "778602": "b3d94376080413e356cd6aece2c31dafd80affeed5509f0ff25bc9fafc1f5c14",
+    "778607": "c81f16723f3a3600471369e632cb19c6588a42dc0463d86c38af6b18b45f04c1",
+    "778612": "bfdbf7a8b9d984645a9170a1b18679fb414d84e900ec8423d3356fdb86b895c0",
+    "778617": "a39d15bbb4af8772c4d9aefc454b6d1c7846a4b6b8cddf822db29151fddf3bb7",
+    "778622": "5ba4882d015f7a5d93a155fb7ba8d831cb9fec7c6ba391f77b87fb7902db700d",
+    "778627": "1da565075b355a9691678b57bf22c98b0e54c9ad1c3ed21bebc1b9a30e89dc9b",
+    "778642": "4f7e3c877959bf2e63b07c5261012880377ab29135c316804d5d8a9306095219",
+    "778647": "7dce7af008f9ef31cace4f60deb5e1486b209fde2687a403628b50103ec74cbe",
+    "778652": "bc6d7679990e6fbb6f7fe4a7bbc5bd19052de50f2903d11782958e36689c005c",
+    "778657": "ec369edf4ea3b8bb61c90c41f7f392ff2757dde99dbeb54b12daf701ea069c99",
+    "778662": "b2d56bc5f2c6b627e9662aa8ac3c4bffe98e516128319bd80dd26759e8ef2693",
+    "778732": "6663273c7bcd319dc1871114c550bf70c92643dbe9930712ca2b6c3bf06ed90e",
+    "778737": "3e9608ad78e1efdef8000e5505f45d3ec3dbe8b23611a5aeeeae43aecbf781aa",
+    "778742": "df77cf78b3d127bf28f7e65affdb568766d85b772afc3ea4e1d80e0c4330a582",
+    "778767": "43e7e2898cbdea4b431ece82ead7ed480c0ace98be5bf211132e9aedf99d4a19",
+    "778772": "3a0869c5794e2f34186a34ac89b92c58f20faec4bfa8b6fc2738fb0df304776d",
+    "778777": "dfddefe316fd9b2a84612e9cb1bc8f9dbb633f451c54a91b9e142249c2877ad8",
+    "778782": "d8446fd07cbdc365aa11fc07885e1b826a30e46d16247d5aa4dcfb1368636ebf",
+    "778792": "52f2e34ac0546aa78b2bea93b1210ad545759783b8c01045fc7d8ab02a4fad77",
+    "778797": "efccbd18a511a96e6267a9b850ede69a38caa04ce93ac887b8432902a717a8be",
+    "778802": "dee6819fced88031bd791a8a0b0e559ca8a02ef5b1f57c3c69e809604c332a4c",
+    "778807": "a0b50d0cb167f1a39c078a0435edafdf61f2313e402cb9415f55476b2d07b2fe",
+    "778812": "b1d873a322c0b817693d087aeec92b7344645490952c32f471a40ce756ccd741",
+    "778817": "aad5ccaacd01b623e8dc960d9067c8b4efd31e019877487bdc2bc239659fbc25",
+    "778822": "ca3e25f90d0b471216067841d01eb4a17ff04ef8fa70b5b49ff422850e24bf67",
+    "778827": "e703ed59af67f9e37144599e65a5ea93e571f8811a93acb4e992d109e6e3dfba",
+    "778832": "f11e37010e83672dec96ded94006f4ea3b127a2129739ce9a96abc219ca93b80",
+    "778842": "3e4a88bfacde9e7b2fe473302423a4078a4da5ead1d56ce3300dc5528f20b1ed",
+    "778847": "c4c8a5cd42aa7ae714707110ec238183d771eaac933d8e51a14fe161fe96ba00",
+    "778852": "9d9847c05bbd31ec9784ada6818570647bb0488628c2dca19167788739830a61",
+    "778962": "f89dfba82ae4ed010b7412eb002b6eb32c14e4945f031457204863e83165d906",
+    "778992": "4db2c1166883e50b20bcedd2e3dac74b084fdd258135fef5a6de4c757613efca",
+    "778997": "df610207b06e417ee8cea3dcba0895c8abf9b364739ee2a3f78d8cf60c0b5b19",
+    "779012": "de133b5d985e5de221bae333c4a4d91d7a417fb253148ad63b26e324dfcb75f1",
+    "779017": "0da969fd3166104d356abc69d41d0829d553797745bbf6d77051fd1c4e9bd08d",
+    "779022": "b87a927373a260e4d53fa2271f08dbb294fe8038d78d168c653deee765522469",
+    "779032": "97addb9e89d07f7a20f257cb81ce1a2bdb58ec4e3192829741ebe0f2ce8aa35a",
+    "779037": "6c0de0b696a0783b134c4a324604bb391dc3fef15c9b3227812c87d7ac1d60c4",
+    "779042": "a61e15698d317fa896eeb9bc449ecde635743c51a97cfd6d4b88dd4a666b9b10",
+    "779177": "b00a491a70d3126c68923ad333528689e17d7a3a60a8f65a427f0b929f6ab2ab",
+    "779182": "f5b936c81b6b1921724159231ba4066317163bc485a7aa48cb2be871bd7c316f",
+    "779192": "2150b5042439b99a3b964a6123f7c2449e2150a546a222d558faf778366d1eb4",
+    "779197": "11f57cc0cd1244d99844ac7a3b7bf35b92a6e2f08258539dae0741117ccfdeb6",
+    "779207": "5d050f3eb20d4851df6a0557dbc8eff789281e813a9d5115697bd9a0a98b9def",
+    "779212": "f0e990d782bae866f974273a6e5642f4200e6dc351f3f54692e99b9ac56df291",
+    "779372": "415a8052e2588600d32504ee889a2a798ec575dd045bae0ad4cd332072e5d362",
+    "779382": "f839358bfc7a13888316cf63e0285cb2f7cceff5997f4738c536aef0d38ed5c7",
+    "779387": "47c05be5c21753222f62c830eb2911e181c350fae21c6dd8bd69499531792fa0",
+    "779397": "c24f392927443319ec87d70fc246a8e28815c83ad4d37910b3dd6dcba11cbd7e",
+    "779557": "2ae7f774bd88c7e259225d9ac038d5ed6e2193599aad503e3e6cabb0623aa862",
+    "779737": "1660ac52b8e545af7fd24130c7cafea487e3b82585b4a03b835c391eff02a25c",
+    "779742": "ceb7063ca125ab6591c82c2ecebd43e5e0fe238020cefe58e6635ac2fde2ac03",
+    "779897": "3809dfd910180fa4a1e5a53e9ce082029ef704952ddd746cea9d482a8b53a87c",
+    "779902": "36c7be07ead61baa04dfbd83544adc6eb711f7c6fdf9d03a5a1103a4eae94682",
+    "782779": "1120509b2ac42a94310bf05f915b5e67ed233be854089a3545829e064b614b44",
+    "783470": "979fb5282694bd3b85b855f7cd841e760c8f7825c4bd3660a0378b18e5089b6e",
+    "783475": "78d63ceffb3f3d8a5d8d30c0f373027ebe902c79226ab40469734fe550886803",
+    "783705": "040733e6b62f1aba8200f07d523025adf7ca7c451c7a40d5c7cb9e0b5cab5512",
+    "783725": "9a2721e0dc92e2290f4708161fac1448f1ec70fc945b21ae37a8ded5bfbc62d6",
+    "783820": "80d9da05875f98f129cc2a001b7d4f0b266212749541813113b6fca20adf9293",
+    "783825": "80150ba629f33fee564c39ece5e672c107b5873a099a8852dda863e0c08abb5a",
+    "783915": "0e475f158b6e90f7bbebbf60df7a227a8e8e451f96d0c8269cd9eccf8b418580",
+    "783940": "1931fa16966ce45e4a39a6f2fcfc9c37c63fa75d242182b2d9c3b467d677b6b4",
+    "783945": "787e986f9c0540832b453e026bd2103c1e9f7bf629581ec323bfbc9eafbdf992",
+    "783960": "d3b82fdf936061fc9d86fac2cb6ae56a484497cd5f367c176371e9052864a819",
+    "784055": "c1f50281cee5ad970a0169ea5c38bba33a57a9898c34821d202171088a34d614",
+    "784060": "c182217106987601ddf81a71558747fa7a937a4987b8574cb5ac722552d1bbe2",
+    "784170": "d1ab92451be483878b07e902d3d149752c085087858949bfb6750ba52afdfa01",
+    "784175": "137dd7f5d9efea1b04490b92764f8dd6292b2b92814f029a3f67e973fccbc70f",
+    "784180": "eec1bab8cc837005f9768d5064782b3b097c80aa65f1ee08e86fd04798eb4180",
+    "784195": "b833db94d0faffc43e353e1ff842133f600915be7567105d2a58d0b8400e8f18",
+    "784340": "b1230e1aff0146f3d796e46ef36e316411c39dc47dc151fa4358df2122c11670",
+    "784345": "cd4af7acfc220cb4491f3a6110e5474d388705119db2972bde59c934fec1c4b4",
+    "784365": "0aa8d41a58843ab86e7abb135292528aa618460dca4c6a3a952ca1b83423058b",
+    "784405": "bc4c63a70c1debd81ac9b259d7924c8dd8e6762d9b4c9f2a9a56a8f8c365b5b8",
+    "784410": "5b2a396f60bcbc726e2e83d7cd285a979b7b19270fe6694c09572de5beb03d89",
+    "784425": "6cded3f7408989d7cc4d8ef2e4c17e2377ad1f1be6fe1c7756485f84af058f3b",
+    "784430": "00fbc6dbfa23fb4138afb26bf18b9378c3e126ac35788855d19c73450f73ff52",
+    "784435": "70c6117d28d3471339972bcc688f2aa5116a7340a938b63b0fe41d5837d45d81",
+    "784445": "069619270a2fc71d4238fe3c34c0bd6ef0925e462a189c2190680a25a2428853",
+    "784575": "fa8807da2c53f0a2e1ce571d55d37d0141f30ff1df72d2f356e7256ba8d78cef",
+    "784580": "6b09b9ae8926b6f0dc577918447e0bbdb80197691b29492f1a10c2a7224d5851",
+    "784590": "fe5cfeb12fdd398b6941ca5c56284fcaa556c00185d4d6cf381bf9bea422845e",
+    "784595": "1602a15ffb86047d32e78d5d6f1f98c00a236c16a10ee6b165fd80f977f8dca4",
+    "784600": "7f58b6570b75f66a1726f9c66bbd93d7fc8dcc564270cd3b7fbc33ec53b61a08",
+    "784640": "45578d1037fd696b1977496f6805a1a1c996abd78a0f6c6be6975cbe66df1a1b",
+    "784645": "2c8cd9c486d8f0c07a252661d37179875493cee93327b924aaa0ff17a26616e9",
+    "784650": "6e8ea2cf3c5f5eae8c0719c1b85211d8d2cd447dfac79fd2c30a3775fdbe894a",
+    "784655": "8e56084305d89cf4ee0227d4b064b776ecd5430cb1a7f4856416709adb65450e",
+    "784660": "24dc52c9a7d1de08e210b8978e2d7e7533a0453f183665be8be10e3a27ac03ce",
+    "784665": "313ed41b7d988eb2742a1d82ca239bb11e589dc5d0033deb3882501894130676",
+    "784670": "9d1a80449d62443a3935b7a29a42e1f0c7f6f5416c186ddeb4f01112c4ac248b",
+    "784675": "cd96363c63fcb385afcbb276b26cce04c271dba02dbf24fc6819e2330335960c",
+    "784680": "2d47bd1e09ebea0356e9d8d55ff4d0a1361c494b71409c23ca377d8e018eb606",
+    "784825": "f7d0249f7b520878708e9d79c6cbe5af5da355891ceb74384cf1559f8a0919fa",
+    "784845": "e1181130222651275e6c56abbc7df4e116b8e5a8f4d71d092b9964f7f8c7bc08",
+    "784850": "44361abd335730c96ebba7d4f78faf059cc6b02923da534b4fb0dcbbb2a86c09",
+    "784855": "b9ac9c232fc1ebb4bc12063c32f126eee71e3bdb477e1ef34f4191b62791c80b",
+    "784860": "1b36cec8417a3d1a812b6e192ec18c32d8c0a92768fea02fd81fef6483b3250c",
+    "784885": "011606ea5b0c7c1b1052f84836e5923057c080bd2eff68655b378e54e194ef2e",
+    "784930": "fd3b63c822223f66d26e32318bfc23af96b04188b988e9b1cc5ca2e385cae185",
+    "785055": "9616a5edf0fa6df49e86a8767c5791cc6d0437a937189788a98602089e89035f",
+    "785060": "a8d9b802a3a5a0c22bfc1a4aa1978439318675dc7a7a95621ea4fb882047cd06",
+    "785065": "9c4752755c6badb699080a56d1bcc62cbd60cfa71bc545b306f11b97b95e01f0",
+    "785070": "318b14c52aebcb59d1ca72095e009e44ffc2c78e0b4ea4699fa27e3ef84dc777",
+    "785090": "8115c383e048ed51fb7623bc43d8e7114b7ecbebcc8cfb3f78f7dd3c554e8857",
+    "785095": "bd6a2855db3191c6611a0cbf3f9d347ac0ffaa92486bf7859c7eb916b21bd506",
+    "785105": "177f80089bc4c0d02087d69c002fa3354336eac40165222a7f3c552b6f4b85f1",
+    "785110": "502e3e3e22d4d2fa0b3f8750189e203f5f91fa4ee704cf51836ce60c4409f735",
+    "785145": "d4e25631f23baf237dee5eb4e152dc9c36044b212bbc1fd763572966794baeb5",
+    "785150": "c5d8bbf3c2d3417f30d3b18fd34f1a092aeb73d63743132ab85a2294ae87b4a3",
+    "785165": "cdcf29ef0de26a9f897cfd459b9d609ff8ebafc4869234f30c9907ab7a66b2ad",
+    "785300": "45ba7d9b4bb69cb353bacca14c6b6f9bdf0bc611ae2d7908e3aebee5e2700723",
+    "785330": "32a32c844ebcd45f7284dcf719693a5cb5cb876676cb352bd99c139cf0ed6948",
+    "785355": "339f31507d0f4d48437176eafb444523021ad10c75906d1ccaafed89e01c0f9e",
+    "785395": "5b8d5e6806239f803f14ebf6c527311068ae95b0ebff05f611beeb0b13915158",
+    "785400": "5992865e423b3f1b15f182e7876df0ee4b17136573f46e029346ffebab9c4581",
+    "785485": "63181c8247e545e5f45980ee6cd338ca5eff61fa9f8251a15b2c0f7f74b005e0",
+    "785490": "a2e7f0b12fc957700257a29f4d29a5fe94fa2df7324a62a1b7cc67e4cd00ce01",
+    "785530": "aedae528636f904a584d94afd7c1e71e9c1f7fc84551f1646eaab185161224ba",
+    "785535": "145c16f103aac967a1d1ad28edaf5288dcf2eee2325fa384e30f4dada266cae5",
+    "785540": "5d6eef4baa85f0c2e5f4ef5e96ac695a1e06a179d8947681d269ded9790cf629",
+    "785630": "b9f6ede2787bf6f7c6a10f3b5096dc08cc8bb21d7811fde4e0e4718bd9807faf",
+    "785695": "fccdd1a0d2fe80ad9a8531fcc5a7d92965522c3af5d60cbcd36b0a02c04e4ad0",
+    "785700": "f411cabebe33d41da5bb1caecbc8349ee160ba6a6ced56cb281d18732134286e",
+    "785705": "1dcdfbd574e67021a0dd75048545bb72d8e132e17540b945b0ee71ab5f8aba04",
+    "785710": "c2ca8e1522f3497f664a7167527bf9dc5e7369015428b734ee0d2aa60777ede5",
+    "785720": "983c6dace092bd0d6ee8e609fb9a3f194562ff1a4cc9339a3b65a83365a3988e",
+    "785725": "ca615792650c0c7396491a9cf9c57bf99028c635a4a95d960a0864c851337aaf",
+    "785760": "7d941528957d63f43cbfb121b0ac1f4b1868debe41d4dae1865adc3d22693874",
+    "785785": "347b5c9cfd053dbd17796018c85901befed2d13a782409e5fdf19bf3776d50ee",
+    "785790": "855ae54a5613f11cade910f9881fb062de1760e1973f05f3e895d7fedbb44af3",
+    "785805": "445b034bdda091e9ea628db5d67745a311eed2e079f25b305dc1999f8a5bf9b4",
+    "785810": "110a1ee50d537c423b1fe6546db105628229a13fc7d019d934fff07f639e757c",
+    "785840": "c024f500d096466a8ac72f0a4cde459c4a0a2d344ee07eb540e0eb577a9da089",
+    "785850": "60ef383e13b04007cda6df74bdba35c040dd76169f31c612592559137942c3a2",
+    "785920": "71c341970bb68b73fb1e4a362d3430ae52798f7b0a6d8d064a5a00a9e8a7c939",
+    "785950": "fea14367e51e883a04c776baf6f88f8efcd5c2420a7c55aa0d5b21672f0a9bb0",
+    "785970": "3211068cc84e847c03496eb4b0dc52e5559428d61597615ce5a141900ef86465",
+    "785975": "ee59338399f376c866383563943e7953cf86b34c03c7cee0cfa130293351986a",
+    "785980": "a656cd4bcd22bb77d048718c7c4ff831e20ecc8afa140c29e43e9fde2a58b8a9",
+    "786020": "7b34f59017b15aa68124c3a6bd34d8c43b41e858bfd1906b4ec9913d18c0b353",
+    "786025": "787d7118676871937060ba27b130bde122a01108c288c526669cbb066015910d",
+    "786030": "4d26fe5dc09a80e233290b00e22e9364b1168c86174d20c627e1c668668aa477",
+    "786035": "381815ed957791f6da2da5ffdd10f11fc7fe09cf28a93a159f701c11af856ec4",
+    "786040": "1048e656db1325c5fc8ee20aee65d683cd0c753bc6eacb83d3dafa4583e9328d",
+    "786045": "953ca213ed7addff0722e425330a784bfaa9191432213478053f5ddfa0dc3e40",
+    "786160": "81279537b0ecef38da3be315fa7c84f2df057286d7f61a943675dc5af6ff0fa5",
+    "786165": "f33244f9c17b755bfceef609afe679306b432cd88ea1128d4e6cf9606188a15e",
+    "786185": "c0aeb8ce20c466746bf65ffdfbd651b0e18e021c6ca80072090e9c7c8a0b4b76",
+    "786190": "0e3c53ff26b01c4a8c1abb8cb114262f7be360b9d8573651ece60bfcf7291ba9",
+    "786195": "3494bf79b04807b4596f9f9ebf0cb1e683a586800bc4d20a2e414e95a55108cc",
+    "786200": "15a0bb1e8066734ca1257440e5585df3e50b45150e6f711f53e3626c46622ccd",
+    "786205": "a2950f8ec9e8f5c47f44fa24497f10182ce343587376a51fe6d832a17347c9e5",
+    "786210": "30d9d7a71a69aef6857c51ff056b82cc7112bd2ec14007658d33ba7f8b652a39",
+    "786240": "6375ea456c65f93809839ac7e3467124036914af3a6edb99c826622b424c507d",
+    "786260": "b445e5ea0d41e608478535fbbd09e75ec02bb7e8957a8a4564e44848d8d4fa67",
+    "786265": "08f983acf291f1cad60ac791eb732c53f9a41282b11cf216edfd1d4c1aa6e8b2",
+    "786275": "38a0edebd35f51b7872a29b2358f64c97573639ad9b4a2c63a36ee6bee986f88",
+    "786280": "2241d1a972d75f29f8a4d4dbbd125ef2bd4d2198af7ee4364eb0a2d8591b1d97",
+    "786380": "41df0ba2134406931e9f140eb3157343a006b48ce420b5e23f5dfb072f2a7c6a",
+    "786385": "eafb619cb75bb08ef738c546de481362d97acb74dc7dbe374115560ab31eb8e1",
+    "786395": "bf3aa214f2243992cd2104b602ec12d48f475963149e10c85fa2b0311bedc341",
+    "786400": "d47fd448a7fa6a464d70a6d5dda1eaa654e4c50f0dd79920f53ef79b5b2c8b44",
+    "786405": "95753aa49e54234555e378bfdb035459f1bf43fb30d18fd8174d1cacf448b64d",
+    "786410": "318c8e4caa435cb9a97642c572cb09036587db09206d7f4f00fc2850c71cf9d3",
+    "786420": "cd2654c72788534a61e2c2a5ee69039b496ed62723a5f6604ac38d8a91dee6f8",
+    "786425": "b5dd5affb7f639fa58150ce455fb14f44440f8455dcdac9722bbd063266e4d6d",
+    "786430": "c2fe00ee36185d860cc0d002e605928ed65208ab94e0b23bec59b730acf7fe03",
+    "786460": "ff0fc07078089aa47b27b9132cf63163f7e4d020dc4898378179d3d936324202",
+    "786470": "08c8856b59613aedf5591097215d3bb59f3f5bad8b18bcf73ee738cb9407756d",
+    "786495": "b2c262c5291e3ae97dbc605107c42de94fa0c9251c19bb2e9195f65bc81f9c91",
+    "786500": "e08ee873762a8dac6be753bd4124b03a4dd766c85ebdce735f0787f6400556bf",
+    "786600": "fb66a1bf96fd5f1835ba4306ebbaf5e261ac7ba0d6ba0925da9013cfe06435f5",
+    "786605": "4fe9eadc3791127230d42061b30b3cf0e75617bdc259a9947d2a59c94e9e78dc",
+    "786640": "dbdb9a185163787d34acd4bbb09b7f7eed75c6db1228a5edaedd2da8d2e69663",
+    "786685": "7fa6886b44a67884f5fb494bbb1d1a5c2585f3858bb05b76ac78c04e61d41cfc",
+    "786690": "2f850385a19032fa47f74badfcbb4ca5a199b2b99efb78a3ffae199bd06eb66b",
+    "786695": "04b07a33834520c925e1feea734465072c27f22e7d00c5c8d5a1fb0d89a9cf75",
+    "786705": "ce26b21256b08416863cb718086319dfa26271f76874d2dde3ce0c8b62a017d5",
+    "786710": "9786fdc4341dcc7adda93c44efb7b12d0ea728b7bde670bed454f6cff1071baa",
+    "790112": "e4ee7f629954da6ea89d2b78e2d2f28fb973991570b1935c6122f8d0b492985a",
+    "790208": "437bc7c9920ffd5f9e0cdeda63214fc1695ab82f515167a177e103df8a4b0967",
+    "790377": "21543ccd8fb674d8f7cd791a41cc59d618e662321503bbc81c300c76de526b28",
+    "790403": "1b79519c77f3d9e1c31882ff7a3af7930cdb2c2a1ef00f7ea7d7ec464d86a126",
+    "790409": "b8dc6b23ef1b12f871f36117252bf6048133e573d337b6b79b97543ead131959",
+    "790425": "4f04cabd5d08f79b8fb3cc82f196d5868db8ef220f5bf527a16e033e241c535e",
+    "790430": "ec155a85954edfdeab1702ef6ccd4f9ed922ad8b2b3e1cdc8af8648de6894ab6",
+    "778597": "6ee77abfc770bf27f03888dd2f1aaf201c1298e25f971dad622b31b5741293e3"
+  },
+  "handoffs": [
+    {
+      "a": 1426,
+      "b": 1437,
+      "worldA": [
+        -1402.0833333333323,
+        -4168.749999999999
+      ],
+      "worldB": [
+        -1402.0833333333321,
+        -4164.583333333332
+      ],
+      "status": "withheld-unproven-approach",
+      "previousID": 28,
+      "approachEvidence": [
+        {
+          "side": "a",
+          "mapID": 1426,
+          "status": "unresolved-approach",
+          "failures": {
+            "different or unknown native owner": 4469,
+            "restricted or wet ground": 349,
+            "dry-only: blocked endpoint": 4,
+            "swimming-fallback: blocked endpoint": 4,
+            "dry-only: too long": 1,
+            "swimming-fallback: too long": 1
+          }
+        },
+        {
+          "side": "b",
+          "mapID": 1437,
+          "status": "verified-ground-approach",
+          "point": {
+            "mapID": 1437,
+            "x": 0.24483627812726397,
+            "y": 0.6772487377173086
+          },
+          "world": [
+            -4014.583333333332,
+            -1402.0833333333321,
+            154.1397705078121
+          ],
+          "policy": "dry-only",
+          "radius": 150.0,
+          "area": 11,
+          "distance": 150.09751215653847
+        }
+      ]
+    },
+    {
+      "a": 1433,
+      "b": 2548,
+      "worldA": [
+        -3531.2499999999986,
+        -9014.583333333336
+      ],
+      "worldB": [
+        -3568.7499999999986,
+        -9014.583333333336
+      ],
+      "status": "withheld-unproven-approach",
+      "previousID": 40,
+      "approachEvidence": [
+        {
+          "side": "a",
+          "mapID": 1433,
+          "status": "verified-ground-approach",
+          "point": {
+            "mapID": 1433,
+            "x": 0.7883689264694149,
+            "y": 0.2639523414884369
+          },
+          "world": [
+            -8957.180818478571,
+            -3392.668070123306,
+            224.31429013755042
+          ],
+          "policy": "dry-only",
+          "radius": 150.0,
+          "area": 44,
+          "distance": 150.00000000000014
+        },
+        {
+          "side": "b",
+          "mapID": 2548,
+          "status": "unresolved-approach",
+          "failures": {
+            "dry-only: blocked endpoint": 1,
+            "swimming-fallback: blocked endpoint": 1,
+            "restricted or wet ground": 30,
+            "different or unknown native owner": 2668,
+            "dry-only: too long": 5,
+            "swimming-fallback: too long": 5
+          }
+        }
+      ]
+    },
+    {
+      "a": 1411,
+      "b": 1440,
+      "worldA": [
+        -3435.416666666667,
+        1477.083333333334
+      ],
+      "worldB": [
+        -3431.25,
+        1477.083333333334
+      ],
+      "status": "withheld-unproven-approach",
+      "previousID": 50,
+      "approachEvidence": [
+        {
+          "side": "a",
+          "mapID": 1411,
+          "status": "short-verified-ground-approach",
+          "point": {
+            "mapID": 1411,
+            "x": 0.2763945861472432,
+            "y": 0.10183442917033976
+          },
+          "world": [
+            1449.3669473579953,
+            -3423.936163695714,
+            218.49388924137844
+          ],
+          "policy": "dry-only",
+          "radius": 30.000000000000004,
+          "area": 14,
+          "distance": 36.05154367517445
+        },
+        {
+          "side": "b",
+          "mapID": 1440,
+          "status": "unresolved-approach",
+          "failures": {
+            "restricted or wet ground": 40,
+            "dry-only: blocked endpoint": 6,
+            "swimming-fallback: blocked endpoint": 6,
+            "different or unknown native owner": 5718
+          }
+        }
+      ]
+    },
+    {
+      "a": 1416,
+      "b": 1425,
+      "worldA": [
+        -1764.5833333333323,
+        560.4166666666679
+      ],
+      "worldB": [
+        -1768.7499999999989,
+        560.4166666666678
+      ],
+      "status": "withheld-unproven-approach",
+      "previousID": 64,
+      "approachEvidence": [
+        {
+          "side": "a",
+          "mapID": 1416,
+          "status": "verified-ground-approach",
+          "point": {
+            "mapID": 1416,
+            "x": 0.8831845434470668,
+            "y": 0.5033482160833859
+          },
+          "world": [
+            560.4166666666679,
+            -1689.5833333333323,
+            47.477035522459744
+          ],
+          "policy": "dry-only",
+          "radius": 75.0,
+          "area": 36,
+          "distance": 88.97182997961308
+        },
+        {
+          "side": "b",
+          "mapID": 1425,
+          "status": "unresolved-approach",
+          "failures": {
+            "restricted or wet ground": 1729,
+            "different or unknown native owner": 1655,
+            "dry-only: blocked endpoint": 7,
+            "swimming-fallback: blocked endpoint": 7
+          }
+        }
+      ]
+    },
+    {
+      "a": 1422,
+      "b": 1425,
+      "worldA": [
+        -1768.75,
+        568.75
+      ],
+      "worldB": [
+        -1768.75,
+        564.5833333333334
+      ],
+      "status": "withheld-unproven-approach",
+      "previousID": 76,
+      "approachEvidence": [
+        {
+          "side": "a",
+          "mapID": 1422,
+          "status": "verified-ground-approach",
+          "point": {
+            "mapID": 1422,
+            "x": 0.5205696952120417,
+            "y": 0.9575175426529324
+          },
+          "world": [
+            621.783008588991,
+            -1821.7830085889912,
+            43.64226135093266
+          ],
+          "policy": "dry-only",
+          "radius": 75.0,
+          "area": 28,
+          "distance": 77.81241950995641
+        },
+        {
+          "side": "b",
+          "mapID": 1425,
+          "status": "unresolved-approach",
+          "failures": {
+            "restricted or wet ground": 1713,
+            "dry-only: blocked endpoint": 6,
+            "swimming-fallback: blocked endpoint": 6,
+            "different or unknown native owner": 1662
+          }
+        }
+      ]
+    },
+    {
+      "a": 1430,
+      "b": 1435,
+      "worldA": [
+        -2397.916666666668,
+        -10668.750000000002
+      ],
+      "worldB": [
+        -2397.916666666668,
+        -10664.583333333336
+      ],
+      "status": "withheld-unproven-approach",
+      "previousID": 84,
+      "approachEvidence": [
+        {
+          "side": "a",
+          "mapID": 1430,
+          "status": "unresolved-approach",
+          "failures": {
+            "different or unknown native owner": 12,
+            "restricted or wet ground": 30,
+            "dry-only: too long": 1,
+            "swimming-fallback: too long": 1,
+            "dry-only: blocked endpoint": 5,
+            "swimming-fallback: blocked endpoint": 5
+          }
+        },
+        {
+          "side": "b",
+          "mapID": 1435,
+          "status": "short-verified-ground-approach",
+          "point": {
+            "mapID": 1435,
+            "x": 0.07629435059037298,
+            "y": 0.6629428527645023
+          },
+          "world": [
+            -10634.583333333336,
+            -2397.916666666668,
+            94.4053390502913
+          ],
+          "policy": "dry-only",
+          "radius": 30.0,
+          "area": 8,
+          "distance": 29.999999999999893
+        }
+      ]
+    },
+    {
+      "a": 1440,
+      "b": 1447,
+      "worldA": [
+        -3964.583333333332,
+        3489.583333333334
+      ],
+      "worldB": [
+        -3968.7499999999986,
+        3489.583333333334
+      ],
+      "status": "withheld-unproven-approach",
+      "previousID": 94,
+      "approachEvidence": [
+        {
+          "side": "a",
+          "mapID": 1440,
+          "status": "unresolved-approach",
+          "failures": {
+            "restricted or wet ground": 35,
+            "dry-only: blocked endpoint": 4,
+            "swimming-fallback: blocked endpoint": 4,
+            "dry-only: too long": 2,
+            "swimming-fallback: too long": 2,
+            "different or unknown native owner": 7
+          }
+        },
+        {
+          "side": "b",
+          "mapID": 1447,
+          "status": "unresolved-approach",
+          "failures": {
+            "restricted or wet ground": 38,
+            "different or unknown native owner": 4,
+            "dry-only: too long": 6,
+            "swimming-fallback: too long": 6
+          }
+        }
+      ]
+    },
+    {
+      "a": 1444,
+      "b": 2652,
+      "worldA": [
+        1568.75,
+        -2927.083333333332
+      ],
+      "worldB": [
+        1564.5833333333333,
+        -2927.083333333332
+      ],
+      "status": "withheld-unproven-approach",
+      "previousID": 106,
+      "approachEvidence": [
+        {
+          "side": "a",
+          "mapID": 1444,
+          "status": "verified-ground-approach",
+          "point": {
+            "mapID": 1444,
+            "x": 0.5472842653983463,
+            "y": 0.1271477985201396
+          },
+          "world": [
+            -2955.784590760714,
+            1638.0409649383464,
+            80.29069513090266
+          ],
+          "policy": "dry-only",
+          "radius": 75.0,
+          "area": 1112,
+          "distance": 77.15309223382651
+        },
+        {
+          "side": "b",
+          "mapID": 2652,
+          "status": "unresolved-approach",
+          "failures": {
+            "restricted or wet ground": 31,
+            "different or unknown native owner": 142,
+            "dry-only: too long": 7,
+            "swimming-fallback: too long": 7,
+            "dry-only: blocked endpoint": 1,
+            "swimming-fallback: blocked endpoint": 1
+          }
+        }
+      ]
+    },
+    {
+      "a": 1426,
+      "b": 1437,
+      "worldA": [
+        -1397.916666666668,
+        -4168.749999999999
+      ],
+      "worldB": [
+        -1397.9166666666679,
+        -4164.583333333332
+      ],
+      "status": "withheld-unproven-approach",
+      "previousID": 28,
+      "inventorySha256": "8e8388532a3c1b574b0562b7f686837d088a958bde348ade1144cedbdbd578cc",
+      "approachEvidence": [
+        {
+          "side": "a",
+          "mapID": 1426,
+          "status": "unresolved-approach",
+          "failures": {
+            "different or unknown native owner": 4483,
+            "restricted or wet ground": 351,
+            "dry-only: blocked endpoint": 3,
+            "swimming-fallback: blocked endpoint": 3,
+            "dry-only: too long": 1,
+            "swimming-fallback: too long": 1
+          }
+        },
+        {
+          "side": "b",
+          "mapID": 1437,
+          "status": "verified-ground-approach",
+          "point": {
+            "mapID": 1437,
+            "x": 0.24382872146032294,
+            "y": 0.6772487377173086
+          },
+          "world": [
+            -4014.583333333332,
+            -1397.9166666666679,
+            153.50845336914062
+          ],
+          "policy": "dry-only",
+          "radius": 150.0,
+          "area": 11,
+          "distance": 150.0000000000002
+        }
+      ]
+    },
+    {
+      "a": 1416,
+      "b": 1425,
+      "worldA": [
+        -1764.5833333333323,
+        564.5833333333322
+      ],
+      "worldB": [
+        -1768.7499999999989,
+        564.5833333333322
+      ],
+      "status": "withheld-unproven-approach",
+      "previousID": 62,
+      "inventorySha256": "8e8388532a3c1b574b0562b7f686837d088a958bde348ade1144cedbdbd578cc",
+      "approachEvidence": [
+        {
+          "side": "a",
+          "mapID": 1416,
+          "status": "verified-ground-approach",
+          "point": {
+            "mapID": 1416,
+            "x": 0.8831845434470668,
+            "y": 0.5011160732182723
+          },
+          "world": [
+            564.5833333333322,
+            -1689.5833333333323,
+            45.651275634765526
+          ],
+          "policy": "dry-only",
+          "radius": 75.0,
+          "area": 36,
+          "distance": 83.23321999333615
+        },
+        {
+          "side": "b",
+          "mapID": 1425,
+          "status": "unresolved-approach",
+          "failures": {
+            "restricted or wet ground": 1713,
+            "dry-only: blocked endpoint": 6,
+            "swimming-fallback: blocked endpoint": 6,
+            "different or unknown native owner": 1662
+          }
+        }
+      ]
+    },
+    {
+      "a": 1422,
+      "b": 1425,
+      "worldA": [
+        -1797.9166666666674,
+        597.9166666666679
+      ],
+      "worldB": [
+        -1802.0833333333346,
+        597.9166666666679
+      ],
+      "status": "withheld-unproven-approach",
+      "previousID": 74,
+      "inventorySha256": "8e8388532a3c1b574b0562b7f686837d088a958bde348ade1144cedbdbd578cc",
+      "approachEvidence": [
+        {
+          "side": "a",
+          "mapID": 1422,
+          "status": "verified-ground-approach",
+          "point": {
+            "mapID": 1422,
+            "x": 0.5472477391705279,
+            "y": 0.9458188771187727
+          },
+          "world": [
+            655.3191815214313,
+            -1936.4985965433605,
+            46.087065315952074
+          ],
+          "policy": "dry-only",
+          "radius": 149.99999999999997,
+          "area": 28,
+          "distance": 164.13476350131637
+        },
+        {
+          "side": "b",
+          "mapID": 1425,
+          "status": "unresolved-approach",
+          "failures": {
+            "restricted or wet ground": 1785,
+            "different or unknown native owner": 1785,
+            "dry-only: blocked endpoint": 2,
+            "swimming-fallback: blocked endpoint": 2,
+            "dry-only: too long": 1,
+            "swimming-fallback: too long": 1
+          }
+        }
+      ]
+    },
+    {
+      "a": 1430,
+      "b": 1435,
+      "worldA": [
+        -2397.916666666668,
+        -10668.75
+      ],
+      "worldB": [
+        -2402.0833333333344,
+        -10668.75
+      ],
+      "status": "withheld-unproven-approach",
+      "previousID": 82,
+      "inventorySha256": "8e8388532a3c1b574b0562b7f686837d088a958bde348ade1144cedbdbd578cc",
+      "approachEvidence": [
+        {
+          "side": "a",
+          "mapID": 1430,
+          "status": "unresolved-approach",
+          "failures": {
+            "different or unknown native owner": 12,
+            "restricted or wet ground": 30,
+            "dry-only: too long": 1,
+            "swimming-fallback: too long": 1,
+            "dry-only: blocked endpoint": 5,
+            "swimming-fallback: blocked endpoint": 5
+          }
+        },
+        {
+          "side": "b",
+          "mapID": 1435,
+          "status": "short-verified-ground-approach",
+          "point": {
+            "mapID": 1435,
+            "x": 0.07811088101725756,
+            "y": 0.6656676478108668
+          },
+          "world": [
+            -10638.75,
+            -2402.0833333333344,
+            91.46835937499858
+          ],
+          "policy": "dry-only",
+          "radius": 30.0,
+          "area": 1777,
+          "distance": 30.000000000000064
+        }
+      ]
+    },
+    {
+      "a": 1426,
+      "b": 1437,
+      "worldA": [
+        -1393.7500000000002,
+        -4168.749999999999
+      ],
+      "worldB": [
+        -1393.75,
+        -4152.083333333332
+      ],
+      "status": "withheld-unproven-approach",
+      "previousID": 28,
+      "inventorySha256": "b8c2bb5f604de4b288d36eb2283b63bf0a1a40e6aee0af5d6f96a6adb320b7aa",
+      "approachEvidence": [
+        {
+          "side": "a",
+          "mapID": 1426,
+          "status": "unresolved-approach",
+          "failures": {
+            "different or unknown native owner": 4499,
+            "restricted or wet ground": 345,
+            "dry-only: blocked endpoint": 4,
+            "swimming-fallback: blocked endpoint": 4
+          }
+        },
+        {
+          "side": "b",
+          "mapID": 1437,
+          "status": "verified-ground-approach",
+          "point": {
+            "mapID": 1437,
+            "x": 0.24282116479338106,
+            "y": 0.6727135903250184
+          },
+          "world": [
+            -4002.083333333332,
+            -1393.75,
+            153.36286926269506
+          ],
+          "policy": "dry-only",
+          "radius": 150.0,
+          "area": 11,
+          "distance": 149.9999999999999
+        }
+      ]
+    },
+    {
+      "a": 1422,
+      "b": 1425,
+      "worldA": [
+        -1814.5833333333321,
+        602.0833333333321
+      ],
+      "worldB": [
+        -1814.5833333333321,
+        597.9166666666655
+      ],
+      "status": "withheld-unproven-approach",
+      "previousID": 73,
+      "inventorySha256": "b8c2bb5f604de4b288d36eb2283b63bf0a1a40e6aee0af5d6f96a6adb320b7aa",
+      "approachEvidence": [
+        {
+          "side": "a",
+          "mapID": 1422,
+          "status": "unresolved-approach",
+          "failures": {
+            "dry-only: blocked endpoint": 1,
+            "swimming-fallback: blocked endpoint": 1,
+            "restricted or wet ground": 32,
+            "different or unknown native owner": 5,
+            "dry-only: too long": 10,
+            "swimming-fallback: too long": 10
+          }
+        },
+        {
+          "side": "b",
+          "mapID": 1425,
+          "status": "unresolved-approach",
+          "failures": {
+            "different or unknown native owner": 14,
+            "restricted or wet ground": 31,
+            "dry-only: blocked endpoint": 3,
+            "swimming-fallback: blocked endpoint": 3
+          }
+        }
+      ]
+    },
+    {
+      "a": 1422,
+      "b": 1425,
+      "worldA": [
+        -1831.25,
+        602.0833333333321
+      ],
+      "worldB": [
+        -1831.25,
+        597.9166666666655
+      ],
+      "status": "withheld-unproven-approach",
+      "previousID": 72,
+      "inventorySha256": "e9de036cc1a41785b9263ec94dde429f8d4cb0690c28e558ff85052562a7a5f9",
+      "approachEvidence": [
+        {
+          "side": "a",
+          "mapID": 1422,
+          "status": "unresolved-approach",
+          "failures": {
+            "restricted or wet ground": 28,
+            "dry-only: blocked endpoint": 1,
+            "swimming-fallback: blocked endpoint": 1,
+            "different or unknown native owner": 9,
+            "dry-only: too long": 10,
+            "swimming-fallback: too long": 10
+          }
+        },
+        {
+          "side": "b",
+          "mapID": 1425,
+          "status": "unresolved-approach",
+          "failures": {
+            "restricted or wet ground": 30,
+            "different or unknown native owner": 12,
+            "dry-only: blocked endpoint": 5,
+            "swimming-fallback: blocked endpoint": 5,
+            "dry-only: too long": 1,
+            "swimming-fallback: too long": 1
+          }
+        }
+      ]
+    },
+    {
+      "a": 1426,
+      "b": 1437,
+      "worldA": [
+        -1406.2500000000002,
+        -4168.749999999999
+      ],
+      "worldB": [
+        -1406.25,
+        -4164.583333333332
+      ],
+      "status": "withheld-unproven-approach",
+      "previousID": 73,
+      "inventorySha256": "e9de036cc1a41785b9263ec94dde429f8d4cb0690c28e558ff85052562a7a5f9",
+      "approachEvidence": [
+        {
+          "side": "a",
+          "mapID": 1426,
+          "status": "unresolved-approach",
+          "failures": {
+            "different or unknown native owner": 4451,
+            "restricted or wet ground": 351,
+            "dry-only: blocked endpoint": 3,
+            "swimming-fallback: blocked endpoint": 3,
+            "dry-only: too long": 1,
+            "swimming-fallback: too long": 1
+          }
+        },
+        {
+          "side": "b",
+          "mapID": 1437,
+          "status": "verified-ground-approach",
+          "point": {
+            "mapID": 1437,
+            "x": 0.24584383479420588,
+            "y": 0.6772487377173086
+          },
+          "world": [
+            -4014.583333333332,
+            -1406.25,
+            155.14082336425759
+          ],
+          "policy": "dry-only",
+          "radius": 150.0,
+          "area": 11,
+          "distance": 150.6612736983801
+        }
+      ]
+    },
+    {
+      "a": 1422,
+      "b": 1425,
+      "worldA": [
+        -1827.0833333333321,
+        602.0833333333321
+      ],
+      "worldB": [
+        -1827.0833333333321,
+        597.9166666666655
+      ],
+      "status": "withheld-unproven-approach",
+      "previousID": 72,
+      "inventorySha256": "0f9362e8d8ded7cda0e57bea3dda7544b2e6def09010c8706458c92b634d963f",
+      "approachEvidence": [
+        {
+          "side": "a",
+          "mapID": 1422,
+          "status": "unresolved-approach",
+          "failures": {
+            "restricted or wet ground": 29,
+            "dry-only: blocked endpoint": 1,
+            "swimming-fallback: blocked endpoint": 1,
+            "different or unknown native owner": 7,
+            "dry-only: too long": 11,
+            "swimming-fallback: too long": 11
+          }
+        },
+        {
+          "side": "b",
+          "mapID": 1425,
+          "status": "unresolved-approach",
+          "failures": {
+            "restricted or wet ground": 27,
+            "different or unknown native owner": 15,
+            "dry-only: blocked endpoint": 6,
+            "swimming-fallback: blocked endpoint": 6
+          }
+        }
+      ]
+    },
+    {
+      "a": 1426,
+      "b": 1437,
+      "worldA": [
+        -1393.7500000000002,
+        -4168.749999999999
+      ],
+      "worldB": [
+        -1393.75,
+        -4164.583333333332
+      ],
+      "status": "withheld-unproven-approach",
+      "previousID": 73,
+      "inventorySha256": "0f9362e8d8ded7cda0e57bea3dda7544b2e6def09010c8706458c92b634d963f",
+      "approachEvidence": [
+        {
+          "side": "a",
+          "mapID": 1426,
+          "status": "unresolved-approach",
+          "failures": {
+            "different or unknown native owner": 4499,
+            "restricted or wet ground": 345,
+            "dry-only: blocked endpoint": 4,
+            "swimming-fallback: blocked endpoint": 4
+          }
+        },
+        {
+          "side": "b",
+          "mapID": 1437,
+          "status": "verified-ground-approach",
+          "point": {
+            "mapID": 1437,
+            "x": 0.24282116479338106,
+            "y": 0.6772487377173086
+          },
+          "world": [
+            -4014.583333333332,
+            -1393.75,
+            152.48893737792935
+          ],
+          "policy": "dry-only",
+          "radius": 150.0,
+          "area": 11,
+          "distance": 150.0000000000002
+        }
+      ]
+    }
+  ]
+}

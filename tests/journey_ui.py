@@ -49,10 +49,7 @@ assert(A.JourneyView.overlay:GetFrameLevel()>=artLevel+5,'walking lines must ren
 assert(#A.JourneyView.lines==2 and A.JourneyView.lines[1]:IsShown(),'each validated segment must render without shortcuts')
 local line=A.JourneyView.lines[1]
 local reached=math.abs(line.lineEnd[3]-300)<.0001 and math.abs(line.lineEnd[4]+480)<.0001
-for _,fragment in ipairs(A.JourneyView.fragments or {}) do
- if fragment:IsShown() and math.abs(fragment.lineEnd[3]-300)<.0001 and math.abs(fragment.lineEnd[4]+480)<.0001 then reached=true end
-end
-assert(line.lineStart[3]==100 and line.lineStart[4]==-120 and reached,'gapped route strokes must retain normalized canvas endpoints')
+assert(line.lineStart[3]==100 and line.lineStart[4]==-120 and reached,'the continuous stroke must reach the corner of the projected route')
 A.JourneyView.Show(plan,{map=1431,x=.7,y=.8,name='Walking test'})
 assert(A.JourneyView.window:IsShown() and A.JourneyView.summary:GetText():find('800',1,true))
 assert(A.JourneyView.pause:IsEnabled() and A.JourneyView.resume:IsEnabled(),'active journey controls must be exposed')
@@ -104,9 +101,8 @@ A.JourneyView.window:Hide();A.Journey.Clear();A.db.navigationMode='direct';A.db.
 A.Navigation.target={map=1431,x=.8,y=.5,worldX=-800,worldY=-500,instance=0,name='Direct destination'}
 A.JourneyView.Refresh()
 local directLine=A.JourneyView.lines[1]
-local directEnd=math.abs(directLine.lineEnd[3]-800)<.0001
-for _,fragment in ipairs(A.JourneyView.fragments or {}) do if fragment:IsShown() and math.abs(fragment.lineEnd[3]-800)<.0001 then directEnd=true end end
-assert(directLine:IsShown() and directLine.lineStart[3]==500 and directEnd,'gapped direct line must still reach the destination')
+assert(directLine:IsShown() and directLine.lineStart[3]==500 and math.abs(directLine.lineEnd[3]-800)<.0001,
+ 'direct guidance must draw one continuous stroke to the destination')
 playerWX=-600;A.JourneyView.Refresh();assert(directLine.lineStart[3]==600,'direct map line must follow player movement')
 A.JourneyView.OpenCurrent();playerWX=-650;A.JourneyView.Refresh()
 assert(A.JourneyView.plan.points[1].worldX==-650 and directLine.lineStart[3]==650,'the active direct journey window must track the player instead of freezing a preview')
@@ -129,3 +125,47 @@ A.JourneyView.Show({kind='walking',mapID=1431,name='Long journey',distance=1000,
 assert(A.JourneyView.stepScroll and A.JourneyView.stepScroll:GetScrollChild():GetHeight()>=216,'all zone legs must be accessible in a scrolling preview')
 assert(A.JourneyView.steps:GetText():find('zone 12',1,true))
 ''')
+lua.execute('''
+local V,J=A.JourneyView,A.Journey
+local oldPlan,oldCandidate=V.plan,V.candidate
+local oldLib=LibStub
+local playerX=400
+LibStub=function() return {GetPlayerWorldPosition=function() return playerX,0,0 end} end
+local function p(x,worldX)
+ return {mapID=1431,x=x,y=.5,worldX=worldX,worldY=0,instance=0}
+end
+local plan={kind='walking',name='Clipped walk',distance=2000,estimatedSeconds=300,
+ points={p(-.5,-500),p(1.5,1500)},legs={{kind='walk',name='Walk'}}}
+V.window:Hide();A.map:Show();A.db.showJourneyRoute=true;J.Install(plan)
+V.Refresh()
+local past,ahead=V.lines[0],V.lines[1]
+assert(past:IsShown() and ahead:IsShown() and past.lineStart[3]==0 and math.abs(ahead.lineStart[3]-400)<.001,
+ 'the world map must fade the visible walked portion up to the projected player')
+assert(past.color[4]<ahead.color[4] and ahead.color[2]>ahead.color[1])
+assert(ahead.thickness==3 and ahead.routeCasing.thickness>ahead.thickness and ahead.routeCasing.thickness<=ahead.thickness+2)
+assert(past.routeCasing.drawSublevel<past.drawSublevel and ahead.routeCasing.drawSublevel<ahead.drawSublevel)
+local refresh=V.Refresh;local redraws=0
+V.Refresh=function(...) redraws=redraws+1;return refresh(...) end
+for i=1,3 do V.progressDriver:GetScript('OnUpdate')(V.progressDriver,.21) end
+playerX=401;V.progressDriver:GetScript('OnUpdate')(V.progressDriver,.21)
+assert(redraws==0,'standing still or moving a single yard cannot rebuild the visible route')
+playerX=440;V.progressDriver:GetScript('OnUpdate')(V.progressDriver,.21)
+assert(redraws==1 and math.abs(ahead.lineStart[3]-440)<.001 and J.index==2,'significant movement must update the map without advancing the follower')
+V.Refresh=refresh
+A.db.showJourneyRoute=false;V.Refresh()
+assert(not past:IsShown() and not past.routeCasing:IsShown() and not ahead.routeCasing:IsShown())
+for _,line in ipairs(V.fragments) do assert(not line:IsShown() and not line.routeCasing:IsShown()) end
+
+-- Inspect the production render inputs to cover projections many map widths away.
+local render=A.RouteStyle.Render
+local seen
+A.RouteStyle.Render=function(segments,...) seen=segments;return render(segments,...) end
+local ship={kind='walking',name='Long sailing piece',distance=1000,estimatedSeconds=100,
+ points={p(-10000,-10000),p(10000,10000),p(11000,11000),p(12000,12000)},legs={}}
+for _,point in ipairs(ship.points) do point.transport=true end
+J.Install(ship);A.db.showJourneyRoute=true;V.Refresh()
+assert(#seen==1 and seen[1].kind=='transport' and math.abs(seen[1][1])<.01 and math.abs(seen[1][3]-1000)<.01,
+ 'clip long projected sailing pieces before allocating dots and skip fully offscreen pieces')
+A.RouteStyle.Render=render;J.Clear();LibStub=oldLib;V.Show(oldPlan,oldCandidate)
+''')
+print('PASS: clipped world route, walking progress, casing cleanup and movement-based redraw')

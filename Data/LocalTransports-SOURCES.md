@@ -33,3 +33,14 @@ Thunder Bluff and Undercity lifts remain unbundled until their own floor/access 
 Preview.32 replays the original native exit audit after the road-strength routing change. Both masks remain identical (1,312 upper and 911 lower cells). The pinned runtime Terrain.lua hash is refreshed, with the revalidation proof retained in native-lift-exit-masks-70959.json provenance. No native coverage or terrain permissions changed.
 
 Preview.33 repeats the native exit audit after road-cost memoization. Coverage remains identical; the provenance routingPerformanceRevalidation field records the new proof and runtime hash binding.
+
+The 25 November 2026 route-planning revalidation repeats the original native
+exit-mask audit against the updated terrain implementation. All 55,575 accepted
+native samples, 591 additional retained disk/anchor samples and six retained
+walking paths pass fresh native and runtime checks. Coverage remains exactly
+1,312 upper and 911 lower cells. Native identities, coordinates, heights, masks,
+links and compiled lift edge fields remain unchanged; generated source hashes
+are rebuilt after validation. `routePlanningRevalidation` in the pinned mask
+provenance records the frozen runtime hash and the revalidator/proof hashes.
+The retained replay is `output/lift-audit/revalidate_route_planner.py`; canonical
+proof bytes omit elapsed timings so repeated validation is deterministic.

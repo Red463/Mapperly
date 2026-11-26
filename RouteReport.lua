@@ -35,13 +35,20 @@ local function redact(report)
     -- Reports are plain, copyable text. Never permit injected game hyperlinks.
     return report:gsub('|','/'):sub(1,16000)
 end
-function R.Build()
+function R.Build(candidate,reason,jobID)
     local N,J=A.Navigation or {},A.Journey or {};local db=A.db or {};local lines={}
     local function add(label,value) lines[#lines+1]=label..': '..value end
     add('Mapperly route report',scalar(A.version));add('Client',scalar(call(GetBuildInfo)))
     if type(GetBuildInfo)=='function' then
         local ok,_,build,_,interface=pcall(GetBuildInfo)
         if ok then add('Client build',scalar(build)..' interface='..scalar(interface)) end
+    end
+    if reason then
+        add('Reported error',scalar(reason))
+        local service=candidate and A.NearestServices and A.NearestServices.categories[candidate.serviceKind]
+        if service then add('Nearest service requested',service)
+        else add('Requested destination',position(candidate)) end
+        if jobID then add('Reported calculation',scalar(jobID)) end
     end
     local start=J.PlayerPosition and call(J.PlayerPosition)
     add('Actual position',position(start));add('Destination',position(N.deferredRoutingTarget or N.target));add('Pending destination',position(N.pending))
@@ -53,11 +60,12 @@ function R.Build()
     add('Native position','north='..scalar(native.north)..' east='..scalar(native.east)..' z='..scalar(native.z)..' instance='..scalar(native.instance))
     add('Movement flags','swimming='..scalar(call(IsSwimming))..' taxi='..scalar(call(UnitOnTaxi,'player'))..' vehicle='..scalar(call(UnitInVehicle,'player')))
     add('Options',fields(db,{'navigationMode','preferRoads','roadPreferenceStrength','allowSwimming','avoidSwimming','rememberJourney'}))
+    add('Travel methods',fields(db,{'useFlights','useBoats','useZeppelins','useAirships','useTrams','useLifts'}))
     add('Journey',fields(J,{'paused','index','legIndex','crossing','inStructure','structureIndex'}))
     local leg=J.Leg and call(J.Leg)
     add('Current step',fields(leg,{'kind','mapID','first','last'}))
     if readable(leg) and type(leg)=='table' and readable(leg.transport) and type(leg.transport)=='table' then add('Method',fields(leg.transport,{'kind','id','source','verified'})) end
-    add('Plan',fields(J.active,{'kind','mapID','distance','estimatedSeconds','coverage','source'}))
+    add('Plan',fields(J.active,{'kind','mapID','distance','estimatedSeconds','coverage','source','swimmingFallbackReason','drySearchBudget'}))
     add('Planning error',scalar(N.planningError));add('Recovery error',scalar(N.recoveryError))
     if A.WaterData then add('Water data',fields(A.WaterData,{'version','source','build','coverage'})) end
     local water='unavailable'
@@ -68,31 +76,37 @@ function R.Build()
         if native then add('Water source',fields(native,{'source','baseSha256','w','h','status'})) end
     end
     add('Water coverage',water)
-    if A.PathReuse and A.PathReuse.Stats then add('Path reuse cache',fields(call(A.PathReuse.Stats),{'hits','bakedHits','misses','entries','points','contexts'})) end
+    if A.PathReuse and A.PathReuse.Stats then add('Path reuse cache',fields(call(A.PathReuse.Stats),{'hits','bakedHits','failureHits','misses','entries','points','contexts'})) end
     if A.TerrainData then add('Terrain source',fields(A.TerrainData,{'version','source','build'})) end
-    local counterKeys={'id','stage','paths','cells','mapID','checked','total','flightRoutes','flightSources','cacheHits','cacheMisses','source','waterCells','waterUnknown','waterRejected'}
+    local counterKeys={'id','stage','paths','cells','slices','workMS','peakSliceMS','mapID','checked','total','flightRoutes','flightSources','cacheHits','cacheMisses','source','waterCells','waterUnknown','waterRejected'}
     local progress=A.PlanningJob and A.PlanningJob.Progress()
     if progress then add('Active calculation',fields(progress,counterKeys)) end
     for _,row in ipairs(A.PlanningJob and A.PlanningJob.Recent and A.PlanningJob.Recent() or {}) do
         add('Recent calculation',fields(row,{'state','elapsedMS','reason','kind','coverage','source','distance'}))
+        if row.start and (row.start.mapID or row.start.map) then add('Calculation start',position(row.start)) end
         add('Calculation destination',position(row.destination));add('Calculation counters',fields(row.progress,counterKeys))
     end
     for _,row in ipairs(requests) do add('Rejected request',row.destination..' from '..row.start..' reason='..row.reason) end
     return redact(table.concat(lines,'\n'))
 end
-function R.Open()
+function R.Open(snapshot)
     local U=A.Dialogs;local f=R.frame
     if not f then
-        f=U.CompactWindow(UIParent,650,480);R.frame=f;f:SetPoint('CENTER');f:SetFrameStrata('DIALOG');f:SetClampedToScreen(true);f:EnableMouse(true)
+        f=U.CompactWindow(UIParent,650,480);R.frame=f;f:ClearAllPoints();f:SetPoint('CENTER');f:SetFrameStrata('FULLSCREEN_DIALOG');f:SetClampedToScreen(true);f:EnableMouse(true)
         U.Label(f,'Route report',18,12,'GameFontNormalLarge')
-        U.Label(f,'Select the text and press Ctrl+C to copy. Nothing is sent automatically.',18,44,'GameFontDisableSmall')
+        f.copyHint=U.Label(f,'',18,44,'GameFontHighlightSmall');f.copyHint:SetWidth(614);f.copyHint:SetJustifyH('LEFT')
         local scroll=CreateFrame('ScrollFrame',nil,f,'UIPanelScrollFrameTemplate');scroll:SetPoint('TOPLEFT',f,'TOPLEFT',18,-76);scroll:SetSize(588,344)
         local edit=U.Input(scroll,0,0,584,344,16000,true);f.edit=edit;scroll:SetScrollChild(edit)
         edit:SetScript('OnEscapePressed',function() f:Hide() end)
         edit:SetScript('OnTextChanged',function(self,user) if user then self:SetText(f.report or '') end end)
-        U.Action(f,'Refresh',390,438,112,function() R.Open() end)
+        f.refresh=U.Action(f,'Refresh',390,438,112,function() R.Open() end)
         U.Action(f,'Close',518,438,112,function() f:Hide() end)
+        f:SetScript('OnHide',function() edit:ClearFocus() end)
     end
-    f.report=R.Build();f.edit:SetText(f.report);f.edit:SetHeight(math.max(344,select(2,f.report:gsub('\n',''))*15+24));U.Show(f)
+    local shortcut=IsMacClient and IsMacClient() and 'Cmd+C' or 'Ctrl+C'
+    f.copyHint:SetText('Press '..shortcut..' to copy the selected report.'..(snapshot and " Paste it in Mapperly’s CurseForge comments." or ''))
+    f.refresh:SetShown(snapshot==nil)
+    f.report=snapshot or R.Build();f.edit:SetText(f.report);f.edit:SetHeight(math.max(344,select(2,f.report:gsub('\n',''))*15+24));U.Show(f)
+    f.edit:SetCursorPosition(0)
     f.edit:SetFocus();f.edit:HighlightText()
 end

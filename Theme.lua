@@ -76,7 +76,16 @@ local function apply(f,entry)
     local new=modern();f.mapperlyThemeStyle=new and 'gatherly' or 'original'
     local role=entry.role
     if role=='window' then
-        if new then
+        if f.drawerIcon then
+            -- The map already supplies the outer frame. Use the tool's toolbar
+            -- symbol and the form heading inside the shared panel.
+            f:SetBackdrop(nil)
+            if f.themeChrome then f.themeChrome:Hide() end
+            if f.themeWindowBase then f.themeWindowBase:Hide() end
+            entry.titleLabel:Show()
+            entry.logo:SetTexture(A.ToolbarTexture(f.drawerIcon,'Medium'))
+            entry.logo:Show()
+        elseif new then
             f:SetBackdrop(nil);local c=chrome(f,entry.title);c:Show()
             if not f.themeWindowBase then
                 local base=f:CreateTexture(nil,'BACKGROUND',nil,-8);f.themeWindowBase=base
@@ -91,7 +100,7 @@ local function apply(f,entry)
             if f.themeWindowBase then f.themeWindowBase:Hide() end
             f:SetBackdrop(originalWindow);f:SetBackdropColor(.035,.04,.05,1)
             if entry.titleLabel then entry.titleLabel:Show() end
-            if entry.logo then entry.logo:Show() end
+            if entry.logo then entry.logo:SetTexture('Interface\\AddOns\\Mapperly\\Media\\Portrait');entry.logo:Show() end
         end
     elseif role=='compactWindow' then
         if new then
@@ -190,6 +199,10 @@ function T.Register(f,role,extra)
         end
     end
     registry[f]=entry;apply(f,entry);return f
+end
+function T.SetDrawerIcon(window,asset)
+    window.drawerIcon=asset
+    apply(window,registry[window])
 end
 function T.Label(t,font)
     local kind=font and (font:find('Disable',1,true) and 'muted' or font:find('Red',1,true) and 'error' or font:find('Normal',1,true) and 'gold') or 'body'

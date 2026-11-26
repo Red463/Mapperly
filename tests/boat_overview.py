@@ -19,15 +19,37 @@ local hbd={GetZoneCoordinatesFromWorldInstance=function(_,x,y,instance,target)
  if instance==0 then return x/1000,y/1000 end
 end}
 LibStub=function() return hbd end
-local plan={points={},legs={{kind='transport',transport=row}}}
+local V=A.JourneyView
+V.window:Hide()
+local plan={points={},legs={{kind='transport',transport=row,first=1,last=#row.path}}}
+for i,p in ipairs(row.path) do
+ plan.points[i]={worldX=p.worldX,worldY=p.worldY,instance=p.instance,transport=true,breakBefore=i==1 or p.breakBefore}
+end
 A.Journey.Install(plan);local active=A.Journey.active
-B.Update(plan)
-local shown=0;for _,line in ipairs(B.lines) do if line:IsShown() then shown=shown+1 end end
-assert(shown>0,'cross-continent boat leg must have a visible world-overview connection')
-A.Journey.Clear();A.Navigation.target=nil
+A.db.showJourneyRoute=true;V.Refresh()
+local function dots()
+ local shown=0
+ for _,dot in ipairs(V.fragments.dots or {}) do if dot:IsShown() then
+  shown=shown+1
+  local x,y=dot.point[4],dot.point[5]
+  assert(math.abs(y-(-120+(x-800)*.2))<.1,'world overview must use the direct schematic, without native harbour spurs')
+ end end
+ return shown
+end
+assert(dots()>2,'cross-continent boat leg must have a dotted world-overview connection')
+for _,line in pairs(V.lines) do assert(not line:IsShown(),'the world-overview journey cannot have a solid base under its transport dots') end
+for _,line in ipairs(B.lines) do assert(not line:IsShown(),'the active leg cannot also draw a second schematic in BoatLinks') end
+A.Journey.legIndex=2;V.Refresh()
+local completed=V.lines[1]
+assert(dots()==0 and completed:IsShown() and completed.color[4]<.5
+ and math.abs(completed.lineStart[3]-800)<.01 and math.abs(completed.lineEnd[3]-200)<.01,
+ 'after disembarking the schematic must share the faded continuous completed-route stroke')
+A.Journey.legIndex=1;V.Refresh()
+A.db.showJourneyRoute=false;V.Refresh();assert(dots()==0,'disabling the world route must clear its schematic')
+A.db.showJourneyRoute=true;A.Journey.Clear();A.Navigation.target=nil;V.Refresh()
 local pin={map=947,category='transport',kind='boat',transportID='ocean',name='Boat to Ratchet'}
 assert(B.Hover(pin));B.Update()
-shown=0;for _,line in ipairs(B.lines) do if line:IsShown() then shown=shown+1 end end
+local shown=0;for _,line in ipairs(B.lines) do if line:IsShown() then shown=shown+1 end end
 assert(shown>0 and not A.Journey.active and not A.Navigation.target,'hover preview must work without starting a route')
 B.Clear(pin);for _,line in ipairs(B.lines) do assert(not line:IsShown(),'hover-only lines must clear on leave') end
 A.Journey.Install(plan);B.Hover(pin);B.Clear(pin);B.Update(plan)

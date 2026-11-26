@@ -37,8 +37,8 @@ A.road.rows[2]='4';assert(A.Terrain.Path(a,b,{preferRoads=true,roadPreferenceStr
 A.TerrainData.zones[1].rows[1]='4';assert(A.Terrain.Path(a,b));assert(calls==7,'terrain edits invalidate reuse')
 A.TerrainData.zones[1].groundRows={'4'};assert(A.Terrain.Path(a,b));assert(calls==8,'ground edits invalidate reuse')
 local q,why=A.Terrain.Path(a,b,{maxDistance=5});assert(not q and why=='too long','range bounds still apply to hits')
-assert(A.Terrain.Path(a,b));assert(calls==8,'range failure cannot poison unlimited result')
-A.blocked=true;assert(A.Terrain.Path(a,b));assert(calls==9,'invalid cached segments must fall back')
+assert(A.Terrain.Path(a,b));assert(calls==9,'a separate bounded retry cannot poison unlimited result')
+A.blocked=true;assert(A.Terrain.Path(a,b));assert(calls==10,'invalid cached segments must fall back')
 A.blocked=false
 for i=1,700 do assert(A.Terrain.Path(p(2,i/1000),p(2,.99))) end
 local s=A.PathReuse.Stats();assert(s.entries<=512 and s.points<=16384 and s.contexts<=16,'retained live geometry must be bounded')

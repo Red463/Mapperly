@@ -64,6 +64,7 @@ function A.Refresh()
     A.AttachZoneLevels()
     A.UpdateNavigation()
     A.UpdateButtonStates()
+    if A.drawerKey=='filters' then A.RefreshFilterPanel() end
 end
 local function current()
     local id=C_Map and C_Map.GetBestMapForUnit and C_Map.GetBestMapForUnit('player')
@@ -79,24 +80,40 @@ local function current()
     end
 end
 local labels={mail='Mailboxes',inn='Inns',dungeon='Dungeon entrances',flight='Flight masters',transport='Boats, zeppelins and airships',portal='Portals',border='Zone exits',notes='Custom notes'}
-local function menuEntry(text,fn,checked,tip)
-    local info=UIDropDownMenu_CreateInfo();info.text=text;info.func=fn;info.checked=checked
-    info.isNotRadio=true;info.keepShownOnClick=true;info.notCheckable=checked==nil
-    if tip then info.tooltipTitle=text;info.tooltipText=tip;info.tooltipOnButton=true end
-    UIDropDownMenu_AddButton(info,1)
-end
-function A.BuildMenu(_,level)
-    if level~=1 then return end
+function A.RefreshFilterPanel()
+    if not A.filterWindow then return end
     local map=A.map:GetMapID();local counts={}
     for _,p in ipairs(A.PinsForMap(map)) do counts[p.category]=(counts[p.category] or 0)+1 end
-    for _,category in ipairs(A.categories) do
-        local k=category
-        local tip=(k=='inn' or k=='mail') and 'Bundled Forever locations plus services you discover. No other addon is needed; coverage may have gaps.' or nil
-        local suffix=k=='border' and '' or ' ('..(counts[k] or 0)..')'
-        menuEntry(labels[k]..suffix,function() A.db.filters[k]=not A.db.filters[k];A.Refresh() end,A.db.filters[k],tip)
+    for k,row in pairs(A.filterWindow.rows) do
+        row:SetChecked(A.db.filters[k])
+        row.count:SetText(k~='border' and tostring(counts[k] or 0) or '')
     end
-    menuEntry('Show all',function() for _,k in ipairs(A.categories) do A.db.filters[k]=true end;A.Refresh() end)
-    menuEntry('Hide all',function() for _,k in ipairs(A.categories) do A.db.filters[k]=false end;A.Refresh() end)
+end
+local function openFilters()
+    local U=A.Dialogs
+    if not A.filterWindow then
+        local f=U.ToolWindow('MapperlyFilterWindow','Location filters','Markers on the current map',333,319)
+        A.filterWindow=f;f.rows={}
+        for index,k in ipairs(A.categories) do
+            local row=CreateFrame('CheckButton',nil,f,'UICheckButtonTemplate')
+            f.rows[k]=row
+            row:SetSize(24,24);row:SetPoint('TOPLEFT',f,'TOPLEFT',16,-48-(index-1)*28)
+            row:SetHitRectInsets(0,-265,0,0)
+            local icon=row:CreateTexture(nil,'ARTWORK');icon:SetSize(18,18);icon:SetPoint('LEFT',row,'RIGHT',6,0)
+            A.SetPinTexture(icon,k,nil,18)
+            U.Label(row,labels[k],55,4,'GameFontHighlight')
+            row.count=U.Label(row,'',250,5,'GameFontDisableSmall')
+            row:SetScript('OnClick',function(s) A.db.filters[k]=not not s:GetChecked();A.Refresh();A.SyncSettings() end)
+        end
+        local function setAll(enabled)
+            for _,k in ipairs(A.categories) do A.db.filters[k]=enabled end
+            A.Refresh();A.SyncSettings()
+        end
+        U.Action(f,'Show all',14,279,148,function() setAll(true) end)
+        U.Action(f,'Hide all',171,279,148,function() setAll(false) end)
+    end
+    A.RefreshFilterPanel()
+    U.Show(A.filterWindow,'filters')
 end
 function A.AttachMap()
     if A.map or not WorldMapFrame or not WorldMapFrame.GetCanvas then return end
@@ -191,8 +208,6 @@ function A.AttachMap()
     headingHost:SetAllPoints(f);headingHost:EnableMouse(false);headingHost:SetFrameStrata('HIGH');headingHost:SetFrameLevel(f:GetFrameLevel()+200)
     A.zoneHeading=headingHost:CreateFontString(nil,'OVERLAY','GameFontNormal')
     A.zoneHeading:SetPoint('LEFT',bar,'LEFT',12,0);A.zoneHeading:SetJustifyH('LEFT');A.zoneHeading:SetWordWrap(false)
-    A.menu=CreateFrame('Frame','MapperlyDropdown',UIParent,'UIDropDownMenuTemplate')
-    UIDropDownMenu_Initialize(A.menu,A.BuildMenu,'MENU')
     local previous,railHeight=nil,4
     local function control(key,asset,tip,fn,gap)
         local b=button(rail,asset,fn);b:ClearAllPoints()
@@ -203,6 +218,11 @@ function A.AttachMap()
         previous=b
         A.AttachButtonTooltip(b,tip)
         A.controls=A.controls or {};A.controls[key]=b;return b
+    end
+    local function drawerControl(key,asset,title,open,gap)
+        return control(key,asset,function() return (A.drawerKey==key and 'Hide ' or 'Show ')..title end,function()
+            if A.drawerKey==key then A.SelectMapDrawer(nil) else open() end
+        end,gap)
     end
     local close=CreateFrame('Button',nil,f,'UIPanelCloseButton');A.closeButton=close
     close:SetSize(22,22);close:SetPoint('TOPRIGHT',f,'TOPRIGHT',-5,-3)
@@ -219,27 +239,27 @@ function A.AttachMap()
         if info and info.parentMapID and info.parentMapID>0 then f:SetMapID(info.parentMapID) end
     end,10)
     control('locate','Locate','My location: return to your zone and ping your arrow',current)
-    control('navigate','Navigate','Destinations: coordinates, saved places, quests and nearest services. Alt-right-click map or marker for a quick waypoint.',function() A.ShowNavigationInput() end)
-    control('notes','AddNote','Add note at player; Alt-click to place anywhere',function()
+    drawerControl('navigate','Navigate','destinations',function() A.ShowNavigationInput(nil,'navigate') end)
+    drawerControl('notes','AddNote','map notes',function()
         local id=f:GetMapID();local pos=id and C_Map.GetPlayerMapPosition(id,'player')
         if not pos then
             id=C_Map.GetBestMapForUnit and C_Map.GetBestMapForUnit('player')
             pos=id and C_Map.GetPlayerMapPosition(id,'player')
             if pos then f:SetMapID(id) end
         end
-        if pos then local x,y=pos:GetXY();A.ShowNote(id,x,y) else A.Print('Alt-click the map to place a note.') end
+        if pos then local x,y=pos:GetXY();A.ShowNote(id,x,y,nil,'notes')
+        else A.ShowNoteBrowser();A.Print('Alt-click the map to place a note.') end
     end)
-    control('filters','Filters','Location filters',function(self) ToggleDropDownMenu(1,nil,A.menu,self,0,0) end,10)
-    local quest=control('quests','Quest',function() return A.db.questPane and 'Hide quest log' or 'Show quest log' end,function()
-        A.db.questPane=not A.db.questPane;A.ApplyLayout()
-        if A.SyncSettings then A.SyncSettings() end
-    end)
+    drawerControl('filters','Filters','location filters',openFilters,10)
+    local quest=control('quests','Quest',function() return A.QuestPaneSelected() and 'Hide quest log' or 'Show quest log' end,
+        function() A.SelectQuestPane(not A.QuestPaneSelected()) end)
     quest.icon:SetSize(24,24)
     quest.arrow=quest:CreateFontString(nil,'OVERLAY','GameFontNormalSmall')
     quest.arrow:SetPoint('BOTTOMRIGHT',quest,'BOTTOMRIGHT',-2,2)
+    drawerControl('services','Services','nearby services',function() A.SelectMapDrawer('services') end)
     control('reveal','Reveal',function() return A.db.reveal and 'Hide unexplored terrain' or 'Reveal unexplored terrain' end,function() A.db.reveal=not A.db.reveal;A.Refresh() end)
     control('lock','Lock',function() return A.db.locked and 'Unlock map position' or 'Lock map position' end,function() A.db.locked=not A.db.locked;A.ApplyLayout() end,10)
-    control('settings','Settings','Open Mapperly settings',A.ShowSettings)
+    drawerControl('settings','Settings','Mapperly settings',function() A.ShowSettings('settings') end)
     A.coordinateText=footer:CreateFontString(nil,'OVERLAY','GameFontNormalSmall')
     A.coordinateText:SetPoint('LEFT',footer,'LEFT',10,0);A.coordinateText:SetJustifyH('LEFT');A.coordinateText:SetWordWrap(false)
     A.brandText=bar:CreateFontString(nil,'OVERLAY','GameFontNormalSmall')
@@ -256,7 +276,13 @@ function A.AttachMap()
     if f.SetMapID then hooksecurefunc(f,'SetMapID',A.Refresh) end
     if f.Maximize then hooksecurefunc(f,'Maximize',function() if not A.applying then A.db.compact=false;A.ApplyLayout() end end) end
     if f.Minimize then hooksecurefunc(f,'Minimize',function() if not A.applying then A.db.compact=true;A.ApplyLayout() end end) end
-    if f.SetQuestLogPanelShown then hooksecurefunc(f,'SetQuestLogPanelShown',function(_,shown) if not A.applying then A.db.questPane=not not shown;A.ApplyLayout() end end) end
+    if f.SetQuestLogPanelShown then
+        hooksecurefunc(f,'SetQuestLogPanelShown',function(_,shown)
+            if A.applying then return end
+            -- Native quest-log opens (including L and quest links) take this slot.
+            if shown or not A.drawerKey then A.SelectQuestPane(shown) else A.ApplyLayout() end
+        end)
+    end
     f:HookScript('OnSizeChanged',function() if not A.applying then A.ApplyLayout() end end)
     f:GetCanvas():HookScript('OnSizeChanged',A.Refresh)
     if f.ScrollContainer then
@@ -271,7 +297,10 @@ function A.AttachMap()
         if serviceRetry>=5 then serviceRetry=0;if A.LoadServices then A.LoadServices() end end
         A.UpdateButtonStates()
         local scale=f:GetCanvas():GetEffectiveScale()
-        if A.lastCanvasScale~=scale then A.lastCanvasScale=scale;A.RefreshPins() end
+        if A.lastCanvasScale~=scale then
+            A.lastCanvasScale=scale;A.RefreshPins()
+            if A.JourneyView and A.db.showJourneyRoute then A.JourneyView.Refresh(true) end
+        end
         A.UpdateOpacity()
         A.UpdateCoordinates()
     end)

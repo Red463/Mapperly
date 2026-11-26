@@ -4,7 +4,8 @@ local _,A=...
 local R={revision=1};A.PathReuse=R
 local T=A.Terrain;local original=T.Path;R.OriginalPath=original
 local contexts,cache,order={}, {}, {};local serial,points=0,0
-local counters={hits=0,bakedHits=0,misses=0}
+local failures,failureOrder={},{}
+local counters={hits=0,bakedHits=0,misses=0,failureHits=0}
 local function finite(n) return type(n)=='number' and n==n and math.abs(n)<math.huge end
 local function valid(p) return type(p)=='table' and finite(p.mapID) and finite(p.x) and finite(p.y) and p.x>=0 and p.x<=1 and p.y>=0 and p.y<=1 end
 local function copy(path,reverse)
@@ -59,8 +60,10 @@ local function context(map,options)
     local roads=options.preferRoads and A.Roads and A.Roads.Zone(map,z)
     local mode=roads and select(1,A.Roads.Strength(options.roadPreferenceStrength)) or 0
     local factor=roads and select(3,A.Roads.Strength(options.roadPreferenceStrength)) or 1
+    local roadCell=roads and A.Roads.Cell;local waterCell=water and A.Water.Cell
     for i,c in ipairs(contexts) do
         if c.map==map and c.mode==mode and c.z==z and c.roads==roads and c.factor==factor and c.dry==dry and c.water==water and same(water and water.rows,c.waterRows) and
+            c.segment==T.Segment and c.roadCell==roadCell and c.waterCell==waterCell and c.guide==A.WalkingPortalData and
             c.w==z.w and c.h==z.h and c.width==z.widthYards and c.height==z.heightYards and c.status==z.status and
             same(z.rows,c.rows) and same(z.groundRows,c.ground) and same(roads and roads.rows,c.roadRows) then
             table.remove(contexts,i);contexts[#contexts+1]=c;return c
@@ -68,12 +71,16 @@ local function context(map,options)
     end
     serial=serial+1
     local c={id=serial,map=map,mode=mode,z=z,roads=roads,factor=factor,w=z.w,h=z.h,width=z.widthYards,height=z.heightYards,status=z.status,
-        rows=snapshot(z.rows),ground=snapshot(z.groundRows),roadRows=snapshot(roads and roads.rows),dry=dry,water=water,waterRows=snapshot(water and water.rows)}
+        rows=snapshot(z.rows),ground=snapshot(z.groundRows),roadRows=snapshot(roads and roads.rows),dry=dry,water=water,waterRows=snapshot(water and water.rows),
+        segment=T.Segment,roadCell=roadCell,waterCell=waterCell,guide=A.WalkingPortalData}
     c.signature=signature(z,roads,factor,dry,water);contexts[#contexts+1]=c
     if #contexts>16 then
         local evicted=table.remove(contexts,1).id
         for i=#order,1,-1 do local key=order[i];local e=cache[key]
             if e.context==evicted then points=points-#e.path;cache[key]=nil;table.remove(order,i) end
+        end
+        for i=#failureOrder,1,-1 do local key=failureOrder[i]
+            if failures[key].context==evicted then failures[key]=nil;table.remove(failureOrder,i) end
         end
     end
     return c
@@ -89,6 +96,7 @@ local function geometry(path,a,b,length,z,options)
     for i,p in ipairs(path) do
         if not valid(p) or p.mapID~=a.mapID or not T.Segment(path[math.max(1,i-1)],p,options) then return false end
         if i>1 then local q=path[i-1];measured=measured+math.sqrt(((p.x-q.x)*z.widthYards)^2+((p.y-q.y)*z.heightYards)^2) end
+        if i%32==0 and T.Checkpoint then T.Checkpoint() end
     end
     return math.abs(measured-length)<.00001
 end
@@ -98,9 +106,20 @@ local function remember(key,c,path,length,reverse)
     while #order>=512 or points+#path>16384 do local old=table.remove(order,1);points=points-#cache[old].path;cache[old]=nil end
     cache[key]={path=copy(path,reverse),length=length,context=c.id};order[#order+1]=key;points=points+#path
 end
-function R.Clear() contexts={};cache={};order={};points=0 end
+local function effectiveBudget(options)
+    local budget=options.maxExpansions or options.budget or 16384
+    if finite(budget) and budget>=0 then return math.min(262144,math.floor(budget)) end
+end
+local function rememberFailure(key,c,budget)
+    local previous=failures[key]
+    if previous then previous.budget=math.max(previous.budget,budget);return end
+    if #failureOrder>=512 then failures[table.remove(failureOrder,1)]=nil end
+    failures[key]={context=c.id,budget=budget};failureOrder[#failureOrder+1]=key
+end
+function R.Clear() contexts={};cache={};order={};points=0;failures={};failureOrder={} end
 function R.Stats()
-    return {hits=counters.hits,bakedHits=counters.bakedHits,misses=counters.misses,entries=#order,points=points,contexts=#contexts}
+    return {hits=counters.hits,bakedHits=counters.bakedHits,misses=counters.misses,failureHits=counters.failureHits,
+        entries=#order,points=points,contexts=#contexts,failureEntries=#failureOrder}
 end
 function T.Path(a,b,options)
     options=type(options)=='table' and options or {}
@@ -111,7 +130,10 @@ function T.Path(a,b,options)
     if hit then
         path=copy(hit.path,reverse);length=hit.length
         -- Same source context, but still honor a changed live segment guard.
-        if path then for i,p in ipairs(path) do if not T.Segment(path[math.max(1,i-1)],p,options) then path=nil;break end end end
+        if path then for i,p in ipairs(path) do
+            if not T.Segment(path[math.max(1,i-1)],p,options) then path=nil;break end
+            if i%32==0 and T.Checkpoint then T.Checkpoint() end
+        end end
     end
     local baked=false
     if not path then
@@ -124,16 +146,38 @@ function T.Path(a,b,options)
             if geometry(candidate,a,b,entry.length,c.z,options) then path=candidate;length=entry.length;baked=true;remember(key,c,path,length,reverse) end
         end
     end
-    if path then
+    -- A verified unrestricted route can include a guide or road detour.
+    -- Its length does not prove a shorter bounded query is impossible.
+    -- Retain it while the bounded core search answers that separate query.
+    local rangeRetry=path and options.maxDistance and length>options.maxDistance+.000001
+    if path and not rangeRetry then
         if A.PlanningJob then A.PlanningJob.BeginPath(a.mapID) end
         counters.hits=counters.hits+1;if baked then counters.bakedHits=counters.bakedHits+1 end
-        if options.maxDistance and length>options.maxDistance+.000001 then return nil,'too long' end
         return path,length
+    end
+    -- Exhaustion records only work already attempted, never unreachability.
+    -- A finite A* allowance is directional; a different range changes its
+    -- search order too. Larger allowances must always get a fresh attempt.
+    local budget=effectiveBudget(options)
+    local failureKey=key..':'..(reverse and 'reverse' or 'forward')..':'..(options.maxDistance and string.format('%.17g',options.maxDistance) or 'unlimited')
+    -- Hierarchical searches split the allowance between stages. Unlike a
+    -- single A* frontier, smaller allowances need not follow the same order.
+    if budget and budget>=16384 and not options.maxDistance and c.guide then
+        failureKey=failureKey..':guided:'..budget
+    end
+    local failed=failures[failureKey]
+    if failed and budget and budget<=failed.budget and T.Segment(a,a,options) and T.Segment(b,b,options) then
+        local direct=math.sqrt(((a.x-b.x)*c.z.widthYards)^2+((a.y-b.y)*c.z.heightYards)^2)
+        if (not options.maxDistance or direct<=options.maxDistance+.000001) and (c.roads or not T.Segment(a,b,options)) then
+            if A.PlanningJob then A.PlanningJob.BeginPath(a.mapID) end
+            counters.failureHits=counters.failureHits+1;return nil,'budget'
+        end
     end
     counters.misses=counters.misses+1
     -- A miss must not inherit the legacy cache's stale mutable road/ground rows.
     if T.ClearPathCache then T.ClearPathCache() end
     path,length=original(a,b,options)
-    if path then remember(key,c,path,length,reverse) end
+    if path and not rangeRetry then remember(key,c,path,length,reverse)
+    elseif length=='budget' and budget then rememberFailure(failureKey,c,budget) end
     return path,length
 end

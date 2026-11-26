@@ -18,7 +18,10 @@ assert(V.directions and #V.directions>0,'remaining route must have direction che
 local a,b,c,d=S.Chevron(20,0,1,0,5)
 assert(a<20 and c<20 and b*d<0,'chevron wings must sit behind its forward tip')
 local before=J.index;V.Refresh();assert(J.index==before,'rendering cannot advance navigation')
-plan.points[4].breakBefore=true;V.Refresh();assert(not V.lines[3]:IsShown(),'progress styling cannot reconnect gaps')
+plan.points[4].breakBefore=true;V.Refresh()
+for _,line in pairs(V.lines) do
+ if line:IsShown() then assert(line.lineEnd[3]<=500,'progress styling cannot reconnect gaps') end
+end
 J.Clear();V.Show(plan,{map=1431,x=.9,y=.5,name='Preview'});V.Refresh();assert(V.lines[1].color[4]>.5,'nonactive preview stays unfaded')
 J.Install(plan);J.index=2;A.map:Show();V.Show(plan,{map=1431,x=.9,y=.5,name='Active'})
 J.index=3;V.progressDriver:GetScript('OnUpdate')(V.progressDriver,.21)
@@ -41,8 +44,8 @@ A.db.showMinimapRoute=true
 local plan={points={{worldX=-600,worldY=-500,instance=0},{worldX=-550,worldY=-500,instance=0},{worldX=-450,worldY=-500,instance=0},{worldX=-400,worldY=-500,instance=0}}}
 A.Journey={active=plan,index=3,Leg=function() end}
 A.JourneyView.DisplayPlan=function() return plan end
-R.Update();assert(R.lines[1].color[4]<.5 and R.lines[2].color[4]>.5,'minimap must share route completion colors')
-assert(#R.directions>0 and #R.directions<=3)
+R.Update();assert(R.lines[2].color[4]<.5 and R.lines[3].color[4]>.5,'both halves of the active segment use shared route progress')
+assert(#R.directions==1 and R.directions[1][1]:IsShown(),'one minimap chevron on the way ahead')
 for _,pair in ipairs(R.directions) do for _,line in ipairs(pair) do if line:IsShown() then
  for _,p in ipairs({line.lineStart,line.lineEnd}) do
   local x,y=p[3],p[4];assert(x*x+y*y>=64,'direction wings cannot cover the player arrow')

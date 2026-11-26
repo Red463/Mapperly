@@ -26,8 +26,16 @@ S.forgetButton:GetScript('OnClick')(S.forgetButton);assert(forgot==2)
 SlashCmdList.MAPPERLY('report');SlashCmdList.MAPPERLY('connections');SlashCmdList.MAPPERLY('resume');assert(opened==4,'report/resume entry points remain; connections must not open a recorder')
 for _,theme in ipairs({'gatherly','original'}) do
  A.db.theme=theme;A.Theme.Apply()
- for key,b in pairs(S.tabs) do assert(b.point[4]+b:GetWidth()<=616,'navigation sub-tabs must fit the existing settings window') end
- for _,b in ipairs({S.resumeButton,S.forgetButton,S.reportButton}) do assert(b:GetWidth()>=120) end
+ for key,b in pairs(S.tabs) do
+  b:GetScript('OnClick')(b)
+  assert(b.active and S.pages[key]:IsShown())
+  assert(b.point[4]+b:GetWidth()<=333,'navigation sub-tabs must fit the compact panel')
+  local card=S.pages[key]
+  assert(card.point[4]+card:GetWidth()<=333 and -card.point[5]+card:GetHeight()<=320)
+ end
+ for _,b in ipairs({S.resumeButton,S.forgetButton,S.reportButton}) do
+  assert(b:GetWidth()>=120 and b.point[4]+b:GetWidth()<=b:GetParent():GetWidth())
+ end
 end
 A.JourneySession=session;A.RouteReport=report
 """)

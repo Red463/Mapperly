@@ -20,7 +20,7 @@ function A.HandleMapClick(map,button,x,y)
         if waypoint then
             if A.MarkWaypointHandled then A.MarkWaypointHandled() end
             A.Navigation.ToPin(p)
-        else A.ShowNote(p.map,p.x,p.y) end
+        else A.ShowNote(p.map,p.x,p.y,nil,'notes') end
     end
     -- Consume modifier clicks before native waypoint, zone-navigation or zoom handlers.
     return true

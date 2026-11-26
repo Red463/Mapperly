@@ -1,29 +1,28 @@
 local _,A=...
-local windowWidth,windowHeight=640,746
-local function label(parent,text,x,y,font) return A.Dialogs.Label(parent,text,x,y,font) end
-local function panel(parent,x,y,width,height) return A.Dialogs.Card(parent,x,y,width,height) end
 local function changed(layout)
     if layout and A.map then A.ApplyLayout() end
     A.UpdateOpacity();A.Refresh()
 end
+
 function A.UpdateMarkerPreview()
     for _,preview in ipairs(A.markerPreviews or {}) do
         preview.icon:SetSize(A.db.iconSize,A.db.iconSize)
         A.SetPinTexture(preview.icon,preview.category,nil,A.db.iconSize)
     end
 end
-function A.ShowSettings()
+
+function A.ShowSettings(drawerKey)
     if not A.settingsWindow then A.CreateSettings() end
-    local f=A.settingsWindow
-    if CloseDropDownMenus then CloseDropDownMenus() end
-    f:SetScale(math.min(1,(UIParent:GetWidth()-40)/windowWidth,(UIParent:GetHeight()-40)/windowHeight))
-    A.SyncSettings();f:Show();f:Raise()
+    A.SyncSettings()
+    A.Dialogs.Show(A.settingsWindow,drawerKey)
 end
+
 function A.SyncSettings()
     if not A.settingsControls then return end
     A.settingsSyncing=true
     for key,c in pairs(A.settingsControls) do
-        if c.kind=='check' then c:SetChecked(A.db[key])
+        if key=='questPane' then c:SetChecked(A.drawerKey=='settings' and A.db.questPane or A.QuestPaneSelected())
+        elseif c.kind=='check' then c:SetChecked(A.db[key])
         elseif c.kind=='filter' then c:SetChecked(A.db.filters[key])
         elseif c.kind=='continent' then c:SetChecked(A.db.continentFilters[c.category])
         else c:SetValue(A.db[key]*c.factor);c.valueText:SetText(c.format(A.db[key]*c.factor)) end
@@ -32,112 +31,139 @@ function A.SyncSettings()
     A.settingsSyncing=nil;A.UpdateMarkerPreview()
     if A.NavigationSettings then A.NavigationSettings.Sync() end
 end
-function A.CreateSettings()
-    local f=A.Dialogs.Window('MapperlySettingsWindow','Mapperly - Settings','Map settings  |  Changes save automatically',windowWidth,windowHeight)
-    A.settingsWindow=f;A.settingsControls={};A.settingsLayerIcons={};A.markerPreviews={}
-    local display=CreateFrame('Frame',nil,f);display:SetAllPoints(f)
-    local layers=CreateFrame('Frame',nil,f);layers:SetAllPoints(f);layers:Hide()
-    local navigation=CreateFrame('Frame',nil,f);navigation:SetAllPoints(f);navigation:Hide()
-    f.displayPage=display;f.layersPage=layers;f.navigationPage=navigation
-    local function action(parent,text,x,y,width,fn,role)
-        return A.Dialogs.Action(parent,text,x,y,width,fn,role)
+
+local function check(parent,key,text,x,y,layout,kind)
+    local c=CreateFrame('CheckButton',nil,parent,'UICheckButtonTemplate')
+    local size=kind and 23 or 24
+    c:SetSize(size,size);c:SetPoint('TOPLEFT',parent,'TOPLEFT',x,-y)
+    if text then
+        local label=A.Dialogs.Label(parent,text,x+26,y+5)
+        c:SetHitRectInsets(0,-2-label:GetStringWidth(),0,0)
     end
-    A.settingsTabs={}
-    local function selectPage(page)
-        display:SetShown(page=='display');layers:SetShown(page=='layers');navigation:SetShown(page=='navigation')
-        for key,tab in pairs(A.settingsTabs) do tab.active=key==page;A.Theme.ButtonRole(tab,'tab') end
-        A.SyncSettings()
+    c.kind=kind or 'check';c.category=key
+    A.settingsControls[kind=='continent' and 'continent_'..key or key]=c
+    c:SetScript('OnClick',function(self)
+        local on=not not self:GetChecked()
+        if key=='questPane' then
+            if A.drawerKey=='settings' then A.db.questPane=on else A.SelectQuestPane(on) end
+            return
+        end
+        if kind=='continent' then A.db.continentFilters[key]=on
+        elseif kind=='filter' then A.db.filters[key]=on else A.db[key]=on end
+        changed(layout)
+    end)
+end
+
+local function slider(parent,key,text,x,y,width,lo,hi,step,factor,layout,format)
+    local U=A.Dialogs
+    U.Label(parent,text,x,y,'GameFontNormalSmall')
+    local s=CreateFrame('Slider',nil,parent,'BackdropTemplate')
+    s.kind='slider';s.factor=factor;s.format=format
+    s:SetOrientation('HORIZONTAL');s:SetSize(width,16);s:SetPoint('TOPLEFT',parent,'TOPLEFT',x,-y-21)
+    s:SetBackdrop({bgFile='Interface\\Buttons\\UI-SliderBar-Background',edgeFile='Interface\\Buttons\\UI-SliderBar-Border',tile=true,tileSize=8,edgeSize=8,insets={left=3,right=3,top=3,bottom=3}})
+    s:SetThumbTexture('Interface\\Buttons\\UI-SliderBar-Button-Horizontal')
+    local thumb=s:GetThumbTexture();if thumb then thumb:SetSize(24,24) end
+    s:SetMinMaxValues(lo,hi);s:SetValueStep(step);s:SetObeyStepOnDrag(true)
+    s:EnableMouse(true);s:SetHitRectInsets(0,0,-4,-4)
+    s.valueText=U.Label(parent,'',x+width-38,y,'GameFontHighlightSmall')
+    s.valueText:SetWidth(38);s.valueText:SetJustifyH('RIGHT')
+    A.settingsControls[key]=s
+    s:SetScript('OnValueChanged',function(_,v)
+        if A.settingsSyncing then return end
+        v=math.max(lo,math.min(hi,math.floor((v-lo)/step+.5)*step+lo))
+        A.db[key]=v/factor;s.valueText:SetText(format(v))
+        if key=='iconSize' then A.UpdateMarkerPreview() end
+        changed(layout)
+    end)
+end
+
+local function buildDisplay(display)
+    local U=A.Dialogs
+    local general=CreateFrame('Frame',nil,display);general:SetAllPoints(display)
+    local sizes=CreateFrame('Frame',nil,display);sizes:SetAllPoints(display)
+    local tabs={}
+    local function selectSize(selected)
+        general:SetShown(not selected);sizes:SetShown(selected)
+        tabs.general.active=not selected;tabs.general:UpdateVisual()
+        tabs.sizes.active=selected;tabs.sizes:UpdateVisual()
     end
-    A.settingsTabs.display=action(f,'Map appearance',24,88,170,function() selectPage('display') end,'tab')
-    A.settingsTabs.layers=action(f,'Location layers',202,88,170,function() selectPage('layers') end,'tab')
-    A.settingsTabs.navigation=action(f,'Navigation',380,88,170,function() selectPage('navigation') end,'tab')
-    A.settingsTabs.display.active=true;A.Theme.ButtonRole(A.settingsTabs.display,'tab');A.Theme.ButtonRole(A.settingsTabs.layers,'tab');A.Theme.ButtonRole(A.settingsTabs.navigation,'tab')
-    local themes=panel(f,24,132,592,58)
-    label(themes,'Appearance theme',16,21,'GameFontNormal')
+    tabs.general=U.Action(display,'General',10,84,151,function() selectSize(false) end,'choice')
+    tabs.sizes=U.Action(display,'Size & opacity',165,84,151,function() selectSize(true) end,'choice')
+    selectSize(false)
+
+    local theme=U.Card(general,10,117,306,60)
+    U.Label(theme,'Appearance theme',8,5,'GameFontNormal')
     A.themeChoices={}
-    A.themeChoices.gatherly=action(themes,'Default',220,15,166,function() A.Theme.Set('gatherly') end)
-    A.themeChoices.original=action(themes,'Minimal Charcoal',394,15,166,function() A.Theme.Set('original') end)
-    A.Theme.ButtonRole(A.themeChoices.gatherly,'choice');A.Theme.ButtonRole(A.themeChoices.original,'choice')
-    A.AttachButtonTooltip(A.themeChoices.gatherly,'Default Mapperly theme. Applies immediately.')
-    A.AttachButtonTooltip(A.themeChoices.original,'Minimal Charcoal theme. Applies immediately.')
-    local function check(parent,key,text,x,y,layout,filter)
-        local c=CreateFrame('CheckButton',nil,parent,'UICheckButtonTemplate');c:SetSize(26,26);c:SetPoint('TOPLEFT',parent,'TOPLEFT',x,-y)
-        if text then label(parent,text,x+30,y+6) end
-        c.kind=filter=='continent' and 'continent' or filter and 'filter' or 'check';c.category=key
-        A.settingsControls[filter=='continent' and 'continent_'..key or key]=c
-        c:SetScript('OnClick',function(s)
-            if filter=='continent' then A.db.continentFilters[key]=not not s:GetChecked()
-            elseif filter then A.db.filters[key]=not not s:GetChecked() else A.db[key]=not not s:GetChecked() end
-            changed(layout)
-        end)
-    end
-    local displayCard=panel(display,24,202,592,110)
-    label(displayCard,'Map display',16,12,'GameFontNormal')
-    check(displayCard,'coordinates','Show coordinates',14,38)
-    check(displayCard,'reveal','Reveal unexplored areas',306,38)
-    check(displayCard,'locked','Lock map position',14,72,true)
-    check(displayCard,'questPane','Show quest log',306,72,true)
-    local sizeCard=panel(display,24,324,592,206)
-    label(sizeCard,'Map and markers',16,12,'GameFontNormal')
-    local function slider(parent,key,text,x,y,width,lo,hi,step,factor,layout,format)
-        label(parent,text,x,y)
-        local s=CreateFrame('Slider',nil,parent,'BackdropTemplate');s.kind='slider';s.factor=factor;s.format=format
-        s:SetOrientation('HORIZONTAL');s:SetSize(width,18);s:SetPoint('TOPLEFT',parent,'TOPLEFT',x,-y-25)
-        s:SetBackdrop({bgFile='Interface\\Buttons\\UI-SliderBar-Background',edgeFile='Interface\\Buttons\\UI-SliderBar-Border',tile=true,tileSize=8,edgeSize=8,insets={left=3,right=3,top=3,bottom=3}})
-        s:SetThumbTexture('Interface\\Buttons\\UI-SliderBar-Button-Horizontal')
-        local thumb=s:GetThumbTexture();if thumb then thumb:SetSize(28,28) end
-        s:SetMinMaxValues(lo,hi);s:SetValueStep(step);s:SetObeyStepOnDrag(true)
-        s:EnableMouse(true);s:SetHitRectInsets(0,0,-6,-6)
-        s.valueText=label(parent,'',x+width-56,y,'GameFontNormal')
-        label(parent,format(lo),x,y+48,'GameFontDisableSmall')
-        local maximum=label(parent,format(hi),x+width-56,y+48,'GameFontDisableSmall');maximum:SetWidth(56);maximum:SetJustifyH('RIGHT')
-        A.settingsControls[key]=s
-        s:SetScript('OnValueChanged',function(_,v)
-            if A.settingsSyncing then return end
-            v=math.max(lo,math.min(hi,math.floor((v-lo)/step+.5)*step+lo))
-            A.db[key]=v/factor;s.valueText:SetText(format(v))
-            if key=='iconSize' then A.UpdateMarkerPreview() end
-            changed(layout)
-        end)
-    end
+    A.themeChoices.gatherly=U.Action(theme,'Default',6,25,138,function() A.Theme.Set('gatherly') end,'choice')
+    A.themeChoices.original=U.Action(theme,'Minimal Charcoal',148,25,152,function() A.Theme.Set('original') end,'choice')
+
+    local map=U.Card(general,10,183,306,85)
+    U.Label(map,'Map display',8,6,'GameFontNormal')
+    check(map,'coordinates','Coordinates',5,27)
+    check(map,'reveal','Reveal unexplored',149,27)
+    check(map,'locked','Lock position',5,54,true)
+    check(map,'questPane','Show quest log',149,54,true)
+    U.Action(general,'Reset map position',10,286,171,function() A.ResetMapPosition();changed(false) end)
+
+    local card=U.Card(sizes,10,117,306,163)
     local percent=function(v) return string.format('%d%%',v) end
-    slider(sizeCard,'scale','Compact map size',20,42,548,50,110,1,100,true,percent)
-    label(sizeCard,'Minimum size keeps the controls readable.',20,104,'GameFontDisableSmall')
-    slider(sizeCard,'iconSize','Map marker size',20,120,280,12,36,1,1,false,function(v) return string.format('%d px',v) end)
-    local previewCard=panel(sizeCard,326,108,246,82)
-    label(previewCard,'Live marker preview',12,10,'GameFontNormalSmall')
+    slider(card,'scale','Compact map',10,10,134,50,110,1,100,true,percent)
+    slider(card,'iconSize','Marker size',162,10,134,12,36,1,1,false,function(v) return string.format('%d px',v) end)
+    U.Label(card,'Marker preview',10,65,'GameFontDisableSmall')
     for i,category in ipairs({'inn','mail','dungeon','flight'}) do
-        local icon=previewCard:CreateTexture(nil,'ARTWORK');icon:SetPoint('CENTER',previewCard,'TOPLEFT',32+(i-1)*60,-52)
+        local icon=card:CreateTexture(nil,'ARTWORK');icon:SetPoint('CENTER',card,'TOPLEFT',123+(i-1)*48,-70)
         A.markerPreviews[#A.markerPreviews+1]={icon=icon,category=category}
     end
-    local opacityCard=panel(display,24,544,592,142)
-    label(opacityCard,'Compact map opacity',16,12,'GameFontNormal')
-    slider(opacityCard,'alpha','While stationary',20,42,250,20,100,5,100,false,percent)
-    slider(opacityCard,'movingAlpha','While moving',320,42,250,20,100,5,100,false,percent)
-    label(opacityCard,'The enlarged map stays fully opaque.',20,116,'GameFontDisableSmall')
-    local layerCard=panel(layers,24,202,592,454)
-    label(layerCard,'Location',16,14,'GameFontNormal')
-    label(layerCard,'Show',392,14,'GameFontNormal')
-    local continentTitle=label(layerCard,'On continents',482,14,'GameFontNormal')
-    continentTitle:SetWidth(110);continentTitle:SetJustifyH('CENTER')
+    U.Label(card,'Compact map opacity',10,95,'GameFontNormal')
+    slider(card,'alpha','Stationary',10,116,134,20,100,5,100,false,percent)
+    slider(card,'movingAlpha','Moving',162,116,134,20,100,5,100,false,percent)
+end
+
+local function buildLayers(page)
+    local U=A.Dialogs
     local names={mail='Mailboxes',inn='Inns',dungeon='Dungeon entrances',flight='Flight masters',transport='Boats and zeppelins',portal='Portals',border='Zone exits',notes='Custom notes'}
+    local card=U.Card(page,10,83,306,200)
+    U.Label(card,'Location',6,3,'GameFontNormalSmall')
+    U.Label(card,'Show',192,3,'GameFontNormalSmall')
+    U.Label(card,'Continents',240,3,'GameFontNormalSmall')
     for i,key in ipairs(A.categories) do
-        local y=38+(i-1)*46
-        local row=CreateFrame('Frame',nil,layerCard);row:SetPoint('TOPLEFT',layerCard,'TOPLEFT',8,-y);row:SetSize(576,42)
-        local bg=row:CreateTexture(nil,'BACKGROUND');bg:SetAllPoints(row);bg:SetColorTexture(1,1,1,i%2==1 and .025 or 0)
-        local icon=row:CreateTexture(nil,'ARTWORK');icon:SetPoint('LEFT',row,'LEFT',12,0);icon:SetSize(24,24)
+        local row=CreateFrame('Frame',nil,card)
+        row:SetPoint('TOPLEFT',card,'TOPLEFT',2,-(16+(i-1)*23));row:SetSize(302,23)
+        local bg=row:CreateTexture(nil,'BACKGROUND');bg:SetAllPoints(row);bg:SetColorTexture(1,1,1,i%2==1 and .035 or 0)
+        local icon=row:CreateTexture(nil,'ARTWORK');icon:SetSize(24,24);icon:SetPoint('LEFT',row,'LEFT',3,0)
         A.SetPinTexture(icon,key,nil,24);A.settingsLayerIcons[key]=icon
-        label(row,names[key],50,14)
-        check(row,key,nil,386,8,false,true)
-        check(row,key,nil,516,8,false,'continent')
+        U.Label(row,names[key],32,5)
+        check(row,key,nil,193,0,false,'filter')
+        check(row,key,nil,254,0,false,'continent')
     end
-    label(layerCard,'Show enables the layer. On continents also shows it on overview maps.',16,416,'GameFontDisableSmall')
-    local coverage=label(layers,'Bundled locations plus your discoveries.',28,668,'GameFontDisableSmall')
-    coverage:SetWidth(330);coverage:SetWordWrap(false)
-    action(layers,'Show all',376,662,112,function() for _,k in ipairs(A.categories) do A.db.filters[k]=true end;A.SyncSettings();changed() end)
-    action(layers,'Hide all',496,662,112,function() for _,k in ipairs(A.categories) do A.db.filters[k]=false end;A.SyncSettings();changed() end)
-    if A.NavigationSettings then A.NavigationSettings.Build(navigation) end
-    A.Theme.ButtonRole(action(f,'Reset map position',24,704,162,function() A.ResetMapPosition();changed(false) end),'primary')
-    A.Theme.ButtonRole(action(f,'Done',496,704,120,function() f:Hide() end),'primary')
+    local function setAll(on)
+        for _,key in ipairs(A.categories) do A.db.filters[key]=on end
+        A.SyncSettings();changed()
+    end
+    U.Action(page,'Show all',10,286,94,function() setAll(true) end)
+    U.Action(page,'Hide all',108,286,94,function() setAll(false) end)
+end
+
+function A.CreateSettings()
+    local U=A.Dialogs
+    local f=U.ToolWindow('MapperlySettingsWindow','Settings','Changes save automatically',333,320)
+    A.settingsWindow=f;A.settingsControls={};A.settingsLayerIcons={};A.markerPreviews={}
+    local pages={};A.settingsTabs={}
+    local function selectPage(selected)
+        for key,page in pairs(pages) do page:SetShown(key==selected) end
+        U.Tabs(A.settingsTabs,selected)
+        A.SyncSettings()
+    end
+    local names={display='Display',layers='Layers',navigation='Navigation'}
+    for i,key in ipairs({'display','layers','navigation'}) do
+        local page=CreateFrame('Frame',nil,f);page:SetAllPoints(f)
+        pages[key]=page;f[key..'Page']=page
+        A.settingsTabs[key]=U.Action(f,names[key],10+(i-1)*103,52,100,function() selectPage(key) end,'tab')
+    end
+    buildDisplay(pages.display)
+    buildLayers(pages.layers)
+    if A.NavigationSettings then A.NavigationSettings.Build(pages.navigation) end
+    U.Action(f,'Done',215,286,101,function() f:Hide() end)
+    selectPage('display')
     f:Hide()
 end

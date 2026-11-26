@@ -7,6 +7,19 @@ from build_roads import LocalCasc,chunks,TILE,CELL,ORIGIN
 from PIL import Image
 from lupa.lua51 import LuaRuntime
 
+def reviewed_handoffs(selected,reviews):
+    """Quarantine exact unsupported landings, never an entire zone pair."""
+    blocked={(r['a'],r['b'],*(round(v,6)for v in r['worldA']),*(round(v,6)for v in r['worldB']))
+             for r in reviews if r['status']=='withheld-unproven-approach'}
+    return [r for r in selected if (r[0],r[1],*(round(v,6)for v in r[2]),*(round(v,6)for v in r[3]))not in blocked]
+
+def select_road_crossings(candidates,reviews):
+    selected=[]
+    for a,b,p,q in sorted(reviewed_handoffs(candidates,reviews)):
+        if any(a==old[0] and b==old[1] and math.dist(p,old[2])<100 for old in selected):continue
+        selected.append((a,b,p,q))
+    return selected
+
 def select_dry_crossings(samples,recorded,score,limit=3):
     """Only receives independently dry/terrain-validated native boundaries."""
     result=[]
@@ -145,10 +158,12 @@ def main():
                 if first>second:firstID,secondID,aa,bb=second,first,b,a
                 else:firstID,secondID,aa,bb=first,second,a,b
                 candidates.append((firstID,secondID,aa,bb))
-    selected=[]
-    for a,b,p,q in sorted(candidates):
-        if any(a==old[0] and b==old[1] and math.dist(p,old[2])<100 for old in selected):continue
-        selected.append((a,b,p,q))
+    review_file=ROOT/'tools/data/crossing-handoff-review.json'
+    reviews=json.loads(review_file.read_text())if review_file.exists()else {}
+    if reviews and reviews.get('build')!=70959:raise ValueError('Handoff review build mismatch')
+    review_rows=reviews.get('handoffs',[])
+    selected=select_road_crossings(candidates,review_rows)
+    plain={pair:[(r[2],r[3])for r in reviewed_handoffs([(*pair,a,b)for a,b in points],review_rows)]for pair,points in plain.items()}
     recorded={(a,b) for a,b,_,_ in selected}
     additions=select_dry_crossings(plain,recorded,road_distance)
     for pair,record in audit.items():
@@ -181,7 +196,7 @@ def main():
     structures=out/'structure-corridors.json'
     if structures.exists():
         for key,row in json.loads(structures.read_text()).items():
-            edges.append(dict(id=len(edges)+1,a=row['a'],b=row['b'],distance=row['distance'],source='native-wmo-floor',structure=int(key)))
+            edges.append(dict(id=len(edges)+1,a=row['a'],b=row['b'],distance=row['distance'],source=row['source'],structure=int(key)))
     report=dict(build=70959,maps=maps,aliases=aliases,crossings=edges,nativeFloorOnlyMaps=sorted(excluded),method='Native MCNK area ownership/AreaTable ancestry and UiMapAssignment. Road approaches within 62.5 yards with connectors up to 120 yards permitted in both masks; otherwise up to three independently dry boundary connectors per missing pair, ranked by connected ground and road proximity. Native structure corridors require separately validated floor proofs; underground city thresholds use these floors rather than ordinary terrain boundary extraction. Deduplicate outdoor connectors within 100 yards; Great Lift excluded pending transport support.')
     (out/'inventory.json').write_text(json.dumps(report,indent=2))
     def literal(value):

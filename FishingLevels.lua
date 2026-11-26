@@ -14,17 +14,61 @@ function A.FishingLabel(map)
     local recommended=rec==highRec and tostring(rec) or rec..'–'..highRec
     return 'Fishing: '..minimum..'+ · Recommended: '..recommended
 end
+local function hoverDescription(label,fishing)
+    local description=label.Description
+    if type(description)~='table' and type(description)~='userdata' then return end
+    if fishing then
+        if not label.mapperlyDescriptionPoints then
+            local points={};label.mapperlyDescriptionPoints=points
+            for i=1,(description:GetNumPoints() or 1) do
+                local point,relative,anchor,x,y=description:GetPoint(i)
+                if point then points[#points+1]={point,relative,anchor,x,y} end
+            end
+        end
+        description:ClearAllPoints();description:SetPoint('TOP',fishing,'BOTTOM',0,-6)
+    elseif label.mapperlyDescriptionPoints then
+        description:ClearAllPoints()
+        for _,point in ipairs(label.mapperlyDescriptionPoints) do description:SetPoint(unpack(point)) end
+        label.mapperlyDescriptionPoints=nil
+    end
+end
+function A.UpdateHoverFishing(label,map)
+    local f=label.mapperlyFishing
+    if not map then
+        label.mapperlyFishingMap=nil
+        if f then f:Hide() end
+        hoverDescription(label)
+        return
+    end
+    local scale=label:GetScale()
+    if type(scale)~='number' or scale~=scale or scale<=0 or scale==math.huge then scale=1 end
+    local width=math.max(1,A.map.ScrollContainer:GetWidth()-48)/scale
+    if f and label.mapperlyFishingMap==map and f:IsShown() and f:GetWidth()==width and f.mapperlyScale==scale then return end
+    local caption=A.FishingLabel(map)
+    if not caption then return A.UpdateHoverFishing(label) end
+    if not f then
+        -- A decorative child of the native hover label: no mouse region or
+        -- tracking/tooltip hooks that could interfere with map navigation.
+        f=label:CreateFontString(nil,'OVERLAY','GameFontHighlightSmall');label.mapperlyFishing=f
+        f.mapperlyBaseFont={f:GetFont()}
+        f:SetJustifyH('CENTER');f:SetWordWrap(false)
+        f:SetTextColor(1,1,1,1);f:SetShadowColor(0,0,0,1);f:SetShadowOffset(1,-1)
+    end
+    local font=f.mapperlyBaseFont
+    if type(font[1])=='string' then f:SetFont(font[1],14/scale,font[3]) end
+    f:ClearAllPoints();f:SetPoint('TOP',label.Name,'BOTTOM',0,-6/scale);f:SetHeight(22/scale)
+    label.mapperlyFishingMap=map;f.mapperlyScale=scale;f:SetWidth(width);f:SetText(caption);f:Show()
+    hoverDescription(label,f)
+end
 local function tooltip(f)
     local lo,rec,hi,highRec,row=A.FishingRange(f.mapID)
     if not lo then return end
     GameTooltip:SetOwner(f,'ANCHOR_BOTTOM')
-    GameTooltip:SetText('Fishing skill — published reference')
+    GameTooltip:SetText('Fishing skill')
     GameTooltip:AddLine('Minimum to fish: '..lo..(lo~=hi and '–'..hi or '')..'.',1,1,1,true)
     GameTooltip:AddLine('Recommended for reliable catches: '..rec..(rec~=highRec and '–'..highRec or '')..'.',1,1,1,true)
     if row.waters then GameTooltip:AddLine('Varies by water. '..row.waters,1,.82,0,true) end
     GameTooltip:AddLine('Includes lure skill bonuses. Pools and special waters may differ.',.8,.8,.8,true)
-    GameTooltip:AddLine('Published open-water guidance, not a live server requirement. Unverified for the current server.',.8,.8,.8,true)
-    GameTooltip:AddLine(A.FishingLevelsData.source..' · checked '..A.FishingLevelsData.checked,.65,.65,.65,true)
     GameTooltip:Show()
 end
 function A.UpdateFishingHeading()
